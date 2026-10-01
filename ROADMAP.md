@@ -464,7 +464,7 @@ izlenecek; bizim arayüz de "keyif veren" olmalı.
 | 8.1 ✅ | Havuz ekranı (giriş sayfası): iki kaynak, grup içi havuz puanı (düşük görünürlük payı korunur), istatistik aileleri, oyuncu kartı (§58) |
 | 8.2 ✅ | Takip listesi: kişi = TM kimliği (iki havuz tek kayıt), durum, not günlüğü, göz testi raporu; append-only günlük, yalnız sonucu bilinmeyen seçim göz testi sayılır (§59) |
 | 8.3 ✅ | Sofascore (DuckDuckGo ilk sonuç, tam ad + kulüp; 9/9 doğru) ve TM profili (yalnız doğrulanmış eşleşmede) — kart, takip, profil (§61) |
-| 8.4 | Görsel düzen: sayfa sayısını azalt, tutarlı kartlar, keyifli tasarım |
+| 8.4 ✅ | 13 → 11 sayfa, üç grup; Oyuncu = Profil + Scout dosyası, Veri = durum + eşleşme; kararlar sayfanın üstünde; ortak oyuncu başlığı (§62) |
 | 8.5 | Bakım: ROADMAP §1 ("Sistem şu an nerede", hâlâ 72 test diyor) ve README'yi güncelle; `use_container_width` → `width="stretch"` (41 yer, Streamlit kaldıracak) |
 
 ---

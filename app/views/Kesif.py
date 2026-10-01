@@ -295,8 +295,14 @@ ui.section("Takibe al",
 names = scored.head(60).apply(
     lambda r: f"{r.player_name} · {r.team_name} · {int(r.season)}", axis=1
 ).tolist()
-c_pick, c_btn = st.columns([3, 1])
+c_pick, c_btn, c_ac = st.columns([3, 1, 1])
 pick = c_pick.selectbox("Oyuncu", ["—"] + names, label_visibility="collapsed")
+if pick != "—" and c_ac.button("Oyuncu sayfası", icon=":material/person:",
+                               width="stretch"):
+    row = scored.head(60).iloc[names.index(pick)]
+    st.switch_page("views/Oyuncu.py", query_params={
+        "pid": int(row.player_id), "lid": int(row.league_id),
+        "sezon": int(row.season)})
 if pick != "—" and c_btn.button("Takibe al / çıkar", type="primary", width="stretch"):
     row = scored.head(60).iloc[names.index(pick)]
     added = sh.takip_api_degistir(int(row.player_id), int(row.league_id),

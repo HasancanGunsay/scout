@@ -218,15 +218,13 @@ def _ayrinti(kisi: str) -> None:
     g = gecmis[gecmis.kisi == kisi].sort_values(["season", "_tm_once"],
                                                 ascending=False)
     with st.container(border=True):
-        st.markdown(f"### {k['ad']}")
         rozet = [(TU.DURUM_ADI[k["durum"]], TU.DURUM_RENK[k["durum"]]),
                  (f"Eklendi: {TU.tarih(k['eklendi'])}", "mute")]
         if r["Mevki"] and r["Mevki"] != "—":
             rozet.append((r["Mevki"], "info"))
         if pd.notna(r["Yaş"]):
             rozet.append((f"{r['Yaş']:.1f} yaş", "mute"))
-        rozet.append((f"Şimdi: {r['Şimdi']}", "mute"))
-        ui.badges(*rozet)
+        ui.oyuncu_basligi(k["ad"], f"Şimdi: {r['Şimdi']}", rozet)
 
         sol, sag = st.columns([1, 1.15])
         with sol:
@@ -285,10 +283,10 @@ def _ayrinti(kisi: str) -> None:
                  else (son_g.arama_kulup if son_g is not None else None)),
                 b_.tm_url if b_ is not None else None)
             api_g = g[g.kaynak == HV.KAYNAK_API]
-            if len(api_g) and b2.button("Scout dosyası", icon=":material/assignment:",
+            if len(api_g) and b2.button("Oyuncu sayfası", icon=":material/person:",
                                         key=f"dosya_{kisi}", width="stretch"):
                 x = api_g.iloc[0]
-                st.switch_page("views/Scout_Dosyasi.py", query_params={
+                st.switch_page("views/Oyuncu.py", query_params={
                     "pid": int(x.player_id), "lid": int(x.league_id),
                     "sezon": int(x.season)})
 

@@ -87,41 +87,42 @@ if df.empty:
     st.stop()
 
 # ------------------------------------------------------------------ filtreler
-with st.sidebar:
-    st.header("Filtreler")
-    sezon = st.selectbox("Sezon", sorted(df.season.unique(), reverse=True),
+# 8.4: filtreler sayfanin USTUNDE (Havuz/Kesif ile ayni duzen). Kenar
+# cubugunda menunun altinda kaliyordu. Widget sirasi korunuyor (testler).
+with st.container(border=True):
+    a1, a2, a3 = st.columns([1, 2.2, 1.1])
+    sezon = a1.selectbox("Sezon", sorted(df.season.unique(), reverse=True),
                          help="Tarihsel sezon: sıralama, o günün bilgisiyle "
                               "ve eğitim verisini görmemiş modelle yapılır.")
     tur = df.loc[df.season == sezon, "tahmin_turu"].iloc[0]
     TUR_ADI = {"lig-disi CV": "lig dışı çapraz doğrulama",
                "zaman-disi": "zaman dışı (eğitimden sonraki sezon)"}
-    st.caption(f"Tahmin türü: **{TUR_ADI.get(tur, tur)}**")
-
-    olcut = st.radio("Sıralama ölçütü", list(OLCUT_ADI),
+    a1.caption(f"Tahmin türü: **{TUR_ADI.get(tur, tur)}**")
+    olcut = a2.radio("Sıralama ölçütü", list(OLCUT_ADI),
                      format_func=OLCUT_ADI.get,
                      help="'Piyasa üstü' yalnızca değerlemesi olan oyuncularda "
                           "tanımlı. 'Yalnız oyun verisi' fiyattan bağımsız "
                           "bir bakış verir.")
-    n = st.slider("Her mevkiden kaç oyuncu", 5, 50, 30, 5)
+    n = a3.slider("Her mevkiden kaç oyuncu", 5, 50, 30, 5)
 
-    st.divider()
-    tavan_m = st.slider("Fiyat tavanı (M €)", 0.25, 20.0, 5.0, 0.25,
+    b1, b2, b3, b4, b5 = st.columns([1.3, 1.3, 1, 1, 1.4])
+    tavan_m = b1.slider("Fiyat tavanı (M €)", 0.25, 20.0, 5.0, 0.25,
                         help="Sezon sonundan 1 ay önceki son piyasa değeri.")
-    degersiz = st.checkbox(
-        "Değerlemesi olmayanları dahil et", True,
+    degersiz = b1.checkbox(
+        "Değerlemesi olmayanlar dahil", True,
         help="Transfermarkt bu oyuncuya değer biçmemiş. Bu 0 € demek DEĞİL: "
              "genellikle izlenmeyen liglerin oyuncuları. Bu grup için "
              "sonuç ölçümümüz kısmen kör (doğrulanmamış).")
-    kapsam_ad = st.radio(
+    kapsam_ad = b2.radio(
         "Lig türü", ["Hepsi", "Düşük görünürlük", "İzlenen ligler"],
         help="İki grup ayrı ayrı kalibre edildi. Bir grubun kendi içindeki "
              "sıralaması kalibrasyondan etkilenmez; 'Hepsi' seçiliyken "
              "izlenen ligler öne çıkar.")
     kapsam = {"Hepsi": None, "Düşük görünürlük": "sicrama_only",
               "İzlenen ligler": "tam"}[kapsam_ad]
-    yas_max = st.slider("Azami yaş", 17.0, 23.0, 23.0, 0.5)
-    min_dk = st.slider("Asgari dakika", 450, 2500, 450, 50)
-    guv = st.multiselect("Güven etiketi", GUVENLER, default=GUVENLER,
+    yas_max = b3.slider("Azami yaş", 17.0, 23.0, 23.0, 0.5, format="%.1f")
+    min_dk = b4.slider("Asgari dakika", 450, 2500, 450, 50)
+    guv = b5.multiselect("Güven etiketi", GUVENLER, default=GUVENLER,
                          format_func=GUVEN_ADI.get)
 
 # --------------------------------------------------------------- üst bant

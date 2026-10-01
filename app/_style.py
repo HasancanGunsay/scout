@@ -140,6 +140,13 @@ p, li, .stMarkdown { font-size:.95rem; line-height:1.6; }
 .bdg-info { background:var(--c-primary-soft); color:#1E3A8A; border-color:#BFDBFE; }
 .bdg-mute { background:#F1F5F9; color:#475569; border-color:#E2E8F0; }
 
+/* --- oyuncu basligi (8.4): Havuz karti, Takip, Oyuncu ayni gorunur ---- */
+.oy-bas { margin:2px 0 10px; }
+.oy-bas .ad { font-size:1.45rem; font-weight:700; line-height:1.2;
+              letter-spacing:-.015em; color:var(--c-fg); }
+.oy-bas .alt { color:var(--c-fg-muted); font-size:.86rem; margin-top:3px; }
+.oy-bas .rz { display:flex; gap:6px; flex-wrap:wrap; margin-top:9px; }
+
 /* --- kenar cubugu ----------------------------------------------------- */
 [data-testid="stSidebar"] { background:var(--c-surface); border-right:1px solid var(--c-border); }
 [data-testid="stSidebar"] h2 { font-size:.75rem !important; font-weight:700 !important;
@@ -231,6 +238,21 @@ def badges(*items: tuple[str, str]) -> None:
         + "</div>",
         unsafe_allow_html=True,
     )
+
+
+def oyuncu_basligi(ad: str, alt: str = "",
+                   rozetler: list[tuple[str, str]] | tuple = ()) -> None:
+    """Oyuncu kartlarinin ortak basligi (8.4): ad, alt satir, rozetler.
+    Havuz karti, Takip ayrintisi ve Oyuncu sayfasi ayni gorunur."""
+    import html
+    st.markdown(
+        f'<div class="oy-bas"><div class="ad">{html.escape(str(ad))}</div>'
+        + (f'<div class="alt">{html.escape(str(alt))}</div>' if alt else "")
+        + ('<div class="rz">' + "".join(badge(html.escape(str(t)), k)
+                                        for t, k in rozetler) + "</div>"
+           if rozetler else "")
+        + "</div>",
+        unsafe_allow_html=True)
 
 
 def section(title: str, hint: str = "") -> None:

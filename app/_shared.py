@@ -19,6 +19,9 @@ ROLES_YAML = ROOT / "config" / "roles.yaml"
 
 from scout.scoring.engine import load_roles, score_role  # noqa: E402
 
+MEVKI_TR = {"Goalkeeper": "Kaleci", "Defender": "Defans",
+            "Midfielder": "Orta saha", "Attacker": "Forvet"}
+
 # Brezilya liglerinde kadro kapsami kismi (§11.10) - kullaniciya soylenmeli
 PARTIAL_COVERAGE_LEAGUES = {71, 72, 75}
 

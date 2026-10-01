@@ -260,9 +260,7 @@ def _kart(r: pd.Series) -> None:
     with st.container(border=True):
         sol, sag = st.columns([1.1, 1])
         with sol:
-            st.markdown(f"### {r.oyuncu}")
             sez = f"{int(r.season)}/{str(int(r.season) + 1)[-2:]}"
-            st.caption(f"{r.kulup} · {r.lig} · {sez}")
             rozet = [(MK.MEVKI_ADI.get(r.pos_group, r.pos_group), "info"),
                      (f"{r.yas:.1f} yaş", "mute")]
             if r.mevki and r.mevki != "—":
@@ -270,7 +268,7 @@ def _kart(r: pd.Series) -> None:
             if r.kaynak == HV.KAYNAK_API:
                 rozet.append((HV.KAPSAM_ADI[r.kapsam],
                               "warn" if r.kapsam == "sicrama_only" else "mute"))
-            ui.badges(*rozet)
+            ui.oyuncu_basligi(r.oyuncu, f"{r.kulup} · {r.lig} · {sez}", rozet)
             m1, m2, m3, m4 = st.columns(4)
             m1.metric("Havuz puanı", f"{r.havuz_puani:.0f}")
             m2.metric("Model", f"%{100 * r.model_olasilik:.0f}")
@@ -283,9 +281,9 @@ def _kart(r: pd.Series) -> None:
                          if pd.notna(r.simdi_deger) else "")
                 st.markdown(f"**Şimdi (TM, Tem 2026):** {simdi}{deger}  \n"
                             f"**Sonuç (12 ay):** {HV.SONRA_ADI[sonra_metni_kodu(r)]}")
-                if st.button("Scout dosyasında aç", icon=":material/assignment:",
+                if st.button("Oyuncu sayfasında aç", icon=":material/person:",
                              key=f"dosya_{r.anahtar}"):
-                    st.switch_page("views/Scout_Dosyasi.py", query_params={
+                    st.switch_page("views/Oyuncu.py", query_params={
                         "pid": int(r.player_id), "lid": int(r.league_id),
                         "sezon": int(r.season)})
             else:

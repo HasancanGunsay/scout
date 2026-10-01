@@ -29,29 +29,31 @@ API anahtarı `.env` dosyasında (repoya girmez). Şablon: `.env.example`.
 
 Tarayıcıda `http://localhost:8501` açılır. Sayfalar iş akışına göre gruplu:
 
-**Keşif akışı** — okyanustan havuz → takip listesi → göz testi
+**Scout** — okyanustan havuz → takip listesi → oyuncu → göz testi
 
 | Sayfa | Ne için |
 |---|---|
-| **Havuz** | Giriş sayfası. API 2022–24 (düşük görünürlük dahil) ve TM 2025/26 havuzu; grup içi havuz puanı, istatistik aileleri, oyuncu kartı (PLAN §58) |
+| **Havuz** | Giriş sayfası. API 2022–24 (düşük görünürlük dahil) ve TM 2025/26 havuzu; grup içi havuz puanı, istatistik aileleri, oyuncu kartı, Sofascore/TM bağlantısı (PLAN §58, §61) |
 | **Takip listesi** | İzlediğin oyuncular: durum, not günlüğü, **göz testi raporu**. Senin kararların sisteme buradan girer (PLAN §59) |
-| **Keşif** | Ana arama. Filtreler + rol şablonu + canlı ağırlık slider'ları. Sıralama anında güncellenir. **Güven** sütunu skordan bağımsızdır — bkz. aşağı. |
-| **Oyuncu profili** | Radar, skor açıklaması (hangi metrik ne kadar katkı verdi), rol uyumu, **benzer oyuncular** (stil bazlı — PLAN §25), video arama |
-| **Karşılaştırma** | 2-5 oyuncu yan yana. "10'u 3'e indirme" adımının aracı. |
+| **Oyuncu** | Tek oyuncu-sezonun bütün görünümü — sekmeler: **Scout dosyası** (iddia, kanıt, yörünge, emsal, riskler, verinin göremediği), **Profil** (radar, rol skorları, skor açıklaması), **Benzer oyuncular** (PLAN §62) |
+| **Karşılaştırma** | 2-5 oyuncu yan yana; takip listendekiler hazır gelir |
+
+**Analiz** — farklı merceklerle arama
+
+| Sayfa | Ne için |
+|---|---|
+| **Keşif (rol şablonu)** | Mevki + rol şablonu sayfanın üstünde; canlı ağırlık slider'ları. **Güven** sütunu skordan bağımsızdır — bkz. aşağı. |
+| **Mevki sıralaması** | Her mevkiden liste ve o listenin gerçekte ne kadar tuttuğu (güven aralığıyla) |
 | **Yükselenler** | Aynı oyuncunun 2022→2024 değişimi. Skorun kendisi değil **yönü** — sabit rol üzerinden, PLAN §24. |
+| **Kadro analizi** | Bir kadronun mevki mevki ihtiyacı |
+| **Laboratuvar** | Serbest sorgulama: dağılım grafiği, lig liderleri (metrik aileleri), doğrudan SQL |
 
-**Araçlar**
-
-| Sayfa | Ne için |
-|---|---|
-| **Laboratuvar** | Serbest sorgulama: dağılım grafiği, lig lideri, doğrudan SQL |
-
-**Veri**
+**Sistem**
 
 | Sayfa | Ne için |
 |---|---|
-| **Veri durumu** | Kota, toplama ilerlemesi, bilinen kör noktalar |
-| **Eşleşme kuyruğu** | Transfermarkt eşleştirmesinde belirsiz kalan vakaları karara bağla |
+| **Hesap defteri** | Sistemin karnesi: iddialar, kalibrasyon, senin seçimlerin |
+| **Veri** | Otomatik çalışma, kota, toplama ilerlemesi, bilinen kör noktalar; **Eşleşme kuyruğu** sekmesi |
 
 ### Skor vs Güven — karıştırma
 

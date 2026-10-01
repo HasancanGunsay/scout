@@ -4610,3 +4610,40 @@ oyuncularda (eşleşmesiz) isabet denenmedi. Sofascore verisi çekilmiyor;
 yalnız bağlantı veriliyor.
 
 Toplam **353 test**.
+
+
+## 62. FAZ 8.4 — Görsel Düzen: Daha Az Sayfa, Üstte Kararlar (1 Eki 2026)
+
+### 62.1 Yapılan
+
+- **13 sayfa → 11, üç grup.** *Scout* (Havuz → Takip listesi → Oyuncu →
+  Karşılaştırma), *Analiz* (Keşif, Mevki sıralaması, Yükselenler, Kadro,
+  Laboratuvar), *Sistem* (Hesap defteri, Veri). Menü tam açık: önceden
+  "View 3 more" sayfaları gizliyordu (kullanıcının ekran görüntüsü).
+- **Oyuncu** = eski *Oyuncu profili* + *Scout dosyası*. İkisi aynı
+  oyuncu-sezona iki açıdan bakıyordu. Sekmeler: Scout dosyası · Profil ·
+  Benzer oyuncular. Arama kutusu tüm oyuncu-sezonları kapsar;
+  Havuz/Takip/Keşif `?pid=&lid=&sezon=` ile açar. Model iddiası olmayan
+  oyuncu-sezonda (23 yaş üstü, eşleşmesiz) dosya sekmesi bunu söyler,
+  diğer sekmeler çalışır.
+- **Veri** = *Veri durumu* + *Eşleşme kuyruğu* (sekmeler; gövdeler
+  `app/_veri_durumu.py`, `app/_eslesme.py`). "Bilinen eksikler" tablosu
+  güncellendi: lig gücü ölçüldü ama uygulanmıyor, yaş eğrisi isteğe bağlı,
+  yalnız doğrulanmış TM eşleşmesi (§60).
+- **Kararlar sayfanın üstünde.** Keşif'te mevki + rol (kullanıcı "rol
+  değiştiremiyorum" dedi: seçici çalışıyordu ama kenar çubuğunda 23 ligin
+  altında kalıyordu). Mevki sıralaması filtreleri de üste alındı. Havuz
+  ve Laboratuvar zaten böyleydi.
+- **Ortak oyuncu başlığı** (`ui.oyuncu_basligi`): Havuz kartı, Takip
+  ayrıntısı ve Oyuncu sayfası aynı ad + alt satır + rozet düzenini
+  kullanıyor.
+
+### 62.2 Bulunan ve düzeltilen
+
+- Profil'deki TM bağlantısı `https://www.transfermarkt.com` önekini tam
+  adresin önüne ekliyordu (bozuk bağlantı). Artık ortak bağlantı düğmeleri
+  (§61) kullanılıyor.
+- Profil'de mevki İngilizce görünüyordu ("Midfielder").
+
+Testler: Scout dosyası testleri Oyuncu sayfasına taşındı (iddiası olmayan
+oyuncu testi eklendi), Veri ve Keşif sayfa testleri. Toplam **353 test**.

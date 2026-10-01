@@ -9,7 +9,7 @@ Sinanan iddialar:
   - sayfa iki kaynakta ve her istatistik gorunumunde acilir, ham kolon adi
     arayuze sizmaz
   - kart (?oyuncu=) acilir; gosterilen olasilik player_tahmin ile ayni
-  - Scout dosyasi ?pid=&lid=&sezon= ile o oyuncuyu secili acar
+  - (Oyuncu sayfasi parametre testi: test_oyuncu_sayfasi.py)
 """
 
 from __future__ import annotations
@@ -23,7 +23,6 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 HAVUZ = ROOT / "app" / "views" / "Havuz.py"
-DOSYA = ROOT / "app" / "views" / "Scout_Dosyasi.py"
 DB = ROOT / "data" / "scout.duckdb"
 SNAP = ROOT / "data" / "scout_ui_snapshot.duckdb"
 sys.path.insert(0, str(ROOT / "app"))
@@ -233,10 +232,10 @@ def test_kart_acilir_ve_olasilik_tek_kaynakla_ayni():
         WHERE r.season = (SELECT max(season) FROM player_ranking)
         ORDER BY t.model_olasilik DESC LIMIT 1""")
     at = _at(oyuncu=f"{pid}-{lid}-{sez}")
-    assert any(m.value == f"### {ad}" for m in at.markdown)
+    assert any(f'class="ad">{ad}<' in m.value for m in at.markdown)
     model = [m for m in at.metric if m.label == "Model"][0].value
     assert model == f"%{100 * p:.0f}"
-    assert any(b.label == "Scout dosyasında aç" for b in at.button)
+    assert any(b.label == "Oyuncu sayfasında aç" for b in at.button)
     # 8.3: Sofascore + TM; TM profili yalniz KABUL edilmis eslesmeden (§60)
     lb = {x.proto.label: x.proto.url for x in at.get("link_button")}
     prof = _ust_oyuncu(f"""SELECT p.url FROM player_links l
@@ -259,19 +258,5 @@ def test_tm_karti_acilir():
         ORDER BY model_olasilik DESC LIMIT 1""")
     at = _at(oyuncu=f"{pid}-{comp}-{sez}")
     _kaynak(at, HV.KAYNAK_TM)
-    assert any(m.value == f"### {ad}" for m in at.markdown)
+    assert any(f'class="ad">{ad}<' in m.value for m in at.markdown)
     assert any("Boy / ayak" in m.value for m in at.markdown)
-
-
-@veri_var
-def test_scout_dosyasi_parametreyle_oyuncuyu_secer():
-    # en ust degil, siradan biri: varsayilan secim zaten en ustu olurdu
-    pid, lid, sez, ad = _ust_oyuncu("""
-        SELECT player_id, league_id, season, player_name FROM player_ranking
-        WHERE season = 2023 ORDER BY model_olasilik LIMIT 1 OFFSET 40""")
-    at = AppTest.from_file(str(DOSYA), default_timeout=180)
-    at.query_params.update({"pid": str(pid), "lid": str(lid), "sezon": str(sez)})
-    at.run()
-    assert not at.exception, [str(e.value) for e in at.exception]
-    sec = [s for s in at.sidebar.selectbox if s.label == "Oyuncu"][0].value
-    assert sec.startswith(ad + " · "), sec
