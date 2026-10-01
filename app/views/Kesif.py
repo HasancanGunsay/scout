@@ -15,7 +15,7 @@ import streamlit as st
 sh.page_setup(
     "Keşif",
     "Filtreleri daralt, rol şablonunu seç, ağırlıkları kendi aramana göre ayarla. "
-    "Sıralama anında güncellenir. Beğendiklerini shortlist'e ekle.",
+    "Sıralama anında güncellenir. Beğendiklerini takibe al.",
     "search",
 )
 
@@ -275,23 +275,19 @@ st.dataframe(show, use_container_width=True, hide_index=True, height=540,
 
 sh.reliability_note(scored, thresholds.get("min_minutes_reliable", 450))
 
-# ------------------------------------------------------------------ shortlist
+# ------------------------------------------------------------------ takip
 st.divider()
-ui.section("Shortlist'e ekle",
-           "Kendin izlemek istediklerini işaretle. Karşılaştırma ekranında yan yana gelecekler.")
+ui.section("Takibe al",
+           "İzlemek istediklerini işaretle; Takip listesinde notlarını tutarsın, "
+           "Karşılaştırma ekranında yan yana gelirler.")
 names = scored.head(60).apply(
     lambda r: f"{r.player_name} · {r.team_name} · {int(r.season)}", axis=1
 ).tolist()
 c_pick, c_btn = st.columns([3, 1])
 pick = c_pick.selectbox("Oyuncu", ["—"] + names, label_visibility="collapsed")
-if pick != "—" and c_btn.button("Ekle / çıkar", type="primary", use_container_width=True):
+if pick != "—" and c_btn.button("Takibe al / çıkar", type="primary", width="stretch"):
     row = scored.head(60).iloc[names.index(pick)]
-    added = sh.toggle_shortlist({
-        "player_id": int(row.player_id), "league_id": int(row.league_id),
-        "season": int(row.season), "player_name": row.player_name,
-        "team_name": row.team_name, "role": role.key, "role_name": role.name,
-        "score": float(row.score), "age": float(row.age_season_end),
-        "minutes": int(row.minutes),
-    })
-    st.success(f"{row.player_name} shortlist'e eklendi." if added
-               else f"{row.player_name} shortlist'ten çıkarıldı.")
+    added = sh.takip_api_degistir(int(row.player_id), int(row.league_id),
+                                  int(row.season), row.player_name)
+    st.success(f"{row.player_name} takip listesine eklendi." if added
+               else f"{row.player_name} takip listesinden çıkarıldı.")

@@ -4349,3 +4349,77 @@ ve oran. Model ya da kural seçimi yok.
 - Uygulamanın giriş sayfası artık Havuz; Keşif ikinci sırada.
 
 Toplam **335 test**.
+
+
+## 59. FAZ 8.2 — Takip Listesi (1 Eki 2026)
+
+`src/scout/takip.py` (depolama + append-only günlük) · `app/_takip_ui.py`
+(ortak düğmeler) · `app/views/Takip.py` (yeni sayfa) · Havuz kartı ·
+Hesap defteri "Senin seçimlerin" · `tests/test_takip.py` (13)
+
+### 59.1 Kullanıcı isteği
+
+"Oyuncuları takibe alabildiğim bir sistem istiyorum." Oyuncu Sofascore'da
+izlenecek; bizim taraf listeyi, durumu ve notları tutar.
+
+### 59.2 Yapılan
+
+- **Kişi anahtarı = Transfermarkt kimliği** (`tm:<id>`; eşleşme yoksa
+  `api:<id>`). API 2024 havuzundan eklenen oyuncu ile TM 2025/26
+  havuzundaki aynı kişi **tek kayıt**. Takip sayfası iki havuz geçmişini
+  birlikte gösteriyor (testle korunuyor).
+- **Havuz kartı:** "Takibe al". Takipteyse durum (İzleniyor /
+  İlgileniyorum / Öncelikli / Bıraktım), hızlı not, "Takip listesinde aç".
+  Havuz tablosunda ★ sütunu.
+- **Takip listesi sayfası:** bugünkü yaş, kulüp, değer (TM Temmuz 2026),
+  ince mevki, son havuz puanı, eklerken model %, not sayısı ve son not.
+  Satıra tıklanınca: durum, zaman damgalı not günlüğü, havuz geçmişi,
+  "eklerken sistem ne diyordu", Havuzda aç / Scout dosyası, göz testi
+  raporu (eski Shortlist formu buraya taşındı), listeden çıkar (onaylı).
+  Liste ve notlar CSV olarak iniyor.
+- **Eski "Shortlist & rapor" kaldırıldı.** `reports/shortlist.json` ve
+  `scout_reports.json` hiç oluşmamıştı; taşınacak veri yoktu. Keşif ve
+  Profil düğmeleri ("Takibe al"), Karşılaştırma'nın hazır listesi ve
+  `scripts/defter.py` artık takip listesinden okuyor.
+
+### 59.3 Defter bağlantısı: göz testi ancak sonuç bilinmiyorken sınanır
+
+İki dosya var:
+- `data/takip/takip.json`: güncel liste, atomik yazılır.
+- `data/defter/takip_gunlugu.csv`: **append-only** olay günlüğü (ekle /
+  durum / not / rapor / sil).
+
+Her seçim, o andaki sistem iddiasını (model %, havuz puanı, değer) ve
+`sonuc_gorunur` bayrağını taşır. Sonradan güncellenmez.
+
+- **API 2022–24'ten seçim:** 12 aylık pencere kapalı ve sonuç Havuz'da
+  ekranda. Bu seçim **göz testi sayılmaz**. Hesap defterinde "geriye
+  dönük — döküm" kutusunda durur ve açıkça öyle yazılır.
+- **TM 2025/26'dan seçim:** sonuç 15.06.2027'ye kadar bilinmiyor. Bu
+  **gerçek sınav**. TM defteriyle aynı gün puanlanacak; sistemin aynı
+  oyuncular için ne dediği de kayıtlı.
+
+Neden: sonucu ekranda görürken "yer edindi" yazan oyuncuyu seçip sonra
+"gözüm %100 tuttu" demek, defterin bütün disiplinini boşa çıkarır.
+Silinen oyuncu günlükten silinmez: "bıraktım, sonra yıldızlaştı" da
+öğretici bir kayıttır. Bu yüzden arayüz silmek yerine durumu "Bıraktım"
+yapmayı öneriyor.
+
+**Bekleyen iş (2027):** `tm_defter.py --puanla` çalıştığında takip
+günlüğündeki ileriye dönük seçimler de aynı sonuçla puanlanacak (kullanıcı
+ile sistem karşılaştırması). Puanlama kodu o zaman yazılacak; şu an
+puanlanacak sonuç yok.
+
+### 59.4 Bulunan ve düzeltilen
+
+- **Seçim konumla saklanıyordu.** Süzgeç değişince aynı satır numarası
+  başka oyuncunun kartını açardı. Tablo anahtarı artık satır kümesinin
+  özetine bağlı; süzgeç değişince seçim sıfırlanıyor (Havuz ve Takip).
+- **Bozuk takip dosyası** sessizce boş liste sayılmıyor. Sayılsaydı ilk
+  kayıt kullanıcının listesini silerdi. Yüksek sesle duruyor (testli).
+- "1 Eki 2026'den beri" → "Eklendi: 1 Eki 2026" (ek uyumu sayıya göre
+  değişiyor).
+- Testler ve tarayıcı denemesi `SCOUT_TAKIP_DIZIN` ile geçici dizinde
+  çalıştı. Kullanıcının gerçek listesine hiç yazılmadı.
+
+Toplam **348 test**.

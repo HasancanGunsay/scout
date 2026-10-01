@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import shutil
 import sys
 from pathlib import Path
@@ -123,58 +122,116 @@ def roles():
     return load_roles(ROLES_YAML)
 
 
-# ---------------------------------------------------------------- shortlist
-SHORTLIST = ROOT / "reports" / "shortlist.json"
-REPORTS = ROOT / "reports" / "scout_reports.json"
+# ------------------------------------------------------------- havuz (8.1)
+# Havuz ve Takip sayfalari ayni cercevelerden okur: kart, takip satiri ve
+# havuz tablosu ayni sayiyi gostersin.
+@st.cache_data(ttl=300)
+def havuz_api() -> pd.DataFrame:
+    """API havuzu (player_ranking, 2022-24) + istatistikler + TM bugunku durum."""
+    import _havuz as HV
+    import _metrikler as MK
+    from scout.scoring.engine import column_for
+
+    try:
+        r = _con().sql("""
+            SELECT r.*, n.role_name, l.tm_id, o.gozlem_ay,
+                   p.current_club_name AS simdi_kulup,
+                   p.market_value_in_eur AS simdi_deger
+            FROM player_ranking r
+            LEFT JOIN player_natural_role n USING (player_id, league_id, season)
+            LEFT JOIN player_outcome o USING (player_id, league_id, season)
+            LEFT JOIN player_links l USING (player_id)
+            LEFT JOIN tm_players p ON p.player_id = l.tm_id
+        """).df()
+    except Exception:
+        return pd.DataFrame()
+    f = load_features()
+    anahtar = ["player_id", "league_id", "season"]
+    ek = [k for k in MK.TUMU if k in f.columns]
+    ek += [c for c in f.columns if c.endswith("_pct") and c != "collection_pct"]
+    # kart profilindeki yuzdeliklerin ham degerleri (katalogda olmayanlar dahil)
+    ek += [column_for(m)[:-len("_pct")] for ms in HV.API_PROFIL.values()
+           for m in ms if column_for(m)[:-len("_pct")] in f.columns]
+    ek = [c for c in dict.fromkeys(ek + ["team_name"]) if c not in r.columns]
+    r = r.merge(f[anahtar + ek], on=anahtar, how="left")
+    return HV.api_hazirla(r)
 
 
-def _read_json(path: Path, default):
-    if path.exists():
-        try:
-            return json.loads(path.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            return default
-    return default
+@st.cache_data(ttl=300)
+def havuz_tm() -> pd.DataFrame:
+    """TM 2025/26 havuzu: ileriye donuk defterdeki kayit (§56)."""
+    import _havuz as HV
+
+    try:
+        r = _con().sql("""
+            SELECT d.*, t.mac, t.tam_mac_payi, t.yedek_payi, t.kart_90,
+                   t.pm_on90, t.pm_on_goreli, t.gf_on90, t.ga_on90,
+                   t.takim_ppg, t.boy, t.ayak
+            FROM tm_iddia_defteri d
+            LEFT JOIN tm_oyuncu_sezon t USING (player_id, comp, season)
+            WHERE d.season = (SELECT max(season) FROM tm_iddia_defteri)
+        """).df()
+    except Exception:
+        return pd.DataFrame()
+    return HV.tm_hazirla(r)
 
 
-def _write_json(path: Path, data) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+# ----------------------------------------------------------- takip (8.2)
+# Eski "shortlist" (reports/shortlist.json) yerine. Dosya hic olusmamisti -
+# tasinacak veri yoktu. Depolama ve gunluk: src/scout/takip.py
+from scout import takip as TK  # noqa: E402
 
 
-def get_shortlist() -> list[dict]:
-    return _read_json(SHORTLIST, [])
+def takip_listesi() -> dict:
+    """Onbelleksiz: kucuk dosya, her tiklamada degisiyor."""
+    return TK.yukle()
 
 
-def toggle_shortlist(entry: dict) -> bool:
-    """Ekle/cikar. Doner: artik listede mi."""
-    items = get_shortlist()
-    key = (entry["player_id"], entry["league_id"], entry["season"])
-    for i, it in enumerate(items):
-        if (it["player_id"], it["league_id"], it["season"]) == key:
-            items.pop(i)
-            _write_json(SHORTLIST, items)
-            return False
-    items.append(entry)
-    _write_json(SHORTLIST, items)
+def takibe_al(r: pd.Series) -> dict:
+    """Havuz satirindan (havuz_api / havuz_tm) takibe al."""
+    api = None
+    if r.kaynak == "api":
+        api = (int(r.player_id), int(r.league_id), int(r.season))
+    return TK.ekle(
+        r.kisi, r.oyuncu, kaynak=r.kaynak, anahtar=r.anahtar,
+        sonuc_gorunur=bool(r.sonuc_gorunur),
+        model_olasilik=r.model_olasilik, havuz_puani=r.havuz_puani,
+        deger=r.deger if r.get("deger_var") == 1 else None, api=api)
+
+
+@st.cache_data(ttl=300)
+def tm_kimligi(api_player_id: int) -> int | None:
+    x = _con().execute("SELECT tm_id FROM player_links WHERE player_id = ?",
+                       [int(api_player_id)]).fetchone()
+    return int(x[0]) if x and x[0] is not None else None
+
+
+def takip_api_degistir(player_id: int, league_id: int, season: int,
+                       ad: str) -> bool:
+    """Kesif/Profil dugmesi: API oyuncu-sezonunu takibe al ya da cikar.
+    Doner: artik takipte mi.
+
+    Satir havuzdaysa (U23, >=450 dk) havuzun iddiasi kaydedilir; degilse
+    yalniz kisi. Sonucu bilinmeyen satir YOK sayilmaz: temkinli taraf
+    (sonuc_gorunur=True, goz testi sayilmaz)."""
+    kisi = TK.kisi_anahtari(tm_kimligi(player_id), player_id)
+    if TK.takipte(takip_listesi(), kisi):
+        TK.sil(kisi)
+        return False
+    h = havuz_api()
+    anahtar = f"{int(player_id)}-{int(league_id)}-{int(season)}"
+    satir = h[h.anahtar == anahtar] if len(h) else h
+    if len(satir):
+        takibe_al(satir.iloc[0])
+    else:
+        TK.ekle(kisi, ad, kaynak="api", anahtar=anahtar, sonuc_gorunur=True,
+                api=(int(player_id), int(league_id), int(season)))
     return True
 
 
-def in_shortlist(pid, lid, season) -> bool:
-    return any(
-        (it["player_id"], it["league_id"], it["season"]) == (pid, lid, season)
-        for it in get_shortlist()
-    )
-
-
-def get_reports() -> list[dict]:
-    return _read_json(REPORTS, [])
-
-
-def add_report(rep: dict) -> None:
-    reps = get_reports()
-    reps.append(rep)
-    _write_json(REPORTS, reps)
+def takipte_api(player_id: int) -> bool:
+    kisi = TK.kisi_anahtari(tm_kimligi(player_id), player_id)
+    return TK.takipte(takip_listesi(), kisi)
 
 
 # ---------------------------------------------------------------- uyarilar

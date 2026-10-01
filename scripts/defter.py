@@ -11,7 +11,6 @@ ASLA guncellenmez. Bir iddianin degeri, geri alinamamasindan gelir.
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from pathlib import Path
 
@@ -30,7 +29,6 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 DB = ROOT / "data" / "scout.duckdb"
-SHORTLIST = ROOT / "reports" / "shortlist.json"
 ILK_N = 50           # her sezon-kapsam icin kac iddia kaydedilsin
 YEDEK = ROOT / "data" / "defter" / "iddia_defteri.csv"   # git'te izlenir
 
@@ -154,16 +152,15 @@ def rapor(con) -> None:
         print("  Bos. BU NORMAL: elimizdeki en yeni sezon 2024 ve onun")
         print("  12 aylik penceresi kapandi. 2025 API'de acilinca dolar.")
 
-    # kullanici secimleriyle ortusme
-    if SHORTLIST.exists():
-        try:
-            sl = json.loads(SHORTLIST.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            sl = []
+    # kullanici secimleriyle ortusme (8.2: takip listesi; shortlist.json
+    # hic olusmamisti). GERIYE DONUK: secerken sonuc ekrandaydi.
+    from scout import takip
+    sl = takip.api_secimleri(takip.yukle())
+    if sl:
         o = kullanici_ortusmesi(sl, pd.concat([retro, pro]))
         if o.get("n"):
-            print(f"\n--- SENIN SECIMLERIN ---")
-            print(f"  shortlist'te defterde olan : {o['n']}")
+            print(f"\n--- SENIN SECIMLERIN (geriye donuk, goz testi DEGIL) ---")
+            print(f"  takipte defterde olan      : {o['n']}")
             print(f"  ortalama model olasiligi   : %{100 * o['ort_model']:.1f} "
                   f"(defter geneli %{100 * o['ort_model_geneli']:.1f})")
             if o.get("gerceklesme") is not None:

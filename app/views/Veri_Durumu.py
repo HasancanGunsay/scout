@@ -125,7 +125,7 @@ scores = sh.load_scores()
 c1, c2, c3 = st.columns(3)
 c1.metric("player_features", f"{len(feats):,}")
 c2.metric("player_scores", f"{len(scores):,}")
-c3.metric("Scout raporu", f"{len(sh.get_reports()):,}")
+c3.metric("Göz testi raporu", f"{sum(len(k['raporlar']) for k in sh.takip_listesi()['oyuncular'].values()):,}")
 
 st.dataframe(
     feats.groupby(["country", "league_name", "season"])

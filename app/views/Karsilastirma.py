@@ -25,7 +25,7 @@ labels = feats.apply(
 )
 lookup = dict(zip(labels, feats.index))
 
-short = sh.get_shortlist()
+short = sh.TK.api_secimleri(sh.takip_listesi())
 default = []
 for it in short:
     m = feats[(feats.player_id == it["player_id"])
@@ -36,13 +36,13 @@ for it in short:
 
 picks = st.multiselect(
     "Oyuncular (2-5)", sorted(lookup), default=default[:5],
-    help="Shortlist'indekiler hazır geliyor.",
+    help="Takip listendekiler hazır geliyor.",
 )
 
 if len(picks) < 2:
     ui.empty_state(
         "En az 2 oyuncu seç",
-        "Shortlist'e eklediklerin buraya otomatik gelir. "
+        "Takibe aldıkların buraya otomatik gelir. "
         "Keşif ekranından oyuncu işaretleyerek başla.",
     )
     st.stop()

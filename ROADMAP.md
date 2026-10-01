@@ -103,7 +103,7 @@ scripts/
 app/
   Home.py             st.navigation girişi
   _style.py           Tasarım token'ları + CSS + bileşenler
-  _shared.py          Veri yükleme, uyarılar, shortlist
+  _shared.py          Veri yükleme, uyarılar, havuz, takip
   views/*.py          7 sayfa
 ```
 
@@ -383,7 +383,7 @@ Sistemin verdiği her iddia tarihiyle kaydedilir. Sonuç geldiğinde puanlanır.
 
 - Sistem geçen yıl ne dedi, ne oldu?
 - Hangi lig / yaş / rolde yanılıyor?
-- **Senin kararların** (shortlist, rapor) sistemle ne kadar örtüşüyor?
+- **Senin kararların** (takip listesi, rapor) sistemle ne kadar örtüşüyor?
 
 Bir scout ekibini ekip yapan şey budur: iddianın kaydı tutulur. Şu an
 hiçbir iddiamız yazılı değil, dolayısıyla hiçbiri yanlışlanamıyor.
@@ -461,7 +461,7 @@ izlenecek; bizim arayüz de "keyif veren" olmalı.
 |---|---|
 | 8.0 ✅ | Laboratuvar Liderler: metrik aileleri, ilişkili metrikler yan yana; API "pas isabeti" yüzde değil (§57) |
 | 8.1 ✅ | Havuz ekranı (giriş sayfası): iki kaynak, grup içi havuz puanı (düşük görünürlük payı korunur), istatistik aileleri, oyuncu kartı (§58) |
-| 8.2 | Takip listesi: oyuncuyu takibe al, kendi notunu yaz; defterle bağlantı ("senin seçimlerin") |
+| 8.2 ✅ | Takip listesi: kişi = TM kimliği (iki havuz tek kayıt), durum, not günlüğü, göz testi raporu; append-only günlük, yalnız sonucu bilinmeyen seçim göz testi sayılır (§59) |
 | 8.3 | Sofascore'a hızlı geçiş (ad + kulüp ile arama), TM profili |
 | 8.4 | Görsel düzen: sayfa sayısını azalt, tutarlı kartlar, keyifli tasarım |
 | 8.5 | Bakım: ROADMAP §1 ("Sistem şu an nerede", hâlâ 72 test diyor) ve README'yi güncelle; `use_container_width` → `width="stretch"` (41 yer, Streamlit kaldıracak) |

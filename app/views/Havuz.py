@@ -23,6 +23,7 @@ import _havuz as HV
 import _metrikler as MK
 import _shared as sh
 import _style as ui
+import _takip_ui as TU
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
@@ -38,48 +39,20 @@ sh.page_setup(
     "waves",
 )
 
-ANAHTAR = ["player_id", "league_id", "season"]
-
-
-@st.cache_data(ttl=300)
-def _api() -> pd.DataFrame:
-    try:
-        r = sh._con().sql("""
-            SELECT r.*, n.role_name,
-                   p.current_club_name AS simdi_kulup,
-                   p.market_value_in_eur AS simdi_deger
-            FROM player_ranking r
-            LEFT JOIN player_natural_role n USING (player_id, league_id, season)
-            LEFT JOIN player_links l USING (player_id)
-            LEFT JOIN tm_players p ON p.player_id = l.tm_id
-        """).df()
-    except Exception:
-        return pd.DataFrame()
-    f = sh.load_features()
-    ek = [k for k in MK.TUMU if k in f.columns]
-    ek += [c for c in f.columns if c.endswith("_pct") and c != "collection_pct"]
-    # kart profilindeki yüzdeliklerin ham değerleri (katalogda olmayanlar dahil)
-    ek += [column_for(m)[:-len("_pct")] for ms in HV.API_PROFIL.values()
-           for m in ms if column_for(m)[:-len("_pct")] in f.columns]
-    ek = [c for c in dict.fromkeys(ek + ["team_name"]) if c not in r.columns]
-    r = r.merge(f[ANAHTAR + ek], on=ANAHTAR, how="left")
-    return HV.api_hazirla(r)
-
-
-@st.cache_data(ttl=300)
-def _tm() -> pd.DataFrame:
-    try:
-        r = sh._con().sql("""
-            SELECT d.*, t.mac, t.tam_mac_payi, t.yedek_payi, t.kart_90,
-                   t.pm_on90, t.pm_on_goreli, t.gf_on90, t.ga_on90,
-                   t.takim_ppg, t.boy, t.ayak
-            FROM tm_iddia_defteri d
-            LEFT JOIN tm_oyuncu_sezon t USING (player_id, comp, season)
-            WHERE d.season = (SELECT max(season) FROM tm_iddia_defteri)
-        """).df()
-    except Exception:
-        return pd.DataFrame()
-    return HV.tm_hazirla(r)
+# ?oyuncu=<anahtar> ile gelindiyse (takip listesinden "Havuzda aç") kaynak ve
+# sezonu o satıra ayarla - widget'lar oluşmadan ÖNCE, anahtar başına bir kez.
+_hedef = st.query_params.get("oyuncu")
+if _hedef and st.session_state.get("hv_hedef_uygulandi") != _hedef:
+    _p = _hedef.split("-")
+    if len(_p) == 3 and _p[1].isdigit():
+        st.session_state["hv_kaynak"] = HV.KAYNAK_API
+        st.session_state["hv_sezon"] = int(_p[2])
+    elif len(_p) == 3:
+        st.session_state["hv_kaynak"] = HV.KAYNAK_TM
+    st.session_state["hv_hedef_uygulandi"] = _hedef
+# varsayılan session_state'ten: widget'a default verip state'i de yazmak
+# Streamlit'te uyarı kutusu çıkarır
+st.session_state.setdefault("hv_kaynak", HV.KAYNAK_API)
 
 
 def _bicim(m: MK.Metrik | None, v) -> str:
@@ -95,7 +68,7 @@ with st.container(border=True):
     a1, a2 = st.columns([1.3, 1])
     kaynak = a1.segmented_control(
         "Kaynak", [HV.KAYNAK_API, HV.KAYNAK_TM], format_func=HV.KAYNAK_ADI.get,
-        default=HV.KAYNAK_API, required=True, key="hv_kaynak")
+        required=True, key="hv_kaynak")
     dilim = a2.segmented_control(
         "Havuz dilimi", HV.DILIMLER, format_func=HV.DILIM_ADI.get,
         default=25, required=True, key="hv_dilim",
@@ -105,7 +78,7 @@ with st.container(border=True):
              "kalmaz.")
     a1.caption(HV.KAYNAK_ACIKLAMA[kaynak])
 
-    tum = _api() if kaynak == HV.KAYNAK_API else _tm()
+    tum = sh.havuz_api() if kaynak == HV.KAYNAK_API else sh.havuz_tm()
     if tum.empty:
         ui.empty_state("Havuz verisi yok",
                        "Önce `python scripts/build_ranking.py` (API) ya da "
@@ -191,7 +164,9 @@ OZET = {HV.KAYNAK_API: ["rating", "np_ga_p90_sh"],
 metrikler = OZET if gorunum == "Özet" else [m.kol for m in aileler[gorunum]]
 metrikler = [k for k in dict.fromkeys(metrikler + ek) if k in katalog]
 
+takipteki = set(sh.takip_listesi()["oyuncular"])
 t = pd.DataFrame({
+    "Takip": v.kisi.isin(takipteki).map({True: "★", False: ""}),
     "Oyuncu": v.oyuncu, "Yaş": v.yas.round(1),
     "Kulüp": v.kulup, "Lig": v.lig,
     "Mevki": v.pos_group.map(MK.MEVKI_ADI),
@@ -201,6 +176,8 @@ t = pd.DataFrame({
     "Havuz puanı": v.havuz_puani.round(0),
 })
 cfg = {
+    "Takip": st.column_config.TextColumn(
+        "★", width="small", help="Takip listende. Kartı açıp takibe al."),
     "Yaş": st.column_config.NumberColumn(format="%.1f"),
     "Dk": st.column_config.NumberColumn(format="%d"),
     "Değer (M €)": st.column_config.NumberColumn(
@@ -219,7 +196,7 @@ cfg = {
 if kaynak == HV.KAYNAK_API:
     cfg["Rol"] = st.column_config.TextColumn(
         help="Puanlama şablonlarına göre en çok uyduğu rol.")
-    t.insert(2, "Görünürlük", v.kapsam.map(
+    t.insert(3, "Görünürlük", v.kapsam.map(
         {"sicrama_only": "düşük", "tam": "izlenen"}))
     t["Şimdi"] = v.simdi_kulup.fillna("—")
     t["Sonuç (12 ay)"] = [HV.SONRA_ADI[sonra_metni_kodu(r)] for _, r in v.iterrows()]
@@ -242,9 +219,12 @@ for k in metrikler:
     cfg[m.ad] = st.column_config.NumberColumn(m.ad, format=m.bicim,
                                               help=m.aciklama or None)
 
-ev = st.dataframe(t, hide_index=True, use_container_width=True, height=520,
+ev = st.dataframe(t, hide_index=True, width="stretch", height=520,
                   column_config=cfg, on_select="rerun",
-                  selection_mode="single-row", key=f"hv_tablo_{kaynak}")
+                  selection_mode="single-row",
+                  # seçim KONUMLA saklanır: süzgeç değişince aynı konum başka
+                  # oyuncuyu gösterirdi. Anahtar satır kümesine bağlı.
+                  key=f"hv_tablo_{kaynak}_{HV.ozet_anahtar(v.anahtar)}")
 st.caption("Sütun başlığına tıklayarak sırala · bir satıra tıkla, kartı aşağıda açılsın")
 if any(k == "pass_accuracy" for k in metrikler):
     st.info("**İsabetli pas/maç (API) bir yüzde değil** — maç başına isabetli "
@@ -314,6 +294,8 @@ def _kart(r: pd.Series) -> None:
                 AYAK = {"right": "sağ", "left": "sol", "both": "iki ayak"}
                 st.markdown(f"**Şimdi (TM, Tem 2026):** {gk}  \n"
                             f"**Boy / ayak:** {boy} · {AYAK.get(r.get('ayak'), '—')}")
+            st.divider()
+            TU.takip_kutusu(r)
         with sag:
             ad, yuz, ham = _profil(r)
             if not ad:
@@ -334,7 +316,7 @@ def _kart(r: pd.Series) -> None:
                               margin=dict(l=8, r=8, t=4, b=8), showlegend=False)
             fig.add_vline(x=50, line=dict(color=ui.COLORS["fg_subtle"], width=1,
                                           dash="dot"))
-            st.plotly_chart(fig, use_container_width=True, key=f"profil_{r.anahtar}")
+            st.plotly_chart(fig, width="stretch", key=f"profil_{r.anahtar}")
             st.caption("50 = ortanca. " + (
                 "Kendi lig + sezon + mevki havuzunda (tüm yaşlar)."
                 if r.kaynak == HV.KAYNAK_API else
@@ -348,8 +330,11 @@ if secili:
 else:
     # ?oyuncu=<anahtar> ile doğrudan açılabilir (takip listesinden dönüş, test)
     hedef = st.query_params.get("oyuncu")
-    if hedef and (v.anahtar == hedef).any():
-        _kart(v[v.anahtar == hedef].iloc[0])
+    if hedef and (tum.anahtar == hedef).any():
+        if not (v.anahtar == hedef).any():
+            st.caption("Bu oyuncu şu anki filtrelerin dışında; kartı yine de "
+                       "açıldı.")
+        _kart(tum[tum.anahtar == hedef].iloc[0])
     else:
         ui.empty_state("Bir satıra tıkla",
                        "Oyuncunun kartı — yüzdelik profili ve bugün nerede "

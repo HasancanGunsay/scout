@@ -163,6 +163,12 @@ def grup_yuzdeligi(df: pd.DataFrame, kol: str, grup: list[str],
     return 100.0 - p if dusuk_iyi else p
 
 
+def ozet_anahtar(anahtarlar) -> str:
+    """Satır kümesinin kısa özeti (tablo widget anahtarı için)."""
+    import hashlib
+    return hashlib.md5("|".join(map(str, anahtarlar)).encode()).hexdigest()[:10]
+
+
 def sade(s: str) -> str:
     """Arama için: aksan ve büyük/küçük harf duyarsız ('Rúben' ~ 'ruben')."""
     s = str(s).replace("ı", "i").replace("İ", "i")
@@ -206,9 +212,17 @@ def filtrele(df: pd.DataFrame, *, dilim: int = 100,
 
 
 # ------------------------------------------------------- ortak şemaya çevir
-ORTAK = ["kaynak", "anahtar", "oyuncu", "yas", "kulup", "lig", "pos_group",
-         "mevki", "dk", "deger", "deger_var", "kapsam", "season",
-         "model_olasilik", "havuz_puani"]
+ORTAK = ["kaynak", "anahtar", "kisi", "oyuncu", "yas", "kulup", "lig",
+         "pos_group", "mevki", "dk", "deger", "deger_var", "kapsam", "season",
+         "model_olasilik", "havuz_puani", "sonuc_gorunur"]
+
+
+def kisi(tm_id, api_id) -> str:
+    """Takip listesinin kişi anahtarı — scout.takip.kisi_anahtari ile AYNI
+    biçim (testle korunuyor). Burada kopya: bu modül src'ye bağımlı değil."""
+    if tm_id is not None and not pd.isna(tm_id):
+        return f"tm:{int(tm_id)}"
+    return f"api:{int(api_id)}"
 
 
 def api_hazirla(raw: pd.DataFrame) -> pd.DataFrame:
@@ -223,11 +237,17 @@ def api_hazirla(raw: pd.DataFrame) -> pd.DataFrame:
     d["lig"] = d.country.map(ULKE_ADI).fillna(d.country) + " · " + d.league_name
     d["mevki"] = d.role_name.fillna("—") if "role_name" in d else "—"
     d["dk"] = d.minutes
+    tm = d.tm_id if "tm_id" in d else pd.Series(None, index=d.index)
+    d["kisi"] = [kisi(t, p) for t, p in zip(tm, d.player_id)]
+    # 12 aylık pencere kapandıysa sonuç biliniyor: o andaki seçim göz testi
+    # sayılmaz (bilinmiyorsa da sayılmaz - temkinli taraf)
+    d["sonuc_gorunur"] = (d.gozlem_ay.fillna(99) >= 12 if "gozlem_ay" in d
+                          else True)
     d["havuz_puani"] = havuz_puani(d, GRUP[KAYNAK_API])
     return d
 
 
-def tm_hazirla(raw: pd.DataFrame) -> pd.DataFrame:
+def tm_hazirla(raw: pd.DataFrame, bugun=None) -> pd.DataFrame:
     """tm_iddia_defteri (+ tm_oyuncu_sezon) → ortak şema.
 
     Sezon içinde lig değiştiren oyuncu (9 kişi) iki satırdır: iki ayrı
@@ -242,6 +262,9 @@ def tm_hazirla(raw: pd.DataFrame) -> pd.DataFrame:
     d["lig"] = d.comp.map(TM_LIG_ADI).fillna(d.comp)
     d["mevki"] = d.ince_mevki.map(lambda m: INCE_MEVKI_ADI.get(m, m)).fillna("—")
     d["kapsam"] = "tam"
+    d["kisi"] = [kisi(p, None) for p in d.player_id]
+    d["sonuc_gorunur"] = (pd.Timestamp(bugun or pd.Timestamp.today())
+                          >= pd.to_datetime(d.pencere_bitis))
     d["havuz_puani"] = havuz_puani(d, GRUP[KAYNAK_TM])
     for k in TM_PROFIL:
         if k in d:

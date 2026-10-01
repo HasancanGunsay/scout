@@ -153,18 +153,59 @@ for boyut, ad in [("kapsam", "Lig türü"), ("league_name", "Lig"),
 ui.section("Senin seçimlerin",
            "Bir scout ekibinde asıl öğrenme burada: sistem ve insan nerede "
            "ayrışıyor, ayrışınca kim haklı çıkıyor.")
-sl = sh.get_shortlist()
-o = kullanici_ortusmesi(sl, pd.concat([retro, pro]))
-if not o.get("n"):
-    st.caption("Shortlist'inde model tahmini olan oyuncu yok. Keşif "
-               "sayfasından oyuncu işaretledikçe bu bölüm dolar.")
+# 8.2: kaynak takip listesi. İki ayrı soru, iki ayrı kutu:
+#   ileriye dönük = sonuç belli DEĞİLKEN seçtiklerin -> göz testinin sınavı
+#   geriye dönük  = sonuç ekrandayken seçtiklerin   -> yalnız döküm
+from scout import takip as TK  # noqa: E402
+from scout.model.tm_defter import PENCERE_BITIS  # noqa: E402
+
+liste = sh.takip_listesi()
+secimler = list(liste["oyuncular"].values())
+if not secimler:
+    st.caption("Takip listen boş. Havuz'dan oyuncu takibe aldıkça bu bölüm "
+               "dolar.")
 else:
-    a, bb = st.columns(2)
-    a.metric("Senin seçtiklerinin model ortalaması",
-             f"%{100 * o['ort_model']:.0f}",
-             delta=f"tüm oyuncular %{100 * o['ort_model_geneli']:.0f}")
-    if o.get("gerceklesme") is not None:
-        bb.metric("Senin seçtiklerinin gerçekleşmesi",
-                  f"%{100 * o['gerceklesme']:.0f}",
-                  delta=f"tüm oyuncular %{100 * o['gerceklesme_geneli']:.0f}")
-    st.caption(f"{o['n']} oyuncu eşleşti.")
+    st.markdown("**İleriye dönük — göz testinin sınavı**")
+    ileri = [k for k in secimler if not k["ilk"]["sonuc_gorunur"]]
+    if not ileri:
+        st.caption("Henüz yok. Sonucu belli olmayan sezondan (2025/26 "
+                   "havuzu) takibe aldıkların burada sayılır.")
+    else:
+        tm = sh.havuz_tm()
+        p_sec = [k["ilk"]["model_olasilik"] for k in ileri
+                 if k["ilk"]["model_olasilik"] is not None]
+        a, bb, c = st.columns(3)
+        a.metric("Seçimin", len(ileri))
+        if p_sec and len(tm):
+            bb.metric("Seçtiklerinin model ortalaması",
+                      f"%{100 * sum(p_sec) / len(p_sec):.0f}",
+                      delta=f"havuz geneli %{100 * tm.model_olasilik.mean():.0f}",
+                      delta_color="off")
+        c.metric("Puanlanacağı tarih", PENCERE_BITIS.strftime("%d.%m.%Y"),
+                 help="Sonuç penceresi kapanınca, TM defteriyle aynı gün "
+                      "puanlanır. Sistemin aynı oyuncular için ne dediği de "
+                      "kayıtlı: kim haklı çıktı, o zaman görülecek.")
+        dag = pd.Series([k["durum"] for k in ileri]).value_counts()
+        AD = {"izle": "izleniyor", "ilgilen": "ilgileniyorum",
+              "oncelikli": "öncelikli", "birakildi": "bıraktım"}
+        st.caption("Durumların: " + " · ".join(
+            f"{AD[d]} {n}" for d, n in dag.items()))
+
+    st.markdown("**Geriye dönük — döküm, göz testi değil**")
+    o = kullanici_ortusmesi(TK.api_secimleri(liste), pd.concat([retro, pro]))
+    if not o.get("n"):
+        st.caption("2022–24 havuzundan takibe aldığın oyuncu yok.")
+    else:
+        a, bb = st.columns(2)
+        a.metric("Seçtiklerinin model ortalaması",
+                 f"%{100 * o['ort_model']:.0f}",
+                 delta=f"tüm oyuncular %{100 * o['ort_model_geneli']:.0f}",
+                 delta_color="off")
+        if o.get("gerceklesme") is not None:
+            bb.metric("Seçtiklerinin gerçekleşmesi",
+                      f"%{100 * o['gerceklesme']:.0f}",
+                      delta=f"tüm oyuncular %{100 * o['gerceklesme_geneli']:.0f}",
+                      delta_color="off")
+        st.caption(f"{o['n']} oyuncu eşleşti. Bunları seçerken 12 aylık "
+                   "sonuç belliydi (Havuz'da da görünüyor). Bu oranlar senin "
+                   "gözünü değil, seçtiğin oyuncuların profilini anlatır.")

@@ -211,18 +211,13 @@ if not mine.empty:
 st.divider()
 a, b = st.columns([1, 3])
 with a:
-    if st.button("⭐ Shortlist'e ekle / çıkar", type="primary", use_container_width=True):
-        top = mine.iloc[0] if not mine.empty else None
-        added = sh.toggle_shortlist({
-            "player_id": int(p.player_id), "league_id": int(p.league_id),
-            "season": int(p.season), "player_name": p.player_name,
-            "team_name": p.team_name,
-            "role": top.role if top is not None else "",
-            "role_name": top.role_name if top is not None else "",
-            "score": float(top.score) if top is not None else 0.0,
-            "age": float(p.age_season_end), "minutes": int(p.minutes),
-        })
-        st.success("Eklendi." if added else "Çıkarıldı.")
+    takipte = sh.takipte_api(int(p.player_id))
+    if st.button("★ Takipten çıkar" if takipte else "Takibe al",
+                 type="secondary" if takipte else "primary", width="stretch"):
+        added = sh.takip_api_degistir(int(p.player_id), int(p.league_id),
+                                      int(p.season), p.player_name)
+        st.success("Takip listesine eklendi." if added
+                   else "Takip listesinden çıkarıldı.")
 with b:
     q = str(p.player_name).replace(" ", "+")
     st.markdown(

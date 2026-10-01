@@ -29,15 +29,16 @@ API anahtarı `.env` dosyasında (repoya girmez). Şablon: `.env.example`.
 
 Tarayıcıda `http://localhost:8501` açılır. Sayfalar iş akışına göre gruplu:
 
-**Keşif akışı** — sistemin verdiği 10 → senin seçtiğin 3 → göz testi
+**Keşif akışı** — okyanustan havuz → takip listesi → göz testi
 
 | Sayfa | Ne için |
 |---|---|
+| **Havuz** | Giriş sayfası. API 2022–24 (düşük görünürlük dahil) ve TM 2025/26 havuzu; grup içi havuz puanı, istatistik aileleri, oyuncu kartı (PLAN §58) |
+| **Takip listesi** | İzlediğin oyuncular: durum, not günlüğü, **göz testi raporu**. Senin kararların sisteme buradan girer (PLAN §59) |
 | **Keşif** | Ana arama. Filtreler + rol şablonu + canlı ağırlık slider'ları. Sıralama anında güncellenir. **Güven** sütunu skordan bağımsızdır — bkz. aşağı. |
 | **Oyuncu profili** | Radar, skor açıklaması (hangi metrik ne kadar katkı verdi), rol uyumu, **benzer oyuncular** (stil bazlı — PLAN §25), video arama |
 | **Karşılaştırma** | 2-5 oyuncu yan yana. "10'u 3'e indirme" adımının aracı. |
 | **Yükselenler** | Aynı oyuncunun 2022→2024 değişimi. Skorun kendisi değil **yönü** — sabit rol üzerinden, PLAN §24. |
-| **Shortlist & rapor** | İzleme listesi + **scout rapor formu** — senin kararların sisteme buradan girer |
 
 **Araçlar**
 
