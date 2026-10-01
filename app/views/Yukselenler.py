@@ -127,7 +127,7 @@ gos["Takım (2024)"] = gos.team_name_1
 st.dataframe(
     gos[["Oyuncu", "Yaş (2022)", "Rol", "Lig (2022→2024)", "Takım (2024)",
          "2022", "2024", "Değişim"]],
-    hide_index=True, use_container_width=True, height=460,
+    hide_index=True, width="stretch", height=460,
     column_config={
         "Değişim": st.column_config.NumberColumn(
             "Değişim", format="%+.1f",
@@ -152,4 +152,4 @@ fig.update_layout(xaxis=dict(tickvals=[2022, 2024], title=None),
                   yaxis=dict(title="Skor (sabit rol)", range=[0, 100]),
                   height=430, showlegend=True,
                   legend=dict(font=dict(size=11)))
-st.plotly_chart(ui.apply_plotly(fig), use_container_width=True)
+st.plotly_chart(ui.apply_plotly(fig), width="stretch")

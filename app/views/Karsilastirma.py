@@ -75,7 +75,7 @@ info = rows[["player_name", "age_season_end", "position", "team_name", "league_n
              "minutes": "Dakika", "apps": "Maç", "rating": "Reyting",
              "height_cm": "Boy", "nationality": "Uyruk"}
 ).round(1)
-st.dataframe(info.set_index("Oyuncu").T, use_container_width=True)
+st.dataframe(info.set_index("Oyuncu").T, width="stretch")
 
 # ------------------------------------------------------------------ radar
 st.divider()
@@ -114,7 +114,7 @@ fig.update_layout(
     ),
     height=520, margin=dict(l=80, r=80, t=24, b=60),
 )
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width="stretch")
 st.caption("Değerler percentile (0-100), her oyuncunun kendi lig/sezon/mevki havuzunda.")
 
 # ------------------------------------------------------------------ metrik tablo
@@ -131,7 +131,7 @@ mdf = pd.DataFrame(tbl)
 st.dataframe(
     mdf.style.background_gradient(cmap="Blues", axis=1, vmin=0, vmax=100)
     .format("{:.0f}", na_rep="—"),
-    use_container_width=True,
+    width="stretch",
 )
 st.caption(
     "Değerler percentile (0-100); koyu mavi = kendi havuzunda üstün. "
@@ -149,6 +149,6 @@ if not sc.empty:
     st.dataframe(
         piv.style.background_gradient(cmap="Blues", axis=None, vmin=0, vmax=100)
         .format("{:.1f}", na_rep="—"),
-        use_container_width=True,
+        width="stretch",
     )
 

@@ -160,7 +160,7 @@ with st.sidebar:
         f"**{role.name}** şablonu. Kaydırarak kendi aramanı kur — "
         "sıralama anında güncellenir."
     )
-    if st.button("Şablona dön", use_container_width=True):
+    if st.button("Şablona dön", width="stretch"):
         for m in role.weights:
             st.session_state.pop(f"w_{role.key}_{m}", None)
         st.rerun()
@@ -282,7 +282,7 @@ if has_meta:
     colcfg["Değer (€)"] = st.column_config.NumberColumn("Değer (€)", format="%d")
     colcfg["Sözleşme"] = st.column_config.DateColumn("Sözleşme", format="YYYY-MM")
 
-st.dataframe(show, use_container_width=True, hide_index=True, height=540,
+st.dataframe(show, width="stretch", hide_index=True, height=540,
              column_config=colcfg)
 
 sh.reliability_note(scored, thresholds.get("min_minutes_reliable", 450))

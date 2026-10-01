@@ -214,7 +214,7 @@ def _sekme(pg: str, ad: str) -> None:
 
     t = _tablo(top)
     st.dataframe(
-        t, use_container_width=True, hide_index=True,
+        t, width="stretch", hide_index=True,
         column_config={
             "Model %": st.column_config.ProgressColumn(
                 "Model %", min_value=0, max_value=100, format="%d",

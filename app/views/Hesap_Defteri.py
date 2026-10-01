@@ -132,7 +132,7 @@ if len(k):
     fig.update_layout(height=380, xaxis_title="model ne dedi",
                       yaxis_title="ne oldu",
                       margin=dict(l=0, r=0, t=10, b=0))
-    st.plotly_chart(ui.apply_plotly(fig), use_container_width=True)
+    st.plotly_chart(ui.apply_plotly(fig), width="stretch")
     st.caption("Köşegenin **altında** kalan nokta = model fazla umutlu.")
 
 st.markdown("**Nerede yanılıyor?** `sapma > 0` = model fazla umutlu.")
@@ -147,7 +147,7 @@ for boyut, ad in [("kapsam", "Lig türü"), ("league_name", "Lig"),
                  .style.format({"model dedi": "{:.2f}",
                                 "gerçekleşen": "{:.2f}",
                                 "sapma": "{:+.3f}"}),
-                use_container_width=True, hide_index=True)
+                width="stretch", hide_index=True)
 
 # --------------------------------------------------- SENİN SEÇİMLERİN
 ui.section("Senin seçimlerin",

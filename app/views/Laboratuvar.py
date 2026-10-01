@@ -64,7 +64,7 @@ with tab1:
         ui.apply_plotly(fig)
         fig.update_layout(margin=dict(l=8, r=8, t=8, b=60))
         fig.update_traces(marker=dict(size=9, line=dict(width=0.5, color="white")))
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         st.caption(f"{len(d)} oyuncu · noktaların üzerine gelerek oyuncu adını gör")
 
 # ------------------------------------------------------------------ liderler
@@ -132,7 +132,7 @@ with tab2:
             cfg[m.ad] = st.column_config.NumberColumn(
                 m.ad + (" ▼" if k == metric else ""), format=m.bicim,
                 help=m.aciklama or None)
-        st.dataframe(t, hide_index=True, use_container_width=True, height=560,
+        st.dataframe(t, hide_index=True, width="stretch", height=560,
                      column_config=cfg)
         st.caption(f"{len(d):,} oyuncu-sezon filtreye uydu · ilk {len(top)} gösteriliyor"
                    .replace(",", "."))
@@ -158,6 +158,6 @@ LIMIT 20"""
     q = st.text_area("Sorgu", default_q, height=190)
     if st.button("Çalıştır", type="primary"):
         try:
-            st.dataframe(sh._con().sql(q).df(), use_container_width=True, hide_index=True)
+            st.dataframe(sh._con().sql(q).df(), width="stretch", hide_index=True)
         except Exception as exc:  # noqa: BLE001
             st.error(f"{type(exc).__name__}: {exc}")

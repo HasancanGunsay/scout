@@ -1,6 +1,6 @@
 # Scout — Yol Haritası ve Uygulama Rehberi
 
-**Son güncelleme:** 29 Ağustos 2026
+**Son güncelleme:** 1 Ekim 2026 (FAZ 8 sonu)
 
 > **Bu dosya ne için?**
 > Projenin *operasyonel hafızası*. Sistem şu an nerede, hangi kararlar
@@ -17,58 +17,54 @@
 
 ## 1. Sistem şu an nerede
 
-Boru hattı uçtan uca çalışıyor: **API → ham JSON → DuckDB → özellikler → skorlar → arayüz**
+Boru hattı uçtan uca çalışıyor:
+**API + Transfermarkt → DuckDB → özellikler → skorlar → sonuçlar → model →
+tahmin (tek kaynak) → havuz / takip / defter → arayüz**
 
-### Veri (29 Ağustos 2026)
-| Tablo | Satır |
-|---|---|
-| `player_season` | 32.588 |
-| `player_features` | 32.588 × 267 sütun |
-| `player_scores` | 108.669 (oyuncu × rol) |
-| `player_natural_role` | 31.678 |
-| `player_links` | 18.965 (TM eşleşmesi) |
-| `player_meta` | 12.689 |
+### Veri (1 Ekim 2026)
+| Tablo | Satır | Not |
+|---|---|---|
+| `player_features` | 37.890 × 304 sütun | API 2022–24, **75/75 lig-sezon tam** |
+| `player_scores` | 126.642 | oyuncu × rol |
+| `player_links` | 19.541 | **13.070 doğrulanmış** (A/B/manuel); `tm_id` yalnız onlarda (§60) |
+| `player_outcome` | 27.158 | 12 ay sonrası, yalnız doğrulanmış eşleşme |
+| `player_tahmin` | 4.794 | **tek doğruluk kaynağı**: U23 dışarıdan tahmin (§51) |
+| `iddia_defteri` | 386 | API defteri, append-only |
+| `tm_oyuncu_sezon` | 92.958 | Transfermarkt 2012–2025/26 (§52) |
+| `tm_iddia_defteri` | 891 | **2025/26 ileriye dönük havuz**, puanlama 15.06.2027 (§56) |
 
-### Toplama durumu
-**64/75 lig-sezon tam.** 2024: 24 lig · 2022: 24 lig · **2023: 14 lig**.
-Kalan ~495 istek ≈ **~5 gün**.
+Kullanıcı verisi: `data/takip/takip.json` (takip listesi) ve
+`data/defter/takip_gunlugu.csv` (append-only seçim günlüğü, §59).
 
 ### Kalite kapıları
-- `python -m pytest` → **72 test**
-- `python scripts/audit.py` → **32 kontrol** (27 geçiyor; 5 bilinen, §6)
-- Günlük iş her sabah denetimi de çalıştırıp log'a yazıyor
+- `python -m pytest` → **353 test**
+- `python scripts/audit.py` → **41 kontrol** (35 geçiyor · 5 bilinen sağlayıcı
+  eksiği, §6 · 1 yapısal uyarı)
+- Günlük zincir her sabah denetimi de çalıştırıp log'a yazıyor
 
-### Sistemin doğruluğu ÖLÇÜLDÜ — ve 29 Ağustos'ta DENETLENDİ (§31)
+### Neye güvenebilirsin — güncel ölçümler (ayrıntı PLAN §50–§60)
 
-Veri bilimi denetimi bootstrap güven aralıklarıyla yapıldı. Sonuç:
-
-**✅ Ayakta kalan tek güçlü iddia — sistem rastgeleden anlamlı biçimde iyi:**
-
-| Kohort · sonuç | SİSTEM − rastgele | %95 GA |
+| İddia | Sonuç | Kaynak |
 |---|---|---|
-| U23 · değer | +9,0 puan | [+2,2 , +16,9] |
-| U23 · terfi | +8,6 | [+2,7 , +14,7] |
-| Tüm yaşlar · değer | +7,5 | [+2,5 , +12,3] |
-| Tüm yaşlar · terfi | +9,1 | [+4,3 , +13,7] |
+| API modeli, U23 "12 ayda izlenen 1. ligde yer edinir mi" | lig-içi AUC **0,732** (CV 2022–23), dakika+yaştan +0,074* | §60 |
+| İzlenen ligler | model > dakika+yaş, CV ve 2024'te | §60 |
+| **Düşük görünürlük, en yeni sezon (2024)** | model **≈ dakika+yaş** (+0,006, GA ±0,08); 2022–23'te açıkça iyi | §60 |
+| Fiyat bandı | ≥5M'de bilgi katıyor; 5M altı "zayıf" (CV'de ayırt edilemiyor) | §60 |
+| TM modeli, mühürlü test 2018–21 | AUC **0,742** > dakika+yaş, > piyasa | §53 |
+| İzlenen liglerde API vs TM | TM önde (−0,025*), birleştirmek katkı vermiyor | §55, §60 |
+| Kalibrasyon | lig türüne göre Platt; koşullu ECE 0,030 (CV) | §50, §60 |
+| Olasılığın seviyesi | sezondan sezona ±4–6 puan oynar; **sıralama daha sağlam** | §54 |
+| Yeniden satış değeri | modelin seçtikleri sahada işe yarıyor, **değer artışı gösterilemedi** | §48 |
 
-**❌ Tabanlarla yapılan tüm kıyaslar gürültü içindeymiş.** "Gol sistemi
-geçiyor" (−5,0 puan, GA [−13,4 , +4,1]), "dakika U21'de en iyi",
-"kalibrasyon +0,07 kazandırıyor" — hiçbiri desteklenmiyor.
+**Gerçek sınavlar ileriye dönük:** TM 2025/26 defteri (891 U23) ve senin
+takip listenden sonucu bilinmeden yaptığın seçimler, 15.06.2027'den sonra
+puanlanacak. API 2025 sezonu açılırsa API defteri de dolar.
 
-**❌ Yaş eğrisi düzeltmesi gürültüye dayanarak ürüne alınmıştı** (§31.4).
-Özellik kaldırılmadı ama üstünlük iddiası arayüzden silindi.
+**Held-out sayacı:** API 2024'e 8 kez bakıldı (§60.4) — tükendi; model
+seçimi için kullanılamaz.
 
-**⚠️ Lig gücü kapısı sağlam kanıt değil:** rho 0,654 ama GA [0,188 , 0,890],
-üstelik varyant seçimi de aynı ölçüyle yapıldı (§31.5).
-
-**Sistemik düzeltme:** `backtest.py` artık **eşleştirilmiş bootstrap %95 GA**
-ve **lig içi AUC** basıyor. Güven aralığı olmayan bir kıyastan ürün kararı çıkmaz.
-
-**✅ Yeni araç gizli bir başarı buldu (§31.8):** sistem, değer büyümesini
-öngörmekte **piyasa değerini anlamlı biçimde geçiyor** (+0,120 AUC,
-GA [0,078 , 0,161]). Terfiyi öngörmekte ise piyasa üstün (−0,110). İkisi
-birlikte wonderkid avının tanımı: *piyasa fark etmemişken değer kazanacak
-oyuncuyu bulmak.*
+**Tarihî:** 29 Ağustos 2026 veri bilimi denetimi (bootstrap GA'lar,
+yaş eğrisi geri alındı, lig gücü kapısı) PLAN §31'de.
 
 ---
 
@@ -76,42 +72,48 @@ oyuncuyu bulmak.*
 
 ```
 config/
-  leagues.yaml        Hedef ligler, öncelik sıralı, sezon sırası
-  roles.yaml          14 rol şablonu + ağırlıklar (+ cluster kısıtı)
-src/scout/
-  ingest/apifootball.py   Kota korumalı, önbellekli, hız sınırlı API istemcisi
-  features/metrics.py     per-90 + oran metrikleri, mevki eşlemesi
-  features/shrinkage.py   Empirical Bayes (Gamma-Poisson, Beta-Binom)
-  features/percentile.py  Kohort içi 0-100 dönüşümü
-  features/age.py         Yaş bandı + KESITSEL yaş eğrisi (devre dışı, §19)
-  features/age_long.py    BOYLAMSAL yaş eğrisi - fark yöntemi (kullanımda, §26)
-  features/development.py Sezonlar arası gelişim (§24)
-  features/similarity.py  Stil benzerliği, CLR (§25)
-  features/position.py    Eksik mevki çıkarımı
-  roles/cluster.py        Doğrulanmış rol ayrımı (çift tepelilik testi)
-  resolve/matcher.py      Kimlik eşleştirme (TM ↔ API)
-  scoring/engine.py       Ağırlıklı skor + katkı ayrıştırması
+  leagues.yaml          Hedef ligler, öncelik sıralı, sezon sırası
+  roles.yaml            14 rol şablonu + ağırlıklar (+ cluster kısıtı)
+src/scout/              (yalnız ASCII kod üretir; Türkçe metin app/'te)
+  ingest/apifootball.py Kota korumalı, önbellekli, hız sınırlı API istemcisi
+  features/             metrikler, shrinkage, percentile, yaş, gelişim,
+                        benzerlik, sonuç (outcome), tm_tarih, dosya, emsal
+  roles/cluster.py      Doğrulanmış rol ayrımı (çift tepelilik testi)
+  resolve/matcher.py    TM ↔ API eşleştirme; KABUL + kabul_disini_bosalt (§60)
+  scoring/engine.py     Ağırlıklı skor + katkı ayrıştırması
+  model/                egitim, kalibrasyon, tahmin (tek kaynak), siralama,
+                        defter, tm_model, tm_defter, zaman_kalibrasyon
+  takip.py              Takip listesi + append-only seçim günlüğü (§59)
 scripts/
-  ingest_players.py   Veri toplayıcı (kaldığı yerden devam eder)
-  build_db.py         Ham JSON → player_season
-  build_features.py   → player_features (rol ayrımı burada)
-  build_links.py      → player_links, player_meta
-  build_scores.py     → player_scores, player_natural_role
-  audit.py            28 doğrulama kontrolü
-  eta.py              Toplama tahmini
-  daily_run.ps1       Günlük zincir (Görev Zamanlayıcı bunu çağırır)
+  ingest_players.py     Veri toplayıcı (kaldığı yerden devam eder)
+  build_db / build_features / build_links / build_scores
+  build_outcomes / build_sonra / build_ranking / build_emsal
+  train_model.py        API modeli (--kaydet-yalniz: üretim modeli)
+  build_tm_tarih.py · tm_model.py · tm_defter.py   Transfermarkt hattı
+  defter.py             API iddia defteri (--kaydet)
+  audit.py              41 doğrulama kontrolü
+  daily_run.ps1         Günlük zincir (Görev Zamanlayıcı bunu çağırır)
 app/
-  Home.py             st.navigation girişi
-  _style.py           Tasarım token'ları + CSS + bileşenler
-  _shared.py          Veri yükleme, uyarılar, havuz, takip
-  views/*.py          7 sayfa
+  Home.py               st.navigation: Scout / Analiz / Sistem (11 sayfa)
+  _style.py             Tasarım token'ları + CSS + bileşenler (oyuncu_basligi)
+  _shared.py            Veri yükleme, uyarılar, havuz yükleyicileri, takip
+  _havuz.py             Havuz şeması, havuz puanı, süzgeç, bağlantılar
+  _takip_ui.py          Takip düğmeleri (Havuz kartı + Takip sayfası)
+  _metrikler.py         Metrik aileleri (Laboratuvar, Havuz)
+  views/                Havuz, Takip, Oyuncu, Karşılaştırma · Keşif, Mevki
+                        sıralaması, Yükselenler, Kadro, Laboratuvar ·
+                        Hesap defteri, Veri
 ```
 
-**Boru hattı sırası kritik:**
-`ingest → build_db → build_features → build_links → build_scores → audit`
+**Günlük zincir sırası kritik** (`daily_run.ps1`):
+`ingest → build_db → build_features → build_links → build_scores →
+build_outcomes → build_sonra → build_ranking → build_emsal → defter --kaydet
+→ audit`
 
 `build_features` içinde: metrikler → **rol ayrımı** → shrinkage → percentile → yaş.
 Rol ayrımı per-90'lardan sonra, percentile'dan önce olmak zorunda (kohortu o belirliyor).
+`train_model.py --kaydet-yalniz` zincirde değil: model spesifikasyonu ya da
+veri düzeltmesi sonrası elle çalıştırılır.
 
 ---
 
@@ -451,7 +453,7 @@ lig. Düşük görünürlüklü ligler orada yok.
 | 7.5 ✅ | 2025/26 havuzu (891 U23, 14 lig) ileriye dönük deftere yazıldı; puanlama 2027-06-15 sonrası (§56) | tamam |
 | 7.6 ✅ | **Eşleşme düzeltmesi:** reddedilmiş/belirsiz TM adayları sonuç ve değerde kullanılıyordu (%26). `tm_id` artık yalnız kabulde; düşük görünürlükte 2024'te model ≈ dakika+yaş; <0,5M 'zayıf' (§60) | tamam |
 
-### FAZ 8 — Arayüz: havuz + takip (kullanıcı isteği, 1 Eki 2026)
+### FAZ 8 — Arayüz: havuz + takip · **TAMAM** (1 Eki 2026, PLAN §57–§63)
 
 Kullanıcı sistemin **tek bir isim** vermesini istemiyor: okyanustan bir
 **havuz** çıkarsın, istatistikler **liste üzerinden** incelenebilsin,
@@ -465,7 +467,7 @@ izlenecek; bizim arayüz de "keyif veren" olmalı.
 | 8.2 ✅ | Takip listesi: kişi = TM kimliği (iki havuz tek kayıt), durum, not günlüğü, göz testi raporu; append-only günlük, yalnız sonucu bilinmeyen seçim göz testi sayılır (§59) |
 | 8.3 ✅ | Sofascore (DuckDuckGo ilk sonuç, tam ad + kulüp; 9/9 doğru) ve TM profili (yalnız doğrulanmış eşleşmede) — kart, takip, profil (§61) |
 | 8.4 ✅ | 13 → 11 sayfa, üç grup; Oyuncu = Profil + Scout dosyası, Veri = durum + eşleşme; kararlar sayfanın üstünde; ortak oyuncu başlığı (§62) |
-| 8.5 | Bakım: ROADMAP §1 ("Sistem şu an nerede", hâlâ 72 test diyor) ve README'yi güncelle; `use_container_width` → `width="stretch"` (41 yer, Streamlit kaldıracak) |
+| 8.5 ✅ | Bakım: ROADMAP §1–§2 güncel (353 test, 41 denetim, 11 sayfa, model hattı); `use_container_width` → `width="stretch"` (kalan 30 yer; uyarı yok) (§63) |
 
 ---
 

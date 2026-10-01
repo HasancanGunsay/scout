@@ -70,7 +70,7 @@ def goster() -> None:
                 rows.append({"Adım": name.strip(),
                              "Sonuç": {"OK": "✔ başarılı", "BASARISIZ": "✖ başarısız",
                                        "UYARI": "! uyarı"}.get(kind, kind)})
-            st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
+            st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
 
         with st.expander("Ham log (son 60 satır)"):
             st.code("\n".join(block[-60:]), language="text")
@@ -82,7 +82,7 @@ def goster() -> None:
     # ------------------------------------------------------------------ tazelik
     c1, c2 = st.columns([3, 1])
     c1.caption(f"Analitik tablolar son güncelleme: **{sh.data_age()}**")
-    if c2.button("Veriyi tazele", use_container_width=True,
+    if c2.button("Veriyi tazele", width="stretch",
                  icon=":material/refresh:"):
         st.cache_resource.clear()
         st.cache_data.clear()
@@ -128,7 +128,7 @@ def goster() -> None:
         c1, c2 = st.columns(2)
         c1.metric("Tamamlanan lig-sezon", f"{done_n}/{len(df)}")
         c2.metric("Tahmini kalan gün", f"~{max(0, (len(df) - done_n) * 45) // 100 + 1}")
-        st.dataframe(df, hide_index=True, use_container_width=True, height=420)
+        st.dataframe(df, hide_index=True, width="stretch", height=420)
     else:
         st.info("Toplama durumu dosyası yok.")
 
@@ -148,7 +148,7 @@ def goster() -> None:
              dk900=("minutes", lambda s: (s >= 900).sum()),
              ort_dk=("minutes", "mean"))
         .round(0).reset_index(),
-        hide_index=True, use_container_width=True,
+        hide_index=True, width="stretch",
     )
 
     # ------------------------------------------------------------------ eksikler

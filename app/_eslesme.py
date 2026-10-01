@@ -93,17 +93,17 @@ def goster() -> None:
             )
 
             x, y, z = st.columns(3)
-            if x.button("✅ Aynı kişi", type="primary", use_container_width=True):
+            if x.button("✅ Aynı kişi", type="primary", width="stretch"):
                 # aday kimligi aday_tm_id'de: tm_id yalniz kabulde dolu (§60)
                 aday = row.get("aday_tm_id", row.tm_id)
                 dec[str(int(row.player_id))] = {"tm_id": int(aday), "action": "accept"}
                 save_dec(dec)
                 st.rerun()
-            if y.button("❌ Farklı kişi", use_container_width=True):
+            if y.button("❌ Farklı kişi", width="stretch"):
                 dec[str(int(row.player_id))] = {"tm_id": None, "action": "reject"}
                 save_dec(dec)
                 st.rerun()
-            if z.button("⏭️ Şimdilik atla", use_container_width=True):
+            if z.button("⏭️ Şimdilik atla", width="stretch"):
                 st.session_state.setdefault("skipped", set()).add(int(row.player_id))
                 st.rerun()
 
@@ -119,7 +119,7 @@ def goster() -> None:
                     "player_name": "API", "tm_name": "TM adayı", "tm_club": "TM kulüp",
                     "name_score": "İsim", "club_score": "Kulüp", "n_candidates": "Aday",
                 }),
-                hide_index=True, use_container_width=True, height=400,
+                hide_index=True, width="stretch", height=400,
             )
 
     # ------------------------------------------------------------------ kararlar
@@ -134,7 +134,7 @@ def goster() -> None:
                 "Karar": "kabul" if d["action"] == "accept" else "red",
                 "TM adayı": m.iloc[0].tm_name if len(m) else "—",
             })
-        st.dataframe(pd.DataFrame(drows), hide_index=True, use_container_width=True)
+        st.dataframe(pd.DataFrame(drows), hide_index=True, width="stretch")
         if st.button("Tüm kararları sıfırla"):
             save_dec({})
             st.rerun()

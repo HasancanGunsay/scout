@@ -4647,3 +4647,21 @@ Toplam **353 test**.
 
 Testler: Scout dosyası testleri Oyuncu sayfasına taşındı (iddiası olmayan
 oyuncu testi eklendi), Veri ve Keşif sayfa testleri. Toplam **353 test**.
+
+
+## 63. FAZ 8.5 — Bakım (1 Eki 2026)
+
+- `use_container_width=True` → `width="stretch"`: kalan **30 yer**
+  (Streamlit 2025 sonu itibarıyla kaldırıyor). 8.1–8.4'te yazılan kod
+  baştan yeni biçimdeydi. 11 sayfanın hepsi AppTest'te hatasız açılıyor,
+  kullanımdan kaldırma uyarısı artık çıkmıyor.
+- **ROADMAP §1–§2** güncel: tablo büyüklükleri, 75/75 lig-sezon, 353 test, 41
+  denetim, "neye güvenebilirsin" tablosu (§60 sonrası sayılarla), mimari
+  harita (model hattı, takip, havuz modülleri, 11 sayfa), günlük zincir
+  sırası. Eski §1'deki 29 Ağustos denetimi §31'e işaret ediyor.
+- **README:** denetim/test sayıları, script tablosu (model ve TM hattı).
+
+FAZ 8 tamam: havuz (8.1), takip (8.2), Sofascore/TM geçişi (8.3), görsel
+düzen (8.4), bakım (8.5). Arada FAZ 7.6 eşleşme düzeltmesi (§60).
+
+Toplam **353 test**.

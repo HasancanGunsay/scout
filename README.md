@@ -8,7 +8,7 @@ Düşük görünürlüklü liglerde genç yetenek keşfi için veri sistemi.
 | [PLAN.md](PLAN.md) | Tasarım, gerekçeler, ölçüm bulguları |
 | [GELISTIRME.md](GELISTIRME.md) | Denetim sonuçları, önceliklendirilmiş geliştirme listesi |
 
-Sistem denetimi: `python scripts/audit.py` — 32 otomatik kontrol.
+Sistem denetimi: `python scripts/audit.py` — 41 otomatik kontrol · testler: `python -m pytest` — 353 test.
 
 ## Kurulum
 
@@ -112,8 +112,15 @@ Durumu istek harcamadan görmek için:
 | `ingest_players.py` | Asıl veri toplayıcı, kaldığı yerden devam eder | kota kadar |
 | `build_db.py` | Ham JSON → `data/scout.duckdb` | **0** |
 | `build_features.py` | per-90, shrinkage, percentile, yaş → `player_features` | **0** |
+| `build_links.py` | TM ↔ API eşleşmesi → `player_links` (`tm_id` yalnız doğrulanmışta), `player_meta` | **0** |
 | `build_scores.py` | rol şablonlarıyla skorlar → `player_scores` | **0** |
-| `audit.py` | **sistem denetimi** — 32 kontrol, bozuk olanı bulur | **0** |
+| `build_outcomes.py` / `build_sonra.py` | 12 ay sonrası: izlenen 1. ligde yer edindi mi | **0** |
+| `train_model.py` | API modeli; `--kaydet-yalniz` üretim modelini yazar | **0** |
+| `build_ranking.py` | dışarıdan tahmin + kalibrasyon → `player_ranking`, `player_tahmin` | **0** |
+| `build_emsal.py` | emsal oranları → `player_emsal` | **0** |
+| `defter.py --kaydet` | API iddia defteri (append-only) | **0** |
+| `build_tm_tarih.py` · `tm_model.py` · `tm_defter.py` | Transfermarkt hattı, 2025/26 ileriye dönük defter | **0** |
+| `audit.py` | **sistem denetimi** — 41 kontrol, bozuk olanı bulur | **0** |
 | `sanity_u21.py` | veri tutarlılık denetimi | **0** |
 | `explore_transfermarkt.py` | Transfermarkt veri setini haritalar | **0** |
 | `explore_tm_depth.py` | Transfermarkt kapsam derinliği | **0** |

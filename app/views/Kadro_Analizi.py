@@ -175,7 +175,7 @@ fig = go.Figure(go.Bar(
 fig.update_layout(height=460, xaxis_title="ligin ortalama takımına göre fark",
                   yaxis_title=None, margin=dict(l=0, r=0, t=10, b=0))
 fig.add_vline(x=0, line_width=1, line_color="#475569")
-st.plotly_chart(ui.apply_plotly(fig), use_container_width=True)
+st.plotly_chart(ui.apply_plotly(fig), width="stretch")
 
 tablo = harita[["role_name", "player_name", "age_season_end", "minutes",
                 "score", "lig_taban", "fark", "derinlik", "durum"]].copy()
@@ -185,7 +185,7 @@ tablo["durum"] = tablo.durum.map(DURUM_ADI)
 st.dataframe(
     tablo.style.format({"yaş": "{:.1f}", "dk": "{:.0f}", "skor": "{:.1f}",
                         "lig tabanı": "{:.1f}", "fark": "{:+.1f}"}),
-    use_container_width=True, hide_index=True,
+    width="stretch", hide_index=True,
 )
 st.caption(
     "**derinlik** = o rolde ligin oyuncu medyanının üstünde kaç oyuncumuz var. "
@@ -224,7 +224,7 @@ if len(ozet) and ozet.dakika.sum():
     ))
     f2.update_layout(height=300, yaxis_title="dakika payı (%)",
                      xaxis_title=None, margin=dict(l=0, r=0, t=20, b=0))
-    st.plotly_chart(ui.apply_plotly(f2), use_container_width=True)
+    st.plotly_chart(ui.apply_plotly(f2), width="stretch")
 
     yasli_pay = float(ozet.loc[ozet.bant.astype(str).isin(["28-30", "31+"]), "pay"].sum())
     genc_pay = float(ozet.loc[ozet.bant.astype(str).isin(["U21", "21-23"]), "pay"].sum())
@@ -330,7 +330,7 @@ else:
         else:
             st.dataframe(
                 _benzer_tablo(b_ic, lig_sutunu=False),
-                use_container_width=True, hide_index=True,
+                width="stretch", hide_index=True,
             )
 
     with d2:
@@ -351,5 +351,5 @@ else:
         else:
             st.dataframe(
                 _benzer_tablo(b_dis, lig_sutunu=True),
-                use_container_width=True, hide_index=True,
+                width="stretch", hide_index=True,
             )

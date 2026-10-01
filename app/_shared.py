@@ -341,7 +341,7 @@ def veri_kalitesi_uyarisi(league_ids) -> None:
                 .rename(columns={"country": "Ülke", "league_name": "Lig",
                                  "season": "Sezon",
                                  "eksik_metrikler": "Yayınlanmayan metrikler"}),
-                hide_index=True, use_container_width=True,
+                hide_index=True, width="stretch",
             )
 
     if len(mac):
@@ -497,7 +497,7 @@ def lig_zorlugu_notu(league_ids) -> None:
             esle[["lig", "zorluk", "kopru"]]
             .rename(columns={"lig": "Lig", "zorluk": "Zorluk",
                              "kopru": "Köprü oyuncu"}),
-            hide_index=True, use_container_width=True,
+            hide_index=True, width="stretch",
         )
 
 
