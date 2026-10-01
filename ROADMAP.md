@@ -459,6 +459,7 @@ izlenecek; bizim arayüz de "keyif veren" olmalı.
 
 | | İş |
 |---|---|
+| 8.0 ✅ | Laboratuvar Liderler: metrik aileleri, ilişkili metrikler yan yana; API "pas isabeti" yüzde değil (§57) |
 | 8.1 | Havuz ekranı: mevki/lig/fiyat/yaş filtreli, sıralanabilir liste; API havuzu (2022–24, düşük görünürlük dahil) + TM 2025/26 havuzu |
 | 8.2 | Takip listesi: oyuncuyu takibe al, kendi notunu yaz; defterle bağlantı ("senin seçimlerin") |
 | 8.3 | Sofascore'a hızlı geçiş (ad + kulüp ile arama), TM profili |

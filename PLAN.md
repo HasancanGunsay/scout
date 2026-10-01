@@ -4225,3 +4225,51 @@ Kaleci 33 · ortalama olasılık 0,561.
 Bu sicil **yalnızca izlenen 14 ligi** kapsıyor. Projenin asıl hedefi olan
 düşük görünürlüklü ligler için ileriye dönük sicil hâlâ API'nin 2025'i
 açmasını bekliyor.
+
+
+## 57. FAZ 8.0 — Laboratuvar Liderler: Metrik Aileleri (1 Eki 2026)
+
+`app/_metrikler.py` (katalog) · `app/views/Laboratuvar.py` ·
+`tests/test_laboratuvar_sayfasi.py` (11)
+
+### 57.1 Kullanıcı isteği
+
+"Lig lideri" ekranı beğenildi, ama bir metriğe bakarken **ilişkili
+metrikler** de görünmeli: pas yüzdesine bakarken pas sayısı, pas sayısına
+bakarken yüzde. Bir oran hacmi olmadan yanıltır: 3 ikilinin 3'ünü kazanmak
+%100'dür.
+
+### 57.2 Yapılan
+
+- **Metrik kataloğu** (`app/_metrikler.py`): 8 aile (Pas ve oyun kurma, Gol
+  ve şut, Çalım ve top taşıma, İkili mücadele, Savunma, Disiplin, Kaleci,
+  Süre ve reyting), 46 metrik. Türkçe ad, biçim, yüzde ölçeği, "düşük olan
+  iyi" bilgisi ve açıklama.
+- **Liderler sekmesi:** kategori seçilir, sıralama metriği seçilir. Ailenin
+  bütün metrikleri yan yana gelir, sıralanan metrik başta ▼ ile. Yön
+  (faul/kart/yenen golde varsayılan "düşük önce"), mevki, sezon, lig, azami
+  yaş, asgari dakika, oyuncu sayısı. Başka ailelerden ek sütun eklenebilir.
+- Yaş 1 ondalık; mevki ve başlıklar Türkçe; ham kolon adı arayüze sızmıyor
+  (testle korunuyor). Dağılım grafiği de aynı Türkçe adları kullanıyor.
+  Önceki liste ~200 ham sütundu (`passes_p90_sh_agepct` gibi).
+
+### 57.3 Bulunan veri tuzağı: API'nin "pass_accuracy" alanı YÜZDE DEĞİL
+
+Kullanıcı ekranda pas yüzdesine baktığını düşünüyordu. Ölçüldü (PL 2022):
+
+| Oyuncu | 90 dk'da pas | API "accuracy" |
+|---|---|---|
+| L. Dunk | 89,1 | 80 |
+| Rúben Dias | 93,3 | 80 |
+| W. Saliba | 69,4 | 62 |
+| R. Varane | 51,7 | 41 |
+
+Değer pas hacmini izliyor (korelasyon 0,66). Düzenli oynayanlarda kabaca
+maç başına isabetli pas **sayısı**. Yedekten girenlerde tutarsız (R. Lewis:
+maç başı 17 pas, değer 42). Sıralamanın tepesine çok pas atan stoperler
+çıkıyordu. Ad artık "İsabetli pas/maç (API)", açıklamada ve sayfada "yüzde
+değil" uyarısı var. **Gerçek pas isabeti yüzdesi ücretsiz veride yok**
+(Sofascore'da var). Bu alan hiçbir modelde ya da rol şablonunda
+kullanılmıyor; etkisi yalnızca bu ekrandı.
+
+Toplam **324 test**.
