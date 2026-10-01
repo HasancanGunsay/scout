@@ -93,7 +93,9 @@ else:
 
         x, y, z = st.columns(3)
         if x.button("✅ Aynı kişi", type="primary", use_container_width=True):
-            dec[str(int(row.player_id))] = {"tm_id": int(row.tm_id), "action": "accept"}
+            # aday kimligi aday_tm_id'de: tm_id yalniz kabulde dolu (§60)
+            aday = row.get("aday_tm_id", row.tm_id)
+            dec[str(int(row.player_id))] = {"tm_id": int(aday), "action": "accept"}
             save_dec(dec)
             st.rerun()
         if y.button("❌ Farklı kişi", use_container_width=True):

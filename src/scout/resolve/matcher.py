@@ -50,6 +50,28 @@ from rapidfuzz import fuzz
 AUTO_ACCEPT_SCORE = 85.0
 REVIEW_SCORE = 65.0
 
+# Kimlik olarak KULLANILABILEN eslesmeler: otomatik kabul (A, B) + manuel
+# onay (M). C (belirsiz) ve D (reddedildi) kimlik DEGILDIR (PLAN §13.3).
+KABUL = ("A", "B", "M")
+
+
+def kabul_disini_bosalt(links: pd.DataFrame) -> pd.DataFrame:
+    """tm_id YALNIZ kabul edilmis eslesmede dolu kalir; aday aday_tm_id'de.
+
+    NEDEN (1 Eki 2026, PLAN §60): build_links her oyuncu icin "en iyi
+    adayi" tm_id'ye yaziyordu - reddedilenler dahil. Sonuc olcumu, deger
+    ozelligi, 'sonra' tablosu ve arayuz tm_id uzerinden JOIN yapiyordu ve
+    guven seviyesine bakmiyordu: sonuc satirlarinin %26'si BASKA BIR
+    KISININ kariyerinden olculdu. Filtreyi her tuketiciye tek tek
+    eklemek yerine kaynakta bosaltiyoruz: tm_id uzerinden yapilan her
+    JOIN kendiliginden dogru olur, yeni kod ayni hatayi yapamaz.
+    aday_tm_id yalniz manuel onay kuyrugu icindir.
+    """
+    out = links.copy()
+    out["aday_tm_id"] = out["tm_id"]
+    out.loc[~out["confidence"].isin(KABUL), "tm_id"] = None
+    return out
+
 
 def normalize(s: object) -> str:
     """Aksanlari soy, kucult, noktalama temizle."""

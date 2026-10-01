@@ -4423,3 +4423,155 @@ puanlanacak sonuç yok.
   çalıştı. Kullanıcının gerçek listesine hiç yazılmadı.
 
 Toplam **348 test**.
+
+
+## 60. FAZ 7.6 — Eşleşme Güveni Düzeltmesi: Sonuçlar Başka Kişinin Kariyerinden Ölçülüyordu (1 Eki 2026)
+
+`src/scout/resolve/matcher.py` (`KABUL`, `kabul_disini_bosalt`) ·
+`scripts/build_links.py` · `scripts/build_ranking.py` (`uretim_yukle`,
+`guven_etiketi`) · `scripts/audit.py` (+2 kontrol) · Eşleşme kuyruğu ·
+Mevki Sıralaması metinleri · `tests/test_matcher.py`, `tests/test_ranking.py`
+
+### 60.1 Bulgu
+
+8.3 için Transfermarkt profil bağlantısı denenirken görüldü: "T. Abed"
+(Jong PSV) → *Abdul Fatawu*, "Diegão" → *Renato Veiga*, "K. Ruiz-Atil" →
+*Dilane Bakwa*. `player_links` her API oyuncusu için **en iyi adayı**
+`tm_id`'ye yazıyordu: C (belirsiz) ve D (reddedildi) dahil. §13.3 C'nin
+"kullanılmıyor", D'nin "reddedildi" olduğunu söylüyor; `player_meta` buna
+uyuyordu. Ama şu tüketiciler `tm_id` üzerinden bağlanıp güvene
+**bakmıyordu**:
+
+| Tüketici | Sonuç |
+|---|---|
+| `build_outcomes.py` | sonuç satırlarının **%26'sı** (9.723 / 36.881) başka kişinin kariyerinden |
+| `train_model.py` (değer özelliği) | aynı satırlarda piyasa değeri başka kişinin |
+| `build_sonra.py`, Scout dosyası, Havuz, Takip | "sonra", değer, "Şimdi", takip kimliği |
+
+Model havuzunda (U23) 1.093 oyuncu-sezon; 1.027'si düşük görünürlükte
+(grubun **%29'u**). İzlenen liglerde yalnız 66. Hata FAZ 1-6'nın ilk
+sürümünden beri vardı. TM tarihi (§52–§56) etkilenmiyor; orada kimlik
+TM'nin kendisi.
+
+### 60.2 Düzeltme — yapısal
+
+`tm_id` artık **yalnız kabul edilmiş** eşleşmede (A, B, manuel M) dolu.
+Aday `aday_tm_id`'de; onu yalnız manuel onay kuyruğu kullanıyor. Filtreyi
+her tüketiciye tek tek eklemek yerine kaynakta boşaltıldı: `tm_id`
+üzerinden yapılan her JOIN kendiliğinden doğru oluyor, yeni kod aynı hatayı
+yapamıyor. Denetime iki kontrol eklendi: kabul dışı eşleşmede `tm_id` boş;
+hiçbir sonuç kabul dışı eşleşmeden ölçülmüyor. İkisi de geçiyor.
+
+Zincir yeniden çalıştı (links → outcomes → sonra → üretim modeli → ranking
+→ emsal). Model spesifikasyonu **değişmedi**; yalnız veri düzeldi
+(`train_model.py --kaydet-yalniz`).
+
+**Yan bulgu:** Ekvador 2023, 10 satırın altına düştüğü için lig-dışı CV
+onu atladı. Boş kalan 6 satırı "üretim modeli" örneklem içi tahminle
+doldurdu ve denetim bunu yakaladı. `uretim_yukle` artık yalnız sonuç
+penceresi açık satırları alıyor. O 6 oyuncunun tahmini yok, havuzda da
+yoklar.
+
+Havuz: **5.893 → 4.794** oyuncu-sezon (düşük görünürlük 3.544 → 2.511).
+
+### 60.3 Etki — aynı ölçüm, düzeltme öncesi / sonrası
+
+Lig-içi AUC, dışarıdan tahmin. Fark sütunları eşli, oyuncu bazlı
+bootstrap %95 GA.
+
+| | Önce | Sonra |
+|---|---|---|
+| **2022–23 CV, hepsi** · model | 0,744 | **0,732** |
+| model − dakika+yaş | +0,094* | +0,074* |
+| saf (piyasasız) − piyasa | −0,032* | −0,013 [−0,04 , +0,02] |
+| **2022–23 CV, düşük gör.** · model | 0,829 | **0,798** |
+| model − dakika+yaş | +0,214* | +0,156* |
+| **2022–23 CV, izlenen** · model | 0,718 | 0,715 |
+| **2024, düşük gör.** · model | 0,742 | **0,688** |
+| model − dakika+yaş | +0,102* | **+0,006 [−0,07 , +0,08]** |
+| model − saf | +0,064* | −0,043 [−0,11 , +0,03] |
+| saf − piyasa | −0,021 | **+0,111*** |
+| **2024, izlenen** · model − dakika+yaş | +0,053* | +0,045* |
+| Koşullu ECE, kalibre (CV / 2024) | 0,028 / 0,050 | 0,030 / 0,057 |
+
+**Okuma:**
+- İzlenen liglerde neredeyse hiçbir şey değişmedi.
+- Düşük görünürlükte değer özelliğinin gücü kısmen **sahteydi**. Değer ve
+  sonuç aynı yanlış kişiden geldiği için birbiriyle tutarlıydı. 2022–23'te
+  model yine açıkça iyi. **En yeni sezonda (2024) düşük görünürlükte
+  model, dakika+yaştan ayırt edilemiyor.** Piyasasız model piyasa
+  modelini geçiyor.
+- Birincil model önceden ilan edildiği gibi **tam model** kalıyor. 2024'e
+  bakıp model değiştirmek, tutulan pencerede seçim olurdu. Sonuç ekranda
+  söyleniyor (Mevki Sıralaması). Gerçek sınav ileriye dönük: API 2025
+  açılırsa o sezon, yoksa TM defteri (yalnız izlenen ligler).
+
+**Kalibrasyon:** karar kuralı (CV) yine **kapsam-koşullu Platt**'ı seçti.
+Koşullu ECE: ham 0,086 → 0,030.
+
+**Liste tepesi** (düşük görünürlük, sezon başına ilk 50, ham sıraya göre):
+
+| | ham önce | ham sonra | kalibre önce | kalibre sonra |
+|---|---|---|---|---|
+| 2022 | +0,198 | +0,239 | +0,054 | +0,062 |
+| 2023 | +0,083 | +0,100 | −0,069 | −0,085 |
+| 2024 | +0,038 | **−0,037** | −0,122 | **−0,223** |
+
+2024'te kalibre değer liste tepesinde ~22 puan kötümser; ham değer gerçeğe
+daha yakın (§50.4'ün yönü aynı, büyüklüğü arttı).
+
+**Mevki** (model − dakika+yaş): defans +0,106* → +0,087*, orta saha
++0,098* → +0,068*, **forvet +0,065* → +0,038 [−0,00 , +0,08]** (sınırda),
+kaleci +0,004 → +0,003 (n 242 → 210).
+
+**Fiyat bandı** (model − dakika+yaş, CV / kayan):
+
+| Bant | Önce | Sonra |
+|---|---|---|
+| <0,5M | +0,082* / +0,158* | **+0,033 / +0,118*** |
+| 0,5–2M, 2–5M | ≈0 / ≈0 | ≈0 / ≈0 |
+| ≥5M | +0,063* / +0,100* | +0,056* / +0,094* |
+
+En ucuz bantta *yalnız oyun verisi* (piyasasız) dakika+yaşın üstüne
+bilgi katıyor: CV +0,063*, kayan +0,110*. Tam model katmıyor.
+
+**Güven etiketi:** "iyi" için ölçüt, model − dakika+yaşın CV **ve**
+kayanda anlamlı olmasıydı (§45.2). <0,5M artık CV'de anlamlı değil.
+**Ölçüt aynı, veri düzeldi:** <0,5M "iyi"den "zayıf"a geçti. 2024
+kullanılmadı. Dağılım: iyi 1.080 · zayıf 2.416 · doğrulanmamış 1.088 ·
+düşük 210.
+
+**API vs TM (§55):** sonuç değişmedi. API − TM −0,030* → −0,025*,
+birleştirmek yine katkı vermiyor (−0,009). Rapor yeniden üretildi.
+
+**Havuz (§58), ilk %25:**
+
+| | Önce | Sonra |
+|---|---|---|
+| Havuzda (2022 / 2023 / 2024) | 484 / 476 / 522 | 414 / 384 / 409 |
+| Düşük görünürlük payı | %58–62 | %50–54 (U23 tabanıyla aynı) |
+| Olasılıkla seçilseydi düşük gör. payı | %3–6 | %0,2–4 |
+| Yer edinme: havuz / olasılık-üst | %49–53 / %70–71 | %54–57 / %73–74 |
+| Düşük gör. içinde: havuz / taban | %29–37 / %12 | %29–38 / %13–15 |
+
+### 60.4 Geçersizleşen sayılar
+
+Önceki API sonuçları (§38–§58) **silinmedi**; o günkü veriyle doğru
+yazıldılar. Bu bölümle çeliştikleri yerde **§60 geçerlidir**. Özellikle
+§45.1–45.2, §47.4, §50.2–50.4, §55 ve §58.3 tabloları. Hesap
+defterindeki eski iddialar append-only kalıyor. Kabul dışı eşleşmeli
+oyuncuların iddiaları artık sonuçsuz (sonuç ölçülemez).
+
+**Held-out sayacı:** 2024'e **8. bakış**. Düzeltme öncesi/sonrası aynı
+ölçüm, betimleyici. Model, kalibrasyon yöntemi ya da etiket ölçütü
+2024'e göre seçilmedi.
+
+### 60.5 Açık kalan
+
+- Kabul dışı eşleşmeli 1.093 oyuncu-sezon havuzdan çıktı. Model onları
+  değersiz oyuncu gibi tahmin edebilir. Sonucu ölçülemez ama "TM
+  eşleşmesi yok" etiketiyle havuza geri alınabilirler (okyanus tamlığı).
+  Ayrı bir adım; karar kullanıcıda.
+- Manuel onay kuyruğunda 1.727 C kaydı var. Onaylandıkça kapsam artar.
+
+Toplam **350 test**.

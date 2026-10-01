@@ -21,7 +21,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from scout.resolve.matcher import build_links  # noqa: E402
+from scout.resolve.matcher import build_links, kabul_disini_bosalt  # noqa: E402
 
 # Windows Gorev Zamanlayici altinda stdout cp1254'e dusuyor ve Hirvat/Polonya
 # isimlerindeki 'c' harfi (ć) tum zinciri UnicodeEncodeError ile
@@ -88,7 +88,9 @@ def main() -> int:
     """).df()
     print(f"[in]  API {len(api):,} oyuncu | TM {len(tm):,} kayit")
 
-    links = apply_decisions(build_links(api, tm))
+    # tm_id yalniz kabul edilmis eslesmede dolu (PLAN §60): asagidaki her
+    # tuketici (sonuc, deger, arayuz) tm_id uzerinden baglaniyor
+    links = kabul_disini_bosalt(apply_decisions(build_links(api, tm)))
     con.execute("CREATE OR REPLACE TABLE player_links AS SELECT * FROM links")
 
     # kabul edilenleri TM meta verisiyle birlestir

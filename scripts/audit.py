@@ -234,6 +234,17 @@ def main() -> int:
         check("bir TM kaydina tek oyuncu bagli",
               acc.tm_id.dropna().duplicated().sum() == 0,
               f"{acc.tm_id.dropna().duplicated().sum()} cakisma")
+        # §60: reddedilen/belirsiz aday kimlik olarak KULLANILMAMALI
+        red = li[~li.confidence.isin(["A", "B", "M"])]
+        check("kabul disi eslesmede tm_id bos (aday ayri sutunda)",
+              int(red.tm_id.notna().sum()) == 0,
+              f"{int(red.tm_id.notna().sum())} satir dolu - build_links calistir")
+        if "player_outcome" in tables:
+            n = q("""SELECT count(*) n FROM player_outcome o
+                     JOIN player_links l USING (player_id)
+                     WHERE l.confidence NOT IN ('A','B','M')""").n[0]
+            check("sonuclar yalniz kabul edilmis eslesmeden olculuyor",
+                  int(n) == 0, f"{int(n)} satir baska kisinin kariyerinden")
 
     # ---------------------------------------------------------- 7. kota/durum
     qf = ROOT / "data" / "raw" / "apifootball" / "_quota.json"

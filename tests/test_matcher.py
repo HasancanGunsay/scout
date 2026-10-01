@@ -11,7 +11,8 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from scout.resolve.matcher import build_links, name_score, normalize, variants
+from scout.resolve.matcher import (KABUL, build_links, kabul_disini_bosalt,
+                                   name_score, normalize, variants)
 
 
 class TestNormalize:
@@ -97,3 +98,19 @@ class TestBuildLinks:
         out = build_links(api, tm)
         kabul = out[out.confidence.isin(["A", "B"])]
         assert kabul.tm_id.dropna().duplicated().sum() == 0
+
+
+def test_kabul_disi_eslesme_kimlik_olarak_kullanilamaz():
+    """PLAN §60: reddedilen/belirsiz aday tm_id'de KALMAZ - sonuc ve deger
+    tm_id uzerinden baglaniyor, aday orada kalirsa baska kisinin kariyeri
+    olculur."""
+    links = pd.DataFrame({
+        "player_id": [1, 2, 3, 4, 5, 6],
+        "tm_id": [10.0, 20.0, 30.0, 40.0, 50.0, None],
+        "confidence": ["A", "B", "M", "C", "D", "-"],
+    })
+    out = kabul_disini_bosalt(links)
+    assert out.tm_id.notna().tolist() == [True, True, True, False, False, False]
+    assert out.aday_tm_id.tolist()[:5] == [10.0, 20.0, 30.0, 40.0, 50.0]
+    assert set(KABUL) == {"A", "B", "M"}
+    assert links.tm_id.notna().sum() == 5, "girdi degistirilmemeli"

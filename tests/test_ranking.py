@@ -9,7 +9,7 @@ from build_ranking import guven_etiketi  # noqa: E402
 
 
 def test_kaleci_her_zaman_dusuk_guven():
-    """Kaleci n=242: ayri model yok, kalibrasyon hatasi 0,065 (outfield 0,02-0,03)."""
+    """Kaleci n=210 (§60): ayri model yok, model ~ dakika+yas (+0,003)."""
     for v in (0, 1):
         for b in ("1 <0,5M", "3 2-5M", "4 >=5M"):
             assert guven_etiketi("Goalkeeper", v, b) == "dusuk"
@@ -26,9 +26,15 @@ def test_ara_bant_zayif():
         assert guven_etiketi("Midfielder", 1, b) == "zayif"
 
 
-def test_en_ucuz_bant_iyi():
-    """<0,5M: oyun verisi dakika+yasin USTUNE bilgi katiyor (+0,082/+0,160)."""
-    assert guven_etiketi("Attacker", 1, "1 <0,5M") == "iyi"
+def test_en_ucuz_bant_artik_zayif():
+    """§60: eslesme duzeltmesinden sonra <0,5M'de model - dakika+yas CV'de
+    anlamli degil (+0,033 [-0,02, +0,10]; once +0,082*). Olcut ayni."""
+    assert guven_etiketi("Attacker", 1, "1 <0,5M") == "zayif"
+
+
+def test_pahali_bant_iyi():
+    """>=5M: model - dakika+yas CV +0,056* / kayan +0,094* (§60)."""
+    assert guven_etiketi("Attacker", 1, "4 >=5M") == "iyi"
 
 
 def test_oncelik_en_kotumser_kazanir():

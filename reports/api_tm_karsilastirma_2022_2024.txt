@@ -1,55 +1,55 @@
-[in] API 2,349 · eslesen 1,742 · kademe uyumu %100.00
+[in] API 2,283 · eslesen 1,724 · kademe uyumu %100.00
 
---- HEPSI 2022-24, izlenen 9 lig (n=1,742, olumlu %60.2) ---
-  api_tam=0.685 tm_tam=0.714 birlesik=0.705 api_saf=0.674 tm_saf=0.716 birlesik_saf=0.709 api_basit=0.644 tm_basit=0.648 api_piyasa=0.664 tm_piyasa=0.667
+--- HEPSI 2022-24, izlenen 9 lig (n=1,724, olumlu %60.3) ---
+  api_tam=0.690 tm_tam=0.715 birlesik=0.706 api_saf=0.674 tm_saf=0.716 birlesik_saf=0.710 api_basit=0.644 tm_basit=0.647 api_piyasa=0.665 tm_piyasa=0.667
        birlesik - tm_tam     -0.009 [-0.019, +0.001]
-       birlesik - api_tam    +0.020 [+0.012, +0.029]*
-        api_tam - tm_tam     -0.030 [-0.046, -0.013]*
-        api_saf - tm_saf     -0.042 [-0.066, -0.019]*
-   birlesik_saf - tm_saf     -0.007 [-0.017, +0.004]
-         tm_tam - tm_basit   +0.066 [+0.042, +0.087]*
-        api_tam - api_basit  +0.040 [+0.014, +0.066]*
+       birlesik - api_tam    +0.016 [+0.008, +0.025]*
+        api_tam - tm_tam     -0.025 [-0.040, -0.009]*
+        api_saf - tm_saf     -0.043 [-0.067, -0.019]*
+   birlesik_saf - tm_saf     -0.006 [-0.017, +0.004]
+         tm_tam - tm_basit   +0.068 [+0.044, +0.090]*
+        api_tam - api_basit  +0.047 [+0.023, +0.074]*
 
---- sezon 2022 (n=575, olumlu %59.1) ---
-  api_tam=0.709 tm_tam=0.738 birlesik=0.730 api_saf=0.690 tm_saf=0.742 birlesik_saf=0.730 api_basit=0.670 tm_basit=0.672 api_piyasa=0.680 tm_piyasa=0.680
-       birlesik - tm_tam     -0.008 [-0.024, +0.008]
-        api_tam - tm_tam     -0.029 [-0.056, -0.001]*
+--- sezon 2022 (n=567, olumlu %59.1) ---
+  api_tam=0.714 tm_tam=0.738 birlesik=0.731 api_saf=0.692 tm_saf=0.741 birlesik_saf=0.731 api_basit=0.672 tm_basit=0.669 api_piyasa=0.679 tm_piyasa=0.679
+       birlesik - tm_tam     -0.007 [-0.020, +0.006]
+        api_tam - tm_tam     -0.023 [-0.049, -0.001]*
 
---- sezon 2023 (n=604, olumlu %59.8) ---
-  api_tam=0.705 tm_tam=0.716 birlesik=0.718 api_saf=0.662 tm_saf=0.714 birlesik_saf=0.706 api_basit=0.638 tm_basit=0.647 api_piyasa=0.702 tm_piyasa=0.701
-       birlesik - tm_tam     +0.003 [-0.011, +0.017]
-        api_tam - tm_tam     -0.011 [-0.036, +0.015]
+--- sezon 2023 (n=597, olumlu %60.0) ---
+  api_tam=0.706 tm_tam=0.717 birlesik=0.718 api_saf=0.661 tm_saf=0.715 birlesik_saf=0.706 api_basit=0.635 tm_basit=0.646 api_piyasa=0.701 tm_piyasa=0.701
+       birlesik - tm_tam     +0.001 [-0.012, +0.016]
+        api_tam - tm_tam     -0.011 [-0.037, +0.013]
 
---- sezon 2024 (n=563, olumlu %61.6) ---
-  api_tam=0.641 tm_tam=0.688 birlesik=0.666 api_saf=0.670 tm_saf=0.691 birlesik_saf=0.691 api_basit=0.624 tm_basit=0.627 api_piyasa=0.610 tm_piyasa=0.618
-       birlesik - tm_tam     -0.023 [-0.044, -0.001]*
-        api_tam - tm_tam     -0.048 [-0.077, -0.015]*
+--- sezon 2024 (n=560, olumlu %61.8) ---
+  api_tam=0.651 tm_tam=0.691 birlesik=0.670 api_saf=0.671 tm_saf=0.694 birlesik_saf=0.695 api_basit=0.626 tm_basit=0.626 api_piyasa=0.614 tm_piyasa=0.621
+       birlesik - tm_tam     -0.020 [-0.042, +0.001]
+        api_tam - tm_tam     -0.040 [-0.073, -0.009]*
 
---- mevki Defender (n=558, olumlu %62.0) ---
-  api_tam=0.701 tm_tam=0.749 birlesik=0.731 api_saf=0.662 tm_saf=0.752 birlesik_saf=0.726 api_basit=0.635 tm_basit=0.650 api_piyasa=0.706 tm_piyasa=0.706
-       birlesik - tm_tam     -0.018 [-0.037, +0.002]
-        api_tam - tm_tam     -0.049 [-0.081, -0.017]*
-        api_saf - tm_saf     -0.090 [-0.137, -0.044]*
+--- mevki Defender (n=551, olumlu %62.3) ---
+  api_tam=0.712 tm_tam=0.755 birlesik=0.737 api_saf=0.671 tm_saf=0.757 birlesik_saf=0.733 api_basit=0.642 tm_basit=0.652 api_piyasa=0.712 tm_piyasa=0.713
+       birlesik - tm_tam     -0.018 [-0.040, +0.004]
+        api_tam - tm_tam     -0.044 [-0.078, -0.010]*
+        api_saf - tm_saf     -0.088 [-0.136, -0.041]*
 
---- mevki Midfielder (n=625, olumlu %62.2) ---
-  api_tam=0.688 tm_tam=0.703 birlesik=0.700 api_saf=0.670 tm_saf=0.704 birlesik_saf=0.698 api_basit=0.614 tm_basit=0.633 api_piyasa=0.666 tm_piyasa=0.666
-       birlesik - tm_tam     -0.002 [-0.022, +0.019]
-        api_tam - tm_tam     -0.014 [-0.046, +0.018]
-        api_saf - tm_saf     -0.033 [-0.081, +0.015]
+--- mevki Midfielder (n=620, olumlu %62.3) ---
+  api_tam=0.685 tm_tam=0.700 birlesik=0.697 api_saf=0.667 tm_saf=0.701 birlesik_saf=0.690 api_basit=0.616 tm_basit=0.632 api_piyasa=0.660 tm_piyasa=0.660
+       birlesik - tm_tam     -0.002 [-0.020, +0.017]
+        api_tam - tm_tam     -0.014 [-0.045, +0.018]
+        api_saf - tm_saf     -0.032 [-0.079, +0.016]
 
---- mevki Attacker (n=511, olumlu %55.8) ---
-  api_tam=0.669 tm_tam=0.691 birlesik=0.679 api_saf=0.699 tm_saf=0.697 birlesik_saf=0.706 api_basit=0.682 tm_basit=0.662 api_piyasa=0.634 tm_piyasa=0.637
-       birlesik - tm_tam     -0.011 [-0.038, +0.020]
-        api_tam - tm_tam     -0.020 [-0.063, +0.023]
-        api_saf - tm_saf     +0.002 [-0.053, +0.050]
+--- mevki Attacker (n=505, olumlu %55.8) ---
+  api_tam=0.670 tm_tam=0.697 birlesik=0.683 api_saf=0.703 tm_saf=0.703 birlesik_saf=0.710 api_basit=0.676 tm_basit=0.661 api_piyasa=0.637 tm_piyasa=0.640
+       birlesik - tm_tam     -0.014 [-0.042, +0.016]
+        api_tam - tm_tam     -0.027 [-0.066, +0.019]
+        api_saf - tm_saf     +0.000 [-0.054, +0.056]
 
 --- ince mevki (AUC; aralik icin n kucuk) ---
-  10 numara            n= 135 api_tam=0.811 tm_tam=0.781 birlesik=0.839
-  Merkez orta saha     n= 239 api_tam=0.639 tm_tam=0.696 birlesik=0.672
-  On libero            n= 131 api_tam=0.710 tm_tam=0.732 birlesik=0.723
-  Sag bek              n= 127 api_tam=0.695 tm_tam=0.689 birlesik=0.686
-  Sag kanat            n= 151 api_tam=0.638 tm_tam=0.604 birlesik=0.624
-  Santrfor             n= 191 api_tam=0.671 tm_tam=0.712 birlesik=0.681
-  Sol bek              n= 123 api_tam=0.847 tm_tam=0.886 birlesik=0.888
-  Sol kanat            n= 156 api_tam=0.694 tm_tam=0.733 birlesik=0.700
-  Stoper               n= 308 api_tam=0.706 tm_tam=0.751 birlesik=0.738
+  10 numara            n= 133 api_tam=0.794 tm_tam=0.764 birlesik=0.824
+  Merkez orta saha     n= 238 api_tam=0.634 tm_tam=0.694 birlesik=0.673
+  On libero            n= 130 api_tam=0.716 tm_tam=0.728 birlesik=0.719
+  Sag bek              n= 125 api_tam=0.689 tm_tam=0.682 birlesik=0.680
+  Sag kanat            n= 146 api_tam=0.636 tm_tam=0.655 birlesik=0.633
+  Santrfor             n= 191 api_tam=0.672 tm_tam=0.712 birlesik=0.681
+  Sol bek              n= 122 api_tam=0.850 tm_tam=0.884 birlesik=0.878
+  Sol kanat            n= 155 api_tam=0.695 tm_tam=0.733 birlesik=0.700
+  Stoper               n= 304 api_tam=0.723 tm_tam=0.765 birlesik=0.746

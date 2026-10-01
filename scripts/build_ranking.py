@@ -25,9 +25,10 @@ gorunur ve kullanici yanlis bir guven edinir. Bu yuzden:
 
 GUVEN ETIKETLERI (6.2 ve 6.2b'nin bulgulari):
   dogrulanmamis  deger_var=0: TM sonucu kor, yalniz tek pencere isareti
-  zayif          0,5-5M bandi: model ~ dakika+yas'tan ayirt edilemiyor
-  dusuk          kaleci: n=242
-  iyi            <0,5M ve >=5M: oyun verisi dakika+yasin USTUNE bilgi katiyor
+  zayif          <5M (degerlemesi var): model ~ dakika+yas'tan ayirt
+                 edilemiyor (CV'de; §60 oncesi <0,5M 'iyi' idi)
+  dusuk          kaleci: n=210
+  iyi            >=5M: oyun verisi dakika+yasin USTUNE bilgi katiyor
 Oncelik: dusuk > dogrulanmamis > zayif > iyi (en kotumser olan kazanir).
 """
 
@@ -66,7 +67,10 @@ def guven_etiketi(pos_group: str, deger_var: int, bant: str) -> str:
         return "dusuk"
     if deger_var == 0:
         return "dogrulanmamis"
-    if bant in ("2 0,5-2M", "3 2-5M"):
+    # §60 (1 Eki 2026): eslesme duzeltmesinden sonra <0,5M bandinda
+    # model - dakika+yas CV'de anlamli DEGIL (+0,033 [-0,02, +0,10]; once
+    # +0,082*). Etiketin olcutu ayni (CV VE kayan anlamli); veri duzeldi.
+    if bant in ("1 <0,5M", "2 0,5-2M", "3 2-5M"):
         return "zayif"
     return "iyi"
 
@@ -146,13 +150,21 @@ def kaydet(d: pd.DataFrame, uretim: pd.DataFrame | None = None) -> None:
 
 def uretim_yukle(con) -> pd.DataFrame | None:
     """Uretim modelinin tahminleri + kapsam. Disaridan tahmini OLMAYAN
-    satirlar (2025+) icin kullanilir; 2022-24'te hepsi elenir."""
+    satirlar (2025+) icin kullanilir.
+
+    YALNIZ SONUC PENCERESI ACIK satirlar (§60, 1 Eki 2026): 'disaridan
+    tahmini olmayan 2022-24 satiri yok' varsayimi eslesme duzeltmesiyle
+    bozuldu - Ekvador 2023 10 satirin altina dustu, lig-disi CV onu
+    atladi ve bos kalan 6 satir orneklem ICI uretim tahminiyle doldu
+    (denetim yakaladi). Sonucu belli bir satirin orneklem ici tahmini
+    olmaz: o oyuncular icin tahmin yok, havuzda da yok."""
     try:
         return con.sql("""
             SELECT m.player_id, m.league_id, m.season, m.model_olasilik,
                    o.kapsam
             FROM player_model_score m
-            JOIN player_outcome o USING (player_id, league_id, season)""").df()
+            JOIN player_outcome o USING (player_id, league_id, season)
+            WHERE coalesce(o.gozlem_ay, 0) < 12""").df()
     except (duckdb.CatalogException, duckdb.BinderException):
         return None
 

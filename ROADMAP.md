@@ -449,6 +449,7 @@ lig. Düşük görünürlüklü ligler orada yok.
 | 7.3 ✅ | Kalibrasyon kayması: güncelleme kuralı işe yaramıyor, kayma gürültü; "tüm geçmiş" kalır (§54) | tamam |
 | 7.4 ✅ | İzlenen liglerde API vs TM: TM önde (−0,030*), birleştirmek katkı vermiyor; defansta fark en büyük (§55) | tamam |
 | 7.5 ✅ | 2025/26 havuzu (891 U23, 14 lig) ileriye dönük deftere yazıldı; puanlama 2027-06-15 sonrası (§56) | tamam |
+| 7.6 ✅ | **Eşleşme düzeltmesi:** reddedilmiş/belirsiz TM adayları sonuç ve değerde kullanılıyordu (%26). `tm_id` artık yalnız kabulde; düşük görünürlükte 2024'te model ≈ dakika+yaş; <0,5M 'zayıf' (§60) | tamam |
 
 ### FAZ 8 — Arayüz: havuz + takip (kullanıcı isteği, 1 Eki 2026)
 
