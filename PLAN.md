@@ -3934,3 +3934,73 @@ Lig içi AUC, oyuncu kümeli eşli bootstrap (B=400).
 API döneminde (§45) tersiydi. Fark muhtemelen nüfustan: burada herkes zaten
 izlenen bir birinci ligde ve değerlemesi var. Kayan doğrulamada defansta
 model dakika+yaşı yenemiyor. Bu, testte defans için kötümser bir beklenti.
+
+### 53.5 MÜHÜRLÜ TEST SONUCU — 2018–2021, tek açılış (1 Eki 2026 13:20)
+
+Hipotezler `467fba1`'de, açılıştan önce commit edildi. Açılış kaydı
+`data/tm_tarih/muhur_acilis.json`. Tam çıktı
+`reports/tm_muhurlu_test_2018_2021.txt`. n=3.097, olumlu %57,3. Eşli,
+oyuncu kümeli bootstrap (B=1000).
+
+| | Hipotez | Sonuç | Karar |
+|---|---|---|---|
+| **H1** | model > dakika+yaş | **+0,046** [+0,027, +0,064] | ✅ |
+| **H2** | model > piyasa | **+0,057** [+0,042, +0,072] | ✅ |
+| H3 | saf vs piyasa (yön iddiası yoktu) | **+0,058** [+0,042, +0,076] | oyun verisi piyasayı yeniyor |
+| **H4** | defansta savunma bağlamı katkı | −0,005 [−0,019, +0,007] | ❌ |
+| **H5** | ucuz bant top-20, dakika+yaştan iyi ve hücrelerin çoğunda | ort. 0,713 / 0,696, **5/12 kazandı** (2 berabere, 5 kaybetti) | ❌ |
+
+AUC'ler: model 0,742 · saf 0,744 · basit 0,696 · piyasa 0,686.
+
+**Sezon sezon (7.3'ün girdisi):**
+
+| Sezon | n | olumlu | model | basit | piyasa | ECE | sapma |
+|---|---|---|---|---|---|---|---|
+| 2018 | 775 | %52,6 | 0,706 | 0,667 | 0,660 | 0,068 | **+0,063** |
+| 2019 (COVID, ara) | 761 | %64,4 | 0,759 | 0,694 | 0,689 | 0,068 | **−0,056** |
+| 2020 (seyircisiz) | 804 | %56,1 | 0,768 | 0,730 | 0,723 | 0,057 | +0,011 |
+| 2021 | 757 | %56,3 | 0,731 | 0,691 | 0,670 | 0,038 | +0,017 |
+
+Model dört sezonun dördünde de dakika+yaşı ve piyasayı yeniyor; COVID
+sezonlarında da. Ama **kalibrasyon yıldan yıla ±6 puan oynuyor.** 2019/20'de
+taban %64'e fırladı (muhtemelen ara ve 5 değişiklik kuralı gençlere daha çok
+süre verdi; ölçülmedi). Sabit kalibrasyonun kırılganlığı (§50.4) bağımsız
+10 yılda da görülüyor.
+
+**Mevki mevki (model − basit):** Stoper **+0,070*** (n=537) ve Santrfor
+**+0,083*** anlamlı. Diğerleri pozitif ama aralık geniş: Sağ bek +0,084,
+10 numara +0,074, Merkez OS +0,058, Sol bek +0,040. Ön libero (+0,005),
+Sağ kanat (−0,010) ve Sol kanat (+0,011) ayırt edilemiyor.
+
+### 53.6 Ne öğrendik
+
+1. **TM verisi izlenen liglerde gerçek ve bağımsız bir sinyal taşıyor.**
+   10 yıl sonraki, hiç görülmemiş 4 sezonda model, piyasayı (+0,057) ve
+   dakika+yaşı (+0,046) yeniyor. Geliştirmedeki etki büyüklüğü (+0,054 /
+   +0,063) testte korundu: aşırı uyum yok.
+2. **İzlenen liglerde piyasa değeri oyun verisine bir şey katmıyor**
+   (saf 0,744 ≈ tam 0,742). API döneminde (§45) tersiydi. Ama orada nüfus
+   düşük görünürlüklü ligleri içeriyordu. Burada herkes izlenen ligde ve
+   değerlemesi var.
+3. **Savunma bağlamı (artı-eksi) işe yaramadı (H4 ❌).** Geliştirmede de
+   anlamsızdı ve K1 gevşek kurulduğu için tutuldu. Sonuç değişmedi: model
+   onsuz da aynı. Yine de **stoperde model dakika+yaşı anlamlı yeniyor**
+   (+0,070). Bu sinyal süre istikrarı, takım gücü ve geçmiş sezondan geliyor,
+   artı-eksiden değil. Kullanıcının sorusunun cevabı netleşti: savunmada
+   **ne** yaptığını ölçemiyoruz, **ne kadar güvenildiğini** ölçebiliyoruz.
+4. **Liste tepesinde (H5 ❌) model, dakika+yaştan güvenilir biçimde iyi
+   değil.** Ucuz bantta top-20 isabeti ortalamada ancak 1,7 puan yüksek ve
+   12 hücrenin yalnızca 5'inde kazanıyor. Sebep: izlenen bir birinci ligde
+   çok oynayan ucuz bir genç zaten büyük olasılıkla yer edinir. Dakika+yaşın
+   top-20'si %70 isabet veriyor ve tepe doymuş durumda. Modelin üstünlüğü
+   sıralamanın **bütününde** (AUC), **tepesinde** değil. API döneminin
+   düşük görünürlüklü havuzunda (§47) bu tersiydi (11/12). Kullanıcı için
+   anlamı: izlenen liglerde "listenin ilk 20'si" bir dakika listesinden
+   çok farklı değil. Modelin değeri, düşük görünürlüklü liglerde ya da
+   sıralamanın ortasında.
+5. **Kalibrasyon yıldan yıla oynuyor.** 7.3 bu dört test yılını kullanamaz
+   (mühür açıldı, artık geliştirme verisi değil). 7.3'ün kalibratör
+   güncelleme kuralı 2013–2017 içinde seçilmeli, 2022–2024'te
+   (TM satırları) sınanmalı.
+
+Held-out sayacı: 2018–2021 **bir kez** açıldı. 2024 (API) için sayaç 5'te.

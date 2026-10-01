@@ -1,0 +1,50 @@
+
+================================================================================
+MUHURLU TEST 2018-2021 - TEK ACILIS · secilen: tam
+================================================================================
+
+--- H1-H3 HEPSI (n=3,097, olumlu %57.3) ---
+  model=0.742  saf=0.744  basit=0.696  piyasa=0.686  tam_savsiz=0.743
+        model - basit       +0.046 [+0.027, +0.064]*
+        model - piyasa      +0.057 [+0.042, +0.072]*
+          saf - piyasa      +0.058 [+0.042, +0.076]*
+          saf - basit       +0.048 [+0.030, +0.066]*
+        model - tam_savsiz  -0.000 [-0.004, +0.004] 
+
+--- H4 DEFANS (n=992, olumlu %59.2) ---
+  model=0.728  saf=0.733  basit=0.681  piyasa=0.681  tam_savsiz=0.732
+        model - tam_savsiz  -0.005 [-0.019, +0.007] 
+        model - basit       +0.044 [+0.007, +0.082]*
+
+--- SEZON SEZON (COVID isaretli) ---
+  2018                                n= 775 olumlu %52.6 model=0.706 basit=0.667 piyasa=0.660 · ECE=0.068 sapma=+0.063
+  2019 2019/20 (COVID, ara verildi)   n= 761 olumlu %64.4 model=0.759 basit=0.694 piyasa=0.689 · ECE=0.068 sapma=-0.056
+  2020 2020/21 (seyircisiz)           n= 804 olumlu %56.1 model=0.768 basit=0.730 piyasa=0.723 · ECE=0.057 sapma=+0.011
+  2021                                n= 757 olumlu %56.3 model=0.731 basit=0.691 piyasa=0.670 · ECE=0.038 sapma=+0.017
+
+--- MEVKI MEVKI (model - basit) ---
+  10 numara            n= 197 model=0.805 basit=0.723 piyasa=0.781  model-basit +0.074 [-0.044, +0.186] 
+  Merkez orta saha     n= 377 model=0.685 basit=0.643 piyasa=0.701  model-basit +0.058 [-0.014, +0.127] 
+  On libero            n= 266 model=0.797 basit=0.796 piyasa=0.701  model-basit +0.005 [-0.090, +0.092] 
+  Sag bek              n= 216 model=0.751 basit=0.669 piyasa=0.644  model-basit +0.084 [-0.059, +0.220] 
+  Sag kanat            n= 280 model=0.692 basit=0.704 piyasa=0.682  model-basit -0.010 [-0.098, +0.085] 
+  Santrfor             n= 357 model=0.770 basit=0.694 piyasa=0.721  model-basit +0.083 [+0.007, +0.156]*
+  Sol bek              n= 239 model=0.718 basit=0.666 piyasa=0.677  model-basit +0.040 [-0.070, +0.148] 
+  Sol kanat            n= 257 model=0.703 basit=0.700 piyasa=0.625  model-basit +0.011 [-0.104, +0.113] 
+  Stoper               n= 537 model=0.723 basit=0.654 piyasa=0.675  model-basit +0.070 [+0.008, +0.127]*
+
+--- H5 UCUZ BANT (<=5M ya da degersiz) TOP-20 ISABETI ---
+ sezon      mevki   n  taban  model  basit
+  2018   Attacker 154  0.409   0.65   0.55
+  2018   Defender 174  0.506   0.75   0.55
+  2018 Midfielder 189  0.455   0.75   0.70
+  2019   Attacker 139  0.432   0.70   0.65
+  2019   Defender 172  0.640   0.80   0.85
+  2019 Midfielder 165  0.564   0.95   0.75
+  2020   Attacker 156  0.429   0.65   0.75
+  2020   Defender 179  0.436   0.60   0.65
+  2020 Midfielder 177  0.492   0.65   0.65
+  2021   Attacker 128  0.391   0.55   0.60
+  2021   Defender 174  0.506   0.70   0.70
+  2021 Midfielder 190  0.521   0.80   0.95
+  ortalama: model 0.713 · basit 0.696 · taban 0.482 · model kazandi 5/12 (berabere 2)
