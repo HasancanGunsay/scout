@@ -3745,3 +3745,115 @@ Sonuncusu sayfayı gerçekten çalıştırıp gösterilen olasılığın
 `player_tahmin` ile aynı olduğunu sınıyor. Eski kaynakla kalsaydı %97 ≠ %93
 ile kalırdı. Toplam **283 test**. Denetim 39 / 33 / 5 / 1 (5 = bilinen
 sağlayıcı boşlukları).
+
+
+## 52. FAZ 7.1 — Transfermarkt Tarihsel Tablo, 2012–2025 (1 Eki 2026)
+
+`src/scout/features/tm_tarih.py` · `scripts/build_tm_tarih.py` ·
+`tm_oyuncu_sezon` (92.958 oyuncu-lig-sezon, 26.297 oyuncu) ·
+`tests/test_tm_tarih.py` (8)
+
+### 52.1 Neden
+
+API ücretsiz planı yalnızca 2022–2024'ü veriyor (Temmuz'da API bunu açıkça
+söyledi; 2021'i yeniden denemek için istek harcanmadı). 2024 held-out'u beş
+bakışla tükendi. Ham TM dosyasında (`2026-07-11`) hiç kullanılmamış
+**2012–2021** ve **2025/26** var.
+
+**Sınır:** TM yalnızca 14 birinci ligde oyuncu kaydı tutuyor. Düşük
+görünürlüklü ligler bu dönemde yok. Bu tablo izlenen liglerdeki genç
+oyuncular içindir.
+
+### 52.2 Mühür (sonuçlara bakılmadan, kodda sabit)
+
+| Sezon | Bölüm | Kullanım |
+|---|---|---|
+| 2012 | yalnız geçmiş | kadro verisi yok; yalnız "önceki sezon" bilgisi |
+| **2013–2017** | geliştirme | özellik, model, kural seçimi |
+| **2018–2021** | **mühürlü test** | **tek açılış (7.2).** 7.1'de sonuç oranı basılmadı |
+| 2022–2024 | API dönemi | 7.4: API modeliyle aynı yıllarda karşılaştırma |
+| 2025 | ileriye dönük | pencere açık; 7.5 defteri |
+
+`test_muhur_degismedi` mührün sessizce kaydırılmasını engelliyor.
+2019/20 ve 2020/21 COVID sezonları; test raporunda ayrı gösterilecek.
+
+### 52.3 Özellikler (yalnız TM)
+
+- **Süre:** dakika, maç, ilk 11, yedekten giriş, oyundan çıkış, tam maç
+  (ilk 11 ve oyundan çıkmadı). Payları: dakika payı = dk / (90 × takımın
+  lig maçı). Sezon içinde kulüp değiştirenlerde takım maçları toplanır.
+- **Üretim:** gol, asist, sarı, kırmızı; G+A/90, kart/90.
+- **Savunma bağlamı (kullanıcının sorusu üzerine):** oyuncu sahadayken
+  takımın attığı ve yediği gol (`gf_on90`, `ga_on90`, artı-eksi) ve bunların
+  **takımın sezon ortalamasına göre** farkı (`ga_on_goreli`, `pm_on_goreli`).
+  Giriş: ilk 11 ise 0, değilse oyuna girdiği dakika. Çıkış: oyundan çıkış ya
+  da kırmızı kart dakikası. Gol aralığı (giriş, çıkış].
+- **Takım gücü:** takımın maç başı puanı, attığı ve yediği gol
+  (sezonda birden çok kulüp varsa dakikayla ağırlıklı).
+- **Mevki:** oyuncunun bugünkü mevkisi değil, **o sezon ilk 11'de en çok
+  oynadığı mevki** (`game_lineups`): Stoper, Sol bek, Sağ bek, Ön libero,
+  Merkez orta saha, 10 numara, kanatlar, Santrfor. 2013 sonrası %100 kadrodan.
+- **Değer:** sezon bitişinden 1 ay önceki son değer (mevcut sistemle aynı kural).
+- **Yörünge:** önceki sezonun 14 ligdeki dakikası ve dakika payı.
+- **Sonuç:** mevcut sistemle aynı. Sezon bitişinden sonraki 12 ayda 14 ligdeki
+  toplam lig dakikası; kademe, en çok oynanan ligin ilk-5 olup olmamasına
+  göre. 2025 penceresi açık: sonuç NULL (0 değil).
+
+### 52.4 Sağlamalar
+
+| Sağlama | Sonuç |
+|---|---|
+| Baştan sona oynayan ilk 11'de sahadaki gol = maç skoru | **%99,95** (n=761.943) |
+| Kendi kalesine gol: `club_id` lehine yazılan takım mı? | **%99,9** evet; işaret çevirme yok |
+| **2022–24'te mevcut sistemle aynı oyuncu-sezonda kademe** | **%100,00** (n=13.478) |
+| Sezon dakikası, TM ve API | korelasyon 0,936 |
+| Kadro verisi kapsamı (maçların ilk 11'i) | 2013–2025 %97–100 |
+
+U23 (≥450 dk) yaklaşık **760–890 oyuncu-sezon/yıl**. Geliştirme yıllarında
+yer edinme tabanı %55–60. API havuzundan (%31) yüksek, çünkü burada herkes
+zaten izlenen bir birinci ligde.
+
+**2025'te değerleme kapsamı %73,4** (diğer yıllar %94–100). TM değerleri
+2026-02-27'de bitiyor. 7.5'te `deger_var` göstergesi bu yüzden kritik.
+
+### 52.5 İlk betimleyici bakış — yalnızca geliştirme yılları
+
+U23, ≥450 dk, lig içi AUC (model değil, tek değişken; seçim 7.2'de):
+
+| Mevki | n | dakika payı | sahadayken az gol yeme (takıma göre) | takım gücü | değer |
+|---|---|---|---|---|---|
+| Stoper | 574 | 0,656 | **0,622** | 0,677 | 0,656 |
+| Sol bek | 348 | 0,709 | 0,553 | 0,683 | 0,726 |
+| Sağ bek | 329 | 0,718 | 0,593 | 0,658 | 0,689 |
+| Ön libero | 345 | 0,699 | 0,503 | 0,671 | 0,670 |
+| Santrfor | 408 | 0,683 | 0,555 | 0,621 | 0,708 |
+
+Stoperde "sahadayken takım ortalamasından az gol yemek" (0,622), API'nin
+stoper rol skorundan (0,586, bkz. aşağıda) güçlü. Beklerde ve ön liberoda
+asıl sinyal süre.
+
+### 52.6 Kullanıcının sorusu: model yalnızca atak mı ölçüyor?
+
+**Yapı olarak hayır:** API modelinde her oyuncu kendi mevkisinin rol
+şablonlarıyla puanlanıyor. Stoper: ikili mücadele, top kesme, araya girme,
+pas. Bek ve orta saha da kendi şablonlarıyla. Ama **ölçüm savunmada rol
+skorunun zayıf olduğunu gösteriyor** (2022–24, lig içi AUC):
+
+| | rol skoru | API reytingi | dakika payı | değer | model |
+|---|---|---|---|---|---|
+| Bek | **0,552** | 0,651 | 0,666 | 0,706 | 0,748 |
+| Stoper | 0,586 | 0,690 | 0,648 | 0,710 | 0,741 |
+| Orta saha | 0,635 | 0,666 | 0,642 | 0,693 | 0,729 |
+| Forvet | 0,655 | 0,728 | 0,694 | 0,700 | 0,762 |
+
+Model savunmada da çalışıyor, ama savunma istatistikleriyle değil reyting,
+süre ve değerle. Sayısal müdahale verisi pozisyon almayı göremez (Scout
+dosyasındaki "kör noktalar" bölümü bunu zaten söylüyor). 7.2'de savunma
+bağlamı özelliklerinin bu boşluğu ne kadar kapattığı **mevki mevki**
+raporlanacak.
+
+### 52.7 Çalıştırma
+
+Ham TM anlık görüntüsü değişmedikçe yeniden kurmaya gerek yok; günlük
+zincirde değil. TM dosyası yenilendiğinde (`data/raw/transfermarkt/<tarih>/`)
+en yeni klasör otomatik seçilir. Toplam **291 test**.
