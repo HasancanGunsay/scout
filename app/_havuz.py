@@ -26,6 +26,7 @@ Streamlit içermez; testler doğrudan çağırır.
 from __future__ import annotations
 
 import unicodedata
+from urllib.parse import quote_plus
 
 import pandas as pd
 
@@ -163,6 +164,33 @@ def grup_yuzdeligi(df: pd.DataFrame, kol: str, grup: list[str],
     return 100.0 - p if dusuk_iyi else p
 
 
+def sofascore_url(ad: str, kulup: str | None = None) -> str:
+    """Sofascore oyuncu sayfasına tek tık (8.3).
+
+    Sofascore'un arama adresi YOK (/search?q= → 404, 1 Eki 2026'da
+    denendi). DuckDuckGo '!ducky' ilk sonuca yönlendirir; 'site:' ile
+    sonuç Sofascore'a sınırlı. Denendi: Pio Esposito + Inter, Kenan Yıldız
+    + Juventus, André Gomes + FC Alverca (aynı adlı ünlü orta saha varken
+    doğru kişi: 2004 doğumlu kaleci - kulübü değişmiş olsa da). Kulüp
+    eş adlıları ayırır; tam ad kısaltmadan iyi sonuç verir.
+    """
+    q = f"!ducky site:sofascore.com {ad}" + (f" {kulup}" if kulup else "")
+    return "https://duckduckgo.com/?q=" + quote_plus(q)
+
+
+def tm_url(profil: str | None, ad: str) -> str:
+    """Kabul edilmiş eşleşmede birebir profil; yoksa TM hızlı arama.
+    (Profil adresi yalnız kabul edilmiş eşleşmeden gelir - §60.)"""
+    if isinstance(profil, str) and profil.startswith("http"):
+        return profil
+    return ("https://www.transfermarkt.com/schnellsuche/ergebnis/"
+            "schnellsuche?query=" + quote_plus(ad))
+
+
+def _metin(s) -> str | None:
+    return s if isinstance(s, str) and s.strip() else None
+
+
 def ozet_anahtar(anahtarlar) -> str:
     """Satır kümesinin kısa özeti (tablo widget anahtarı için)."""
     import hashlib
@@ -237,6 +265,18 @@ def api_hazirla(raw: pd.DataFrame) -> pd.DataFrame:
     d["lig"] = d.country.map(ULKE_ADI).fillna(d.country) + " · " + d.league_name
     d["mevki"] = d.role_name.fillna("—") if "role_name" in d else "—"
     d["dk"] = d.minutes
+    # 8.3 bağlantıları: TM'deki tam ad > API ad+soyad > API kısa ad
+    # ("T. Abed" gibi kısaltma aramayı bozar); kulüp: bugünkü > o sezonki
+    api_tam = ((d.firstname.fillna("") + " " + d.lastname.fillna("")).str.strip()
+               if {"firstname", "lastname"} <= set(d.columns)
+               else pd.Series("", index=d.index))
+    tm_ad = d.tm_ad if "tm_ad" in d else pd.Series(None, index=d.index)
+    d["tam_ad"] = [_metin(a) or _metin(b) or c
+                   for a, b, c in zip(tm_ad, api_tam, d.player_name)]
+    simdi = d.simdi_kulup if "simdi_kulup" in d else pd.Series(None, index=d.index)
+    d["arama_kulup"] = [_metin(a) or _metin(b) for a, b in zip(simdi, d.kulup)]
+    if "tm_url" not in d:
+        d["tm_url"] = None
     tm = d.tm_id if "tm_id" in d else pd.Series(None, index=d.index)
     d["kisi"] = [kisi(t, p) for t, p in zip(tm, d.player_id)]
     # 12 aylık pencere kapandıysa sonuç biliniyor: o andaki seçim göz testi
@@ -262,6 +302,11 @@ def tm_hazirla(raw: pd.DataFrame, bugun=None) -> pd.DataFrame:
     d["lig"] = d.comp.map(TM_LIG_ADI).fillna(d.comp)
     d["mevki"] = d.ince_mevki.map(lambda m: INCE_MEVKI_ADI.get(m, m)).fillna("—")
     d["kapsam"] = "tam"
+    d["tam_ad"] = d.player_name
+    gk = d.guncel_kulup if "guncel_kulup" in d else pd.Series(None, index=d.index)
+    d["arama_kulup"] = [_metin(a) or _metin(b) for a, b in zip(gk, d.kulup)]
+    if "tm_url" not in d:
+        d["tm_url"] = None
     d["kisi"] = [kisi(p, None) for p in d.player_id]
     d["sonuc_gorunur"] = (pd.Timestamp(bugun or pd.Timestamp.today())
                           >= pd.to_datetime(d.pencere_bitis))

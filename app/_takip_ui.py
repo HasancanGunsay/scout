@@ -11,6 +11,7 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
+import _havuz as HV
 import _shared as sh
 import _style as ui
 from scout import takip as TK
@@ -65,6 +66,20 @@ def not_girisi(kisi: str, yer: str) -> None:
                  placeholder="ör. 12 Eki – Ajax maçı: baskı altında soğukkanlı")
     b.button("Kaydet", key=f"{key}_btn", on_click=_not_cb, args=(kisi, key),
              width="stretch")
+
+
+def baglantilar(ad: str, kulup: str | None, profil: str | None) -> None:
+    """Sofascore + Transfermarkt, yeni sekmede (8.3)."""
+    a, b = st.columns(2)
+    a.link_button("Sofascore", HV.sofascore_url(ad, kulup),
+                  icon=":material/open_in_new:", width="stretch",
+                  help=f"'{ad}'" + (f" + '{kulup}'" if kulup else "")
+                       + " ile aranıp ilk sonuç açılır (DuckDuckGo).")
+    b.link_button("Transfermarkt", HV.tm_url(profil, ad),
+                  icon=":material/open_in_new:", width="stretch",
+                  help="Eşleşmesi doğrulanmış oyuncuda profil; değilse arama."
+                  if not (isinstance(profil, str) and profil) else
+                  "Transfermarkt profili.")
 
 
 def takip_kutusu(r: pd.Series) -> None:

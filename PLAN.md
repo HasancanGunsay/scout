@@ -4575,3 +4575,38 @@ oyuncuların iddiaları artık sonuçsuz (sonuç ölçülemez).
 - Manuel onay kuyruğunda 1.727 C kaydı var. Onaylandıkça kapsam artar.
 
 Toplam **350 test**.
+
+
+## 61. FAZ 8.3 — Sofascore ve Transfermarkt'a Tek Tık (1 Eki 2026)
+
+`app/_havuz.py` (`sofascore_url`, `tm_url`) · `app/_takip_ui.py`
+(`baglantilar`) · Havuz kartı · Takip detayı · Profil · testler (+4)
+
+### 61.1 Yapılan
+
+- **Sofascore:** Sofascore'un arama adresi **yok** (`/search?q=` → 404,
+  denendi). DuckDuckGo `!ducky` ilk sonuca yönlendiriyor; `site:sofascore.com`
+  ile sonuç Sofascore'a sınırlı. Sorgu: tam ad + kulüp.
+- **Transfermarkt:** **yalnız kabul edilmiş eşleşmede** birebir profil
+  (§60); değilse TM hızlı arama. "T. Abed" önce Abdul Fatawu'nun profiline
+  gidecekti, şimdi "Tai Abed Kassus" araması.
+- **Arama adı:** TM'deki tam ad > API ad+soyad > API kısa ad. Kısa ad
+  ("T. Abed", "F. Esposito") aramayı bozuyor. Kulüp: bugünkü (TM) > o
+  sezonki.
+- Yerler: Havuz kartı, Takip listesi ayrıntısı, Profil (eski düz TM
+  araması yerine).
+
+### 61.2 Denendi — 9/9 doğru oyuncu sayfası
+
+Pio Esposito (Inter), Kenan Yıldız (Juventus), **André Gomes** (FC
+Alverca: aynı adlı ünlü orta saha varken doğru kişi, 2004 doğumlu kaleci;
+kulübü Temmuz'dan sonra değişmiş olsa da), Vitor Reis, Sebastian Nanasi,
+Eli Junior Kroupi, Élan Ricardo, Kelian Nsona, Oskar Siira Sivertsen.
+Düşük görünürlüklü liglerden, havuzun tepesinden farklı liglerden seçildi.
+
+**Sınır:** Bu bir arama motoru yönlendirmesi, kimlik eşleşmesi değil.
+Örneklemdeki herkesin TM eşleşmesi doğrulanmıştı. Yalnız API adı olan
+oyuncularda (eşleşmesiz) isabet denenmedi. Sofascore verisi çekilmiyor;
+yalnız bağlantı veriliyor.
+
+Toplam **353 test**.

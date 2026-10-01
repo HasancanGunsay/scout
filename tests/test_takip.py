@@ -209,6 +209,9 @@ def test_takip_sayfasi_not_durum_ve_havuz_gecmisi(dizin):
     assert len(at.dataframe[0].value) == 1
     gecmis = at.dataframe[1].value
     assert len(gecmis) >= 2, "API 2024 + TM 2025/26 birlikte gorunmeli"
+    # 8.3: ayrintida Sofascore + Transfermarkt
+    assert {x.proto.label for x in at.get("link_button")} == {
+        "Sofascore", "Transfermarkt"}
     [x for x in at.text_input if x.label == "Not ekle"][0] \
         .set_value("Ajax maçı: baskı altında soğukkanlı").run()
     _tikla(at, "Kaydet")

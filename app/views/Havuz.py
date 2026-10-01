@@ -294,6 +294,7 @@ def _kart(r: pd.Series) -> None:
                 AYAK = {"right": "sağ", "left": "sol", "both": "iki ayak"}
                 st.markdown(f"**Şimdi (TM, Tem 2026):** {gk}  \n"
                             f"**Boy / ayak:** {boy} · {AYAK.get(r.get('ayak'), '—')}")
+            TU.baglantilar(r.tam_ad, r.arama_kulup, r.tm_url)
             st.divider()
             TU.takip_kutusu(r)
         with sag:

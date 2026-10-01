@@ -55,7 +55,8 @@ def _tm_bilgi(tm_idler: tuple[int, ...]) -> pd.DataFrame:
     if not tm_idler:
         return pd.DataFrame()
     return sh._con().sql(f"""
-        SELECT player_id AS tm_id, current_club_name AS simdi_kulup,
+        SELECT player_id AS tm_id, name AS tm_ad, url AS tm_url,
+               current_club_name AS simdi_kulup,
                market_value_in_eur AS simdi_deger, date_of_birth,
                sub_position, foot, height_in_cm
         FROM tm_players WHERE player_id IN ({",".join(map(str, tm_idler))})
@@ -275,6 +276,14 @@ def _ayrinti(kisi: str) -> None:
                                     key=f"havuz_{kisi}", width="stretch"):
                 st.switch_page("views/Havuz.py",
                                query_params={"oyuncu": g.iloc[0].anahtar})
+            b_ = tmb.loc[kisi] if len(tmb) and kisi in tmb.index else None
+            son_g = g.iloc[0] if len(g) else None
+            TU.baglantilar(
+                (b_.tm_ad if b_ is not None and isinstance(b_.tm_ad, str)
+                 else (son_g.tam_ad if son_g is not None else k["ad"])),
+                (b_.simdi_kulup if b_ is not None and isinstance(b_.simdi_kulup, str)
+                 else (son_g.arama_kulup if son_g is not None else None)),
+                b_.tm_url if b_ is not None else None)
             api_g = g[g.kaynak == HV.KAYNAK_API]
             if len(api_g) and b2.button("Scout dosyası", icon=":material/assignment:",
                                         key=f"dosya_{kisi}", width="stretch"):

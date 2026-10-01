@@ -102,6 +102,42 @@ def test_filtre_puani_degistirmez_bos_liste_hepsi():
     assert len(HV.filtrele(d)) == len(d)
 
 
+def test_sofascore_baglantisi_ad_kulup_kodlu():
+    """8.3: Sofascore'un arama adresi yok; DuckDuckGo '!ducky' + site:."""
+    from urllib.parse import parse_qs, urlparse
+    u = HV.sofascore_url("Kenan Yıldız", "Juventus FC")
+    q = parse_qs(urlparse(u).query)["q"][0]
+    assert u.startswith("https://duckduckgo.com/?q=")
+    assert q == "!ducky site:sofascore.com Kenan Yıldız Juventus FC"
+    assert parse_qs(urlparse(HV.sofascore_url("A B")).query)["q"][0] \
+        == "!ducky site:sofascore.com A B"
+
+
+def test_tm_baglantisi_profil_yoksa_arama():
+    prof = "https://www.transfermarkt.co.uk/x/profil/spieler/1"
+    assert HV.tm_url(prof, "X") == prof
+    for yok in (None, float("nan"), ""):
+        assert "schnellsuche" in HV.tm_url(yok, "T. Abed")
+
+
+def test_arama_adi_kisaltma_degil_tam_ad():
+    """'T. Abed' gibi kisa ad aramayi bozar: TM adi > API ad+soyad > kisa ad."""
+    r = pd.DataFrame({
+        "player_id": [1, 2, 3], "league_id": 9, "season": 2024,
+        "player_name": ["P. Esposito", "T. Abed", "Zeca"],
+        "tm_ad": ["Pio Esposito", None, None],
+        "firstname": ["Francesco Pio", "Tarik", None],
+        "lastname": ["Esposito", "Abed", None],
+        "team_name": ["Spezia", "Jong PSV", "X"],
+        "simdi_kulup": ["Inter Milan", None, None],
+        "country": "Italy", "league_name": "Serie B", "kapsam": "tam",
+        "pos_group": "Attacker", "age_season_end": 20.0, "minutes": 900,
+        "model_olasilik": [0.5, 0.4, 0.3]})
+    d = HV.api_hazirla(r)
+    assert d.tam_ad.tolist() == ["Pio Esposito", "Tarik Abed", "Zeca"]
+    assert d.arama_kulup.tolist() == ["Inter Milan", "Jong PSV", "X"]
+
+
 def test_tm_katalogu_tutarli():
     adlar = [m.ad for m in HV.TM_TUMU.values()]
     assert len(adlar) == len(set(adlar))
@@ -201,6 +237,14 @@ def test_kart_acilir_ve_olasilik_tek_kaynakla_ayni():
     model = [m for m in at.metric if m.label == "Model"][0].value
     assert model == f"%{100 * p:.0f}"
     assert any(b.label == "Scout dosyasında aç" for b in at.button)
+    # 8.3: Sofascore + TM; TM profili yalniz KABUL edilmis eslesmeden (§60)
+    lb = {x.proto.label: x.proto.url for x in at.get("link_button")}
+    prof = _ust_oyuncu(f"""SELECT p.url FROM player_links l
+        JOIN tm_players p ON p.player_id = l.tm_id
+        WHERE l.player_id = {pid} AND l.confidence IN ('A','B','M')""")
+    assert "sofascore.com" in lb["Sofascore"]
+    if prof and prof[0]:
+        assert lb["Transfermarkt"] == prof[0]
     # profil: her yüzdeliğin yanında ham değeri var (ilk sürümde katalogda
     # olmayan blocks_padj / duel_win_pct_sh için "—" çıkıyordu)
     import json

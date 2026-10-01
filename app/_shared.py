@@ -136,7 +136,8 @@ def havuz_api() -> pd.DataFrame:
         r = _con().sql("""
             SELECT r.*, n.role_name, l.tm_id, o.gozlem_ay,
                    p.current_club_name AS simdi_kulup,
-                   p.market_value_in_eur AS simdi_deger
+                   p.market_value_in_eur AS simdi_deger,
+                   p.name AS tm_ad, p.url AS tm_url
             FROM player_ranking r
             LEFT JOIN player_natural_role n USING (player_id, league_id, season)
             LEFT JOIN player_outcome o USING (player_id, league_id, season)
@@ -152,7 +153,8 @@ def havuz_api() -> pd.DataFrame:
     # kart profilindeki yuzdeliklerin ham degerleri (katalogda olmayanlar dahil)
     ek += [column_for(m)[:-len("_pct")] for ms in HV.API_PROFIL.values()
            for m in ms if column_for(m)[:-len("_pct")] in f.columns]
-    ek = [c for c in dict.fromkeys(ek + ["team_name"]) if c not in r.columns]
+    ek = [c for c in dict.fromkeys(ek + ["team_name", "firstname", "lastname"])
+          if c not in r.columns]
     r = r.merge(f[anahtar + ek], on=anahtar, how="left")
     return HV.api_hazirla(r)
 
@@ -166,9 +168,10 @@ def havuz_tm() -> pd.DataFrame:
         r = _con().sql("""
             SELECT d.*, t.mac, t.tam_mac_payi, t.yedek_payi, t.kart_90,
                    t.pm_on90, t.pm_on_goreli, t.gf_on90, t.ga_on90,
-                   t.takim_ppg, t.boy, t.ayak
+                   t.takim_ppg, t.boy, t.ayak, p.url AS tm_url
             FROM tm_iddia_defteri d
             LEFT JOIN tm_oyuncu_sezon t USING (player_id, comp, season)
+            LEFT JOIN tm_players p ON p.player_id = d.player_id
             WHERE d.season = (SELECT max(season) FROM tm_iddia_defteri)
         """).df()
     except Exception:

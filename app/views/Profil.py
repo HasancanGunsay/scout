@@ -219,11 +219,17 @@ with a:
         st.success("Takip listesine eklendi." if added
                    else "Takip listesinden çıkarıldı.")
 with b:
-    q = str(p.player_name).replace(" ", "+")
+    import _takip_ui as TU
+    from urllib.parse import quote_plus
+
+    # 8.3: kısa ad ("T. Abed") aramayı bozar - API ad+soyad; TM profili
+    # yalnız doğrulanmış eşleşmede (player_meta, §60)
+    tam = " ".join(str(x) for x in (p.get("firstname"), p.get("lastname"))
+                   if isinstance(x, str) and x.strip()) or str(p.player_name)
+    TU.baglantilar(tam, p.team_name, p.get("tm_url"))
     st.markdown(
-        f"**Video ara:** [YouTube](https://www.youtube.com/results?search_query={q}+skills) · "
-        f"[Transfermarkt](https://www.transfermarkt.com/schnellsuche/ergebnis/schnellsuche?query={q})"
-    )
+        f"**Video ara:** [YouTube](https://www.youtube.com/results?search_query="
+        f"{quote_plus(tam + ' skills')})")
     st.caption("Sistem dikkatini yönlendirir, kararı göz testi verir.")
 
 
