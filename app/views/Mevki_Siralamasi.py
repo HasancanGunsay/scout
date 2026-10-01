@@ -15,6 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+import _havuz as HV
 import _shared as sh
 import _style as ui
 import numpy as np
@@ -38,11 +39,7 @@ MEVKI_SEKME = [("Defender", "Defans"), ("Midfielder", "Orta saha"),
                ("Attacker", "Forvet"), ("Goalkeeper", "Kaleci")]
 GUVEN_ADI = {"iyi": "iyi", "zayif": "zayıf", "dogrulanmamis": "doğrulanmamış",
              "dusuk": "düşük"}
-SONRA_ADI = {
-    "yer_edindi": "✅ yer edindi", "rotasyon": "rotasyon (450-899 dk)",
-    "gorundu": "göründü (<450 dk)", "iz_yok": "iz yok",
-    "iz_yok_gorunmez": "iz yok*", "bilinmiyor": "—",
-}
+SONRA_ADI = HV.SONRA_ADI       # Havuz ekranıyla ortak (8.1)
 OLCUT_ADI = {"model": "Model olasılığı (oyun verisi + piyasa)",
              "piyasa_ustu": "Piyasa üstü (model − piyasa)",
              "saf": "Yalnız oyun verisi (piyasa YOK)"}

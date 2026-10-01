@@ -99,9 +99,19 @@ if df.empty:
     st.stop()
 
 # ------------------------------------------------------------------ seçim
+# Havuz kartından gelinirse (?pid=&lid=&sezon=) o oyuncu seçili açılır (8.1)
+try:
+    hedef = (int(st.query_params["pid"]), int(st.query_params["lid"]),
+             int(st.query_params["sezon"]))
+except (KeyError, ValueError):
+    hedef = None
+
 with st.sidebar:
     st.header("Aday seç")
-    sezon = st.selectbox("Sezon", sorted(df.season.unique(), reverse=True))
+    sezonlar = sorted(df.season.unique(), reverse=True)
+    sezon = st.selectbox("Sezon", sezonlar,
+                         index=sezonlar.index(hedef[2])
+                         if hedef and hedef[2] in sezonlar else 0)
     alt = df[df.season == sezon]
 
     kapsam = st.radio(
@@ -125,7 +135,11 @@ with st.sidebar:
     alt = alt.sort_values("model_olasilik", ascending=False)
     etiket = (alt.player_name + " · " + alt.league_name
               + " (%" + (100 * alt.model_olasilik).round(0).astype(int).astype(str) + ")")
-    sec = st.selectbox("Oyuncu", etiket.tolist())
+    konum = 0
+    if hedef:
+        es = ((alt.player_id == hedef[0]) & (alt.league_id == hedef[1])).to_numpy()
+        konum = int(es.argmax()) if es.any() else 0
+    sec = st.selectbox("Oyuncu", etiket.tolist(), index=konum)
     r = alt.iloc[etiket.tolist().index(sec)].to_dict()
 
 d = _detay(int(r["player_id"]), int(r["league_id"]), int(r["season"]))

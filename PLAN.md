@@ -4273,3 +4273,79 @@ değil" uyarısı var. **Gerçek pas isabeti yüzdesi ücretsiz veride yok**
 kullanılmıyor; etkisi yalnızca bu ekrandı.
 
 Toplam **324 test**.
+
+
+## 58. FAZ 8.1 — Havuz Ekranı (1 Eki 2026)
+
+`app/_havuz.py` (biçimlendirme + süzgeç, Streamlit'siz) ·
+`app/views/Havuz.py` (sayfa, uygulamanın yeni giriş sayfası) ·
+`app/views/Scout_Dosyasi.py` (`?pid=&lid=&sezon=` ile açılır) ·
+`tests/test_havuz.py` (11)
+
+### 58.1 Kullanıcı isteği
+
+"Sistemin bana bir oyuncu ismi vermesini istemiyorum … okyanus içerisinde
+bir havuz yaratmasını bekliyorum. İstatistikleri liste üzerinden
+inceleyebildiğim …" Ayrıntılı güncel istatistik Sofascore'da izlenecek.
+
+### 58.2 Yapılan
+
+- **İki kaynak, tek ekran.** *2022–24 · geniş lig ağı* (API, 23 lig,
+  düşük görünürlük dahil, 5.893 U23 oyuncu-sezon, dışarıdan tahmin) ve
+  *2025/26 · Avrupa ligleri* (TM, 14 lig, 891 U23, §56 ileriye dönük
+  defterdeki kayıt). İkisi ortak şemaya çevrilir (`api_hazirla`,
+  `tm_hazirla`).
+- **Havuz dilimi:** İlk %10 / %25 (varsayılan) / %50 / Hepsi.
+- **Süzgeçler:** mevki, sezon, lig türü, lig, azami yaş, asgari dakika,
+  fiyat tavanı (değeri bilinmeyen tavana takılmaz, ayrı kutucuk), isim
+  arama (aksan ve Türkçe harf duyarsız: "ruben" → Rúben, "yildiz" →
+  Yıldız).
+- **İstatistik görünümü:** Liderler'deki aileler (API'de 8, TM'de 3: süre ve
+  rol, üretim, takım katkısı), ek sütun eklenebilir. Sütun başlığından
+  sıralanır. CSV indirilebilir.
+- **Oyuncu kartı:** satıra tıklanınca açılır. Havuz puanı, model %,
+  dakika, değer, **bugün nerede** (TM Temmuz 2026: kulüp + değer), 12 ay
+  sonucu, yüzdelik profil (API: kendi lig+sezon+mevki havuzunda; TM: aynı
+  mevkideki U23 havuzunda), "Scout dosyasında aç". `?oyuncu=<anahtar>` ile
+  doğrudan açılır (8.2 takip listesi buradan dönecek).
+- API ülke adları Türkçe (TM tarafıyla aynı dil).
+
+### 58.3 Tasarım kararı: havuz puanı = GRUP İÇİ yüzdelik
+
+Havuz puanı, model olasılığının oyuncunun kendi grubundaki yüzdeliğidir.
+Grup: sezon × mevki × lig türü (TM'de sezon × mevki). Lig türü içinde
+yüzdelik kalibrasyondan bağımsızdır (Platt monoton). Puan kullanıcı
+süzgeçlerinden **önce** hesaplanır.
+
+Neden olasılık değil: iki lig türünün taban oranı çok farklı (düşük
+görünürlükte yer edinme %12, izlenende %59). Olasılıkla sıralanan bir
+liste, kullanıcının asıl aradığı düşük görünürlüklü ligleri neredeyse
+tamamen dışarıda bırakıyor. Karar ölçümden ÖNCE verildi. Aşağıdaki ölçüm
+betimleyicidir; kuralı değiştirmedi.
+
+| Sezon | Havuzda (ilk %25) | Düşük gör. payı: havuz | Aynı sayıda en yüksek olasılık | Bütün U23 |
+|---|---|---|---|---|
+| 2022 | 484 | %59,9 | %6,4 | %60,0 |
+| 2023 | 476 | %57,8 | %3,2 | %57,8 |
+| 2024 | 522 | %62,3 | %2,7 | %62,4 |
+
+**Bedeli (dürüstlük için):** listenin tamamında 12 ayda yer edinme oranı
+düşüyor: ilk %25'te havuz %49–53, olasılığa göre üst %70–71. Sebep
+taban oranı farkı ve düşük görünürlükte sonucun kısmen görünmemesi ("iz
+yok*"). Düşük görünürlüklü grubun **kendi içinde** havuz işini yapıyor:
+ilk %25'te %29–37, ilk %10'da %39–46. Grubun tabanı %12, yani 2,5–4 kat.
+Ekran bu yüzden iki sayıyı birlikte gösteriyor: sıralama havuz puanıyla,
+seviye model %'siyle okunur.
+
+**Held-out sayacı:** 2024'e 7. bakış. Yalnızca betimleyici: kompozisyon
+ve oran. Model ya da kural seçimi yok.
+
+### 58.4 Bulunan ve düzeltilen
+
+- Kart profilinde katalogda olmayan iki metriğin (blocks_padj,
+  duel_win_pct_sh) ham değeri "—" çıkıyordu. Ham sütunlar artık
+  yükleniyor ve biçim taban metrikten alınıyor ("12 · %45"). Testle
+  korunuyor.
+- Uygulamanın giriş sayfası artık Havuz; Keşif ikinci sırada.
+
+Toplam **335 test**.
