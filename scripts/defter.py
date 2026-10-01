@@ -21,8 +21,9 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from scout.model.defter import (SUTUNLAR, bolumle, iddia_kaydi,  # noqa: E402
-                                kalibrasyon, kullanici_ortusmesi,
+from scout.model.defter import (SUTUNLAR, bolumle,  # noqa: E402
+                                disaridan_degerlendirme, eski_iddia_sayisi,
+                                iddia_kaydi, kalibrasyon, kullanici_ortusmesi,
                                 nerede_yaniliyor, puanla)
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -53,16 +54,26 @@ def _defteri_oku(con) -> pd.DataFrame:
         return pd.DataFrame(columns=SUTUNLAR)
 
 
+def sema_guncelle(con) -> None:
+    """7.0 oncesi defterde tahmin_turu sutunu yok; eklenir. Eski satirlar
+    NULL kalir (= uretim modeli, orneklem ici). Gecmis kayit DEGISMEZ."""
+    try:
+        con.execute("ALTER TABLE iddia_defteri "
+                    "ADD COLUMN IF NOT EXISTS tahmin_turu VARCHAR")
+    except duckdb.CatalogException:
+        pass                                   # defter henuz yok
+
+
 def kaydet(con) -> int:
     """Bugunku en guclu iddialari deftere yaz. Yinelenenleri atla."""
     aday = con.sql(f"""
         SELECT o.player_id, o.league_id, o.season, o.player_name,
-               o.league_name, o.kapsam, m.model_olasilik,
+               o.league_name, o.kapsam, m.model_olasilik, m.tahmin_turu,
                e.oran, e.lig_taban,
                row_number() OVER (PARTITION BY o.season, o.kapsam
                                   ORDER BY m.model_olasilik DESC) rn
         FROM player_outcome o
-        JOIN player_model_score m USING (player_id, league_id, season)
+        JOIN player_tahmin m USING (player_id, league_id, season)
         LEFT JOIN player_emsal e USING (player_id, league_id, season)
         WHERE o.age_season_end < 23 AND o.minutes >= 450
     """).df()
@@ -81,7 +92,7 @@ def kaydet(con) -> int:
     con.register("yeni", yeni)
     con.execute("""CREATE TABLE IF NOT EXISTS iddia_defteri AS
                    SELECT * FROM yeni WHERE 1=0""")
-    con.execute("INSERT INTO iddia_defteri SELECT * FROM yeni")
+    con.execute("INSERT INTO iddia_defteri BY NAME SELECT * FROM yeni")
     print(f"[kaydet] {len(yeni):,} yeni iddia deftere yazildi")
     return len(yeni)
 
@@ -92,24 +103,30 @@ def rapor(con) -> None:
         print("[rapor] defter bos - once --kaydet")
         return
     sonuc = con.sql("""SELECT player_id, league_id, season, sezon_bitis,
-                              kademe, gozlem_ay, age_season_end
+                              kademe, gozlem_ay, age_season_end, league_name
                        FROM player_outcome""").df()
-    b = bolumle(defter, sonuc)
-    retro, pro = puanla(b["retrospektif"]), puanla(b["prospektif"])
+    b = bolumle(defter, sonuc.drop(columns="league_name"))
+    pro = puanla(b["prospektif"])
+    # 7.0: gecmise donuk rapor defterin (orneklem ici) iddialarindan DEGIL,
+    # disaridan tahminlerden
+    retro = disaridan_degerlendirme(
+        con.sql("SELECT * FROM player_tahmin").df(), sonuc)
 
     print(f"\n{'=' * 70}")
     print("HESAP DEFTERI")
     print("=" * 70)
     print(f"  toplam iddia            : {len(defter):,}")
-    print(f"  GECMISE DONUK (sonuc zaten biliniyordu) : {len(retro):,}")
+    print(f"  GECMISE DONUK (sonuc zaten biliniyordu) : "
+          f"{len(b['retrospektif']):,}  (7.0 oncesi, orneklem ici: "
+          f"{eski_iddia_sayisi(defter):,})")
     print(f"  ILERIYE DONUK (sonuc bekleniyor)        : {len(pro):,}")
 
     if len(retro):
         print(f"\n--- GECMISE DONUK: KALIBRASYON RAPORU ---")
-        print("    DIKKAT: bu bir SICIL DEGIL. Model bu veriyle egitildi")
-        print("    (2022+2023) ya da uzerinde sinandi (2024). Basari iddiasi")
-        print("    olarak kullanilamaz - isi modelin NEREDE yanildigini")
-        print("    gostermek.")
+        print("    DIKKAT: bu bir SICIL DEGIL; sonuc zaten biliniyor. Kaynak:")
+        print(f"    player_tahmin - DISARIDAN tahminler ({len(retro):,} satir),")
+        print("    defterin orneklem ici iddialari DEGIL. Isi: modelin NEREDE")
+        print("    yanildigini cevabi bilmeyen modelle gostermek.")
         k = kalibrasyon(retro)
         if len(k):
             print("\n  model ne dedi / ne oldu:")
@@ -164,6 +181,7 @@ def main() -> int:
         a.rapor = True
 
     con = duckdb.connect(str(DB))
+    sema_guncelle(con)
     if a.kaydet:
         kaydet(con)
         yedekle(con)

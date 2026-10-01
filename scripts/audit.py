@@ -278,6 +278,40 @@ def main() -> int:
               f"en az secilen: {pay.role[0]} ({int(pay.n[0])} kez) - "
               f"argmax genelci sablonu secemez, PLAN §36")
 
+    # ------------------------------------------------ 7.0: tek dogruluk kaynagi
+    # DuckDB tablo zaman damgasi tutmuyor. Eski kalmayi ICERIKTEN yakala:
+    # sonuc tablosu yeniden kuruldu ama siralama kurulmadiysa kademe ayrisir.
+    if {"player_tahmin", "player_ranking", "player_outcome"} <= tables:
+        pt = q("SELECT * FROM player_tahmin")
+        anahtar = ["player_id", "league_id", "season"]
+        check("player_tahmin anahtari tekil",
+              pt.duplicated(anahtar).sum() == 0,
+              f"{pt.duplicated(anahtar).sum()} yinelenen")
+        eksik = q("""SELECT count(*) n FROM player_ranking r
+                     ANTI JOIN player_tahmin t USING (player_id, league_id, season)
+                  """).n[0]
+        check("player_tahmin her siralama satirini kapsiyor", eksik == 0,
+              f"{eksik} siralama satirinin tahmini yok")
+        ayrisan = q("""SELECT count(*) n FROM player_ranking r
+                       JOIN player_outcome o USING (player_id, league_id, season)
+                       WHERE r.kademe IS DISTINCT FROM o.kademe""").n[0]
+        check("player_ranking guncel (kademe player_outcome ile ayni)",
+              ayrisan == 0,
+              f"{ayrisan} satirda kademe ayrisiyor"
+              + (" - build_ranking calistir" if ayrisan else ""))
+        orneklem_ici = int(pt.tahmin_turu.isin(
+            ["uretim", "uretim_kalibresiz"]).sum()) if len(pt) else 0
+        sonucu_bilinen = q("""SELECT count(*) n FROM player_tahmin t
+                              JOIN player_outcome o USING (player_id, league_id, season)
+                              WHERE t.tahmin_turu LIKE 'uretim%'
+                                AND o.gozlem_ay >= 12""").n[0]
+        check("sonucu bilinen sezonlarda uretim (orneklem ici) tahmini yok",
+              sonucu_bilinen == 0,
+              f"{sonucu_bilinen} / {orneklem_ici} uretim satirinin sonucu belli")
+    else:
+        check("tablo mevcut: player_tahmin", False,
+              "build_ranking calistirilmamis")
+
     # sirlar repoya sizmis mi?
     gi = (ROOT / ".gitignore").read_text(encoding="utf-8") if (ROOT / ".gitignore").exists() else ""
     check(".env gitignore'da", ".env" in gi)

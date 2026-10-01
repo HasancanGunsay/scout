@@ -433,6 +433,23 @@ kullanıcı "şimdi ne yapmış" diye kendisi incelesin. Pahalı oyuncular ilgi 
 6.3–6.5 "oyun verisi piyasadan fazlasını söylemiyor" gerçeğine göre yeniden kurulur.
 Rating (API) sonraki dönem için yok — "kaç puanla oynadı" olçülemez, yerine TM verisi.
 
+### FAZ 7 — Eldeki verinin maksimumu · 7.0 TAMAM (1 Eki 2026, PLAN §51)
+
+API ücretsiz planı yalnızca 2022–2024'ü veriyor ve 2025'in ne zaman açılacağı
+bilinmiyor. 2024 held-out'u beş bakışla tükendi. Ama ham Transfermarkt
+dosyasında hiç kullanılmamış **2012–2021** (10 sezon, ~7.600 U23 oyuncu-sezon)
+ve **2025/26** var. Sınır: yalnızca TM'nin oyuncu bazında izlediği 14 birinci
+lig. Düşük görünürlüklü ligler orada yok.
+
+| Alt faz | İş | Durum |
+|---|---|---|
+| 7.0 ✅ | Tek doğruluk kaynağı `player_tahmin`; zincire `build_sonra` + `build_ranking` (§51) | tamam |
+| 7.1 | 2012–2021 TM-only özellikler (dakika payı, ilk 11, G+A/90, kart, değişiklik, yaş, değer, takım gücü) | |
+| 7.2 | Temiz sınavı önceden mühürle: 2012–2017 geliştirme, **2018–2021 tek açılış** (COVID sezonları ayrı raporlanır) | |
+| 7.3 | Kalibrasyon kayması: kalibratör güncelleme kuralı geliştirmede seçilir, test yıllarında sınanır | |
+| 7.4 | İzlenen liglerde API modeli vs TM-only model (2022–24): API metrikleri ne katıyor? | |
+| 7.5 | 2025/26 için **ileriye dönük defter**, TM-only modelle (873 oyuncu) | |
+
 ---
 
 ## 8. Bilinen tuzaklar

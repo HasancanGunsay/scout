@@ -45,8 +45,9 @@ def veri(con) -> pd.DataFrame:
 
     df = pd.concat([tm.veri_yukle(con, (2022, 2023)),
                     tm.veri_yukle(con, (2024,))], ignore_index=True)
+    # 7.0: disaridan tahmin (player_tahmin); uretim modeli 2022-24'u gormus
     ek = con.sql("""SELECT player_id, league_id, season, model_olasilik
-                    FROM player_model_score""").df()
+                    FROM player_tahmin""").df()
     df = df.merge(ek, on=["player_id", "league_id", "season"], how="left")
     df["lig_taban"] = lig_taban_orani(df)
     return df

@@ -95,3 +95,23 @@ def test_oyuncu_degistirince_cokmuyor():
         at2 = _at()
         at2.selectbox[-1].select(ad).run()
         assert not at2.exception, f"{ad}: {[str(e) for e in at2.exception]}"
+
+
+def test_olasilik_tek_kaynaktan_disaridan_tahmin():
+    """7.0: dosya, Mevki Siralamasi ile AYNI olasiligi gostermeli - yani
+    player_tahmin'deki disaridan tahmini; sezonu egitimde gormus uretim
+    modelinin (player_model_score) orneklem ici olasiligini DEGIL."""
+    import duckdb
+    at = _at()
+    assert not at.exception
+    goster = [m.value for m in at.metric if m.label == "Model olasılığı"][0]
+    con = duckdb.connect(str(DB if DB.exists() else SNAP), read_only=True)
+    try:
+        beklenen = con.sql("""
+            SELECT max(t.model_olasilik) FROM player_tahmin t
+            JOIN player_outcome o USING (player_id, league_id, season)
+            WHERE t.season = (SELECT max(season) FROM player_tahmin)
+        """).fetchone()[0]
+    finally:
+        con.close()
+    assert goster == f"%{100 * beklenen:.0f}"

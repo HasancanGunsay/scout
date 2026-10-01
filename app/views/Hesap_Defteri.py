@@ -22,8 +22,10 @@ import plotly.graph_objects as go
 import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
-from scout.model.defter import (bolumle, kalibrasyon,  # noqa: E402
-                                kullanici_ortusmesi, nerede_yaniliyor, puanla)
+from scout.model.defter import (bolumle,  # noqa: E402
+                                disaridan_degerlendirme, eski_iddia_sayisi,
+                                kalibrasyon, kullanici_ortusmesi,
+                                nerede_yaniliyor, puanla)
 
 sh.page_setup(
     "Hesap Defteri",
@@ -38,14 +40,18 @@ def _defter():
     try:
         d = con.sql("SELECT * FROM iddia_defteri").df()
     except Exception:
-        return None, None
+        return None, None, None
     s = con.sql("""SELECT player_id, league_id, season, sezon_bitis, kademe,
-                          gozlem_ay, age_season_end
+                          gozlem_ay, age_season_end, league_name
                    FROM player_outcome""").df()
-    return d, s
+    try:
+        t = con.sql("SELECT * FROM player_tahmin").df()
+    except Exception:
+        t = None
+    return d, s, t
 
 
-defter, sonuc = _defter()
+defter, sonuc, tahmin = _defter()
 if defter is None or defter.empty:
     ui.empty_state(
         "Defter boş",
@@ -53,13 +59,19 @@ if defter is None or defter.empty:
     )
     st.stop()
 
-b = bolumle(defter, sonuc)
-retro, pro = puanla(b["retrospektif"]), puanla(b["prospektif"])
+b = bolumle(defter, sonuc.drop(columns="league_name"))
+pro = puanla(b["prospektif"])
+# 7.0: kalibrasyon raporu defterin iddialarindan DEGIL, disaridan tahminlerden
+retro = (disaridan_degerlendirme(tahmin, sonuc) if tahmin is not None
+         else pd.DataFrame())
+eski = eski_iddia_sayisi(defter)
 
 c1, c2, c3 = st.columns(3)
 c1.metric("Toplam iddia", f"{len(defter):,}")
-c2.metric("Geçmişe dönük", f"{len(retro):,}",
-          help="Kayıt anında sonuç zaten biliniyordu. Sicil DEĞİL.")
+c2.metric("Geçmişe dönük", f"{len(b['retrospektif']):,}",
+          help="Kayıt anında sonuç zaten biliniyordu. Sicil DEĞİL. "
+               f"Bunların {eski}'i, sezonu eğitimde görmüş modelle kaydedildi "
+               "(Faz 7.0 öncesi); kalibrasyon raporunda kullanılmıyor.")
 c3.metric("İleriye dönük", f"{len(pro):,}",
           help="Kayıt anında sonuç bilinmiyordu. Gerçek sicil budur.")
 
@@ -89,10 +101,15 @@ ui.section("Geçmişe dönük kalibrasyon",
 # Sayfanin EN ONEMLI cekincesi - ui.section alt metni fazla sessiz kaliyor,
 # uyari olarak veriliyor.
 st.warning(
-    "**Bu bir sicil DEĞİL, başarı iddiası DEĞİL.** Model bu veriyle eğitildi "
-    "(2022+2023) ya da üzerinde sınandı (2024) — sonuç kayıt anında zaten "
-    "biliniyordu. Buradaki sayılar yalnızca modelin **nerede yanıldığını** "
+    "**Bu bir sicil DEĞİL, başarı iddiası DEĞİL** — 2022-24'ün sonucu zaten "
+    "biliniyor. Buradaki sayılar yalnızca modelin **nerede yanıldığını** "
     "gösterir. Gerçek sicil, yukarıdaki ileriye dönük bölümde birikecek."
+)
+st.caption(
+    f"Kaynak: {len(retro):,} **dışarıdan** tahmin — her oyuncunun olasılığı, "
+    "o ligi ya da o sezonu hiç görmemiş modelden geliyor. Defterdeki eski "
+    "iddialar (sezonu eğitimde görmüş modelle kaydedildikleri için iyimser) "
+    "bu rapora girmiyor."
 )
 
 if retro.empty:
@@ -139,15 +156,15 @@ ui.section("Senin seçimlerin",
 sl = sh.get_shortlist()
 o = kullanici_ortusmesi(sl, pd.concat([retro, pro]))
 if not o.get("n"):
-    st.caption("Shortlist'inde defterde kayıtlı oyuncu yok. Keşif "
+    st.caption("Shortlist'inde model tahmini olan oyuncu yok. Keşif "
                "sayfasından oyuncu işaretledikçe bu bölüm dolar.")
 else:
     a, bb = st.columns(2)
     a.metric("Senin seçtiklerinin model ortalaması",
              f"%{100 * o['ort_model']:.0f}",
-             delta=f"defter geneli %{100 * o['ort_model_geneli']:.0f}")
+             delta=f"tüm oyuncular %{100 * o['ort_model_geneli']:.0f}")
     if o.get("gerceklesme") is not None:
         bb.metric("Senin seçtiklerinin gerçekleşmesi",
                   f"%{100 * o['gerceklesme']:.0f}",
-                  delta=f"defter geneli %{100 * o['gerceklesme_geneli']:.0f}")
+                  delta=f"tüm oyuncular %{100 * o['gerceklesme_geneli']:.0f}")
     st.caption(f"{o['n']} oyuncu eşleşti.")

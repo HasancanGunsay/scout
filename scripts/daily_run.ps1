@@ -47,12 +47,12 @@ function Write-Log {
 function Invoke-Step {
     <#  Bir adimi calistir, cikis kodunu kontrol et, hata varsa bir kez tekrar dene.
         Doner: $true basarili, $false basarisiz. #>
-    param([string]$script)
+    param([string]$script, [string[]]$ekArg = @())
 
     foreach ($attempt in 1, 2) {
         $tag = if ($attempt -eq 1) { $script } else { "$script (2. deneme)" }
-        Write-Log "--- $tag ---"
-        & $py (Join-Path $root "scripts\$script") 2>&1 | ForEach-Object { Write-Log $_ }
+        Write-Log "--- $tag $($ekArg -join ' ') ---"
+        & $py (Join-Path $root "scripts\$script") @ekArg 2>&1 | ForEach-Object { Write-Log $_ }
         $code = $LASTEXITCODE
         if ($code -eq 0) {
             Write-Log "OK: $script"
@@ -162,10 +162,17 @@ if (Wait-Internet) {
 
 # 2) build zinciri - SIRALI bagimlilik, biri coktuyse sonrakiler anlamsiz
 $failed = $null
+#    7.0 (1 Eki 2026): build_sonra + build_ranking eklendi. Onceden zincirde
+#    yoktu - veri guncellenince Mevki Siralamasi SESSIZCE eski kaliyordu.
+#    build_ranking player_tahmin'i (tek dogruluk kaynagi) da yazar; emsal ve
+#    defter ondan okudugu icin ONLARDAN ONCE calisir.
 foreach ($step in @("build_db.py", "build_features.py", "build_links.py",
                     "build_scores.py", "build_outcomes.py",
+                    "build_sonra.py", "build_ranking.py --sessiz",
                     "build_emsal.py")) {
-    if (-not (Invoke-Step $step)) { $failed = $step; break }
+    $parca = $step -split ' '
+    $ek = if ($parca.Count -gt 1) { $parca[1..($parca.Count - 1)] } else { @() }
+    if (-not (Invoke-Step $parca[0] $ek)) { $failed = $step; break }
 }
 
 # 3) Hesap defteri - iddiayi KAYDET. Append-only; gecmis kayit

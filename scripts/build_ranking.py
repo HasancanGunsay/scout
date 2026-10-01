@@ -33,6 +33,7 @@ Oncelik: dusuk > dogrulanmamis > zayif > iyi (en kotumser olan kazanir).
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 import warnings
@@ -51,6 +52,7 @@ import fiyat_bandi as fb  # noqa: E402
 import train_model as tm  # noqa: E402
 from scout.model.kalibrasyon import grup_fit, grup_uygula, lolo_kalibre  # noqa: E402
 from scout.model.ranker import esli_bootstrap, fark_ga, lig_ici_auc  # noqa: E402
+from scout.model.tahmin import tahmin_tablosu  # noqa: E402
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -120,7 +122,7 @@ def tablo_uret(con) -> pd.DataFrame:
     return d
 
 
-def kaydet(d: pd.DataFrame) -> None:
+def kaydet(d: pd.DataFrame, uretim: pd.DataFrame | None = None) -> None:
     kol = ["player_id", "league_id", "season", "player_name", "league_name",
            "country", "kapsam", "pos_group", "age_season_end", "minutes",
            "score", "deger", "deger_var", "bant", "ucuz", "model_olasilik",
@@ -131,8 +133,28 @@ def kaydet(d: pd.DataFrame) -> None:
     con = duckdb.connect(str(DB))
     con.register("t", t)
     con.execute("CREATE OR REPLACE TABLE player_ranking AS SELECT * FROM t")
+    # 7.0: tek dogruluk kaynagi - tum sayfalar ve defter buradan okur
+    par = json.loads(KALIBRATOR.read_text(encoding="utf-8"))["parametre"]
+    pt = tahmin_tablosu(t, uretim, par.get("model"))
+    con.register("pt", pt)
+    con.execute("CREATE OR REPLACE TABLE player_tahmin AS SELECT * FROM pt")
     con.close()
     print(f"[kaydet] player_ranking: {len(t):,} satir")
+    print(f"[kaydet] player_tahmin : {len(pt):,} satir · "
+          f"{pt.tahmin_turu.value_counts().to_dict()}")
+
+
+def uretim_yukle(con) -> pd.DataFrame | None:
+    """Uretim modelinin tahminleri + kapsam. Disaridan tahmini OLMAYAN
+    satirlar (2025+) icin kullanilir; 2022-24'te hepsi elenir."""
+    try:
+        return con.sql("""
+            SELECT m.player_id, m.league_id, m.season, m.model_olasilik,
+                   o.kapsam
+            FROM player_model_score m
+            JOIN player_outcome o USING (player_id, league_id, season)""").df()
+    except (duckdb.CatalogException, duckdb.BinderException):
+        return None
 
 
 def rapor(d: pd.DataFrame) -> None:
@@ -193,12 +215,19 @@ def rapor(d: pd.DataFrame) -> None:
 
 
 def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--sessiz", action="store_true",
+                    help="tani raporunu atla (gunluk zincir icin)")
+    a = ap.parse_args()
+
     con = duckdb.connect(str(DB), read_only=True)
     d = tablo_uret(con)
+    uretim = uretim_yukle(con)
     con.close()
     print(f"[in] {len(d):,} satir · {d.tahmin_turu.value_counts().to_dict()}")
-    rapor(d)
-    kaydet(d)
+    if not a.sessiz:
+        rapor(d)
+    kaydet(d, uretim)
     return 0
 
 

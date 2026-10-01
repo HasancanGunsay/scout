@@ -154,3 +154,35 @@ def test_kullanici_ortusmesi_eslesme_bulur():
 
 def test_kullanici_ortusmesi_bos_shortlist():
     assert kullanici_ortusmesi([], pd.DataFrame({"a": [1]}))["n"] == 0
+
+
+# ------------------------------------------------------------- 7.0
+def test_iddia_kaydi_tahmin_turunu_tasir():
+    """Yeni iddia olasiliginin NEREDEN geldigini kaydeder."""
+    k = iddia_kaydi({**_iddia(), "oran": None, "tahmin_turu": "zaman-disi"})
+    assert k["tahmin_turu"] == "zaman-disi"
+
+
+def test_eski_iddia_sayisi_null_tahmin_turu():
+    from scout.model.defter import eski_iddia_sayisi
+    d = pd.DataFrame([_iddia(1), _iddia(2), _iddia(3)])
+    assert eski_iddia_sayisi(d) == 3                 # sutun hic yok: hepsi eski
+    d["tahmin_turu"] = [None, "lig-disi CV", None]
+    assert eski_iddia_sayisi(d) == 2
+
+
+def test_disaridan_degerlendirme_defteri_degil_tahmini_kullanir():
+    """Gecmise donuk rapor disaridan tahmine dayanir; sonucu bilinmeyen
+    satir (kademe NaN) rapora girmez."""
+    from scout.model.defter import disaridan_degerlendirme
+    tahmin = pd.DataFrame({"player_id": [1, 2, 3], "league_id": 10,
+                           "season": 2022, "kapsam": "tam",
+                           "model_olasilik": [0.2, 0.8, 0.5]})
+    sonuc = pd.DataFrame({"player_id": [1, 2, 3], "league_id": 10,
+                          "season": 2022, "kademe": [0, 4, np.nan],
+                          "kapsam": "BASKA", "league_name": "L"})
+    d = disaridan_degerlendirme(tahmin, sonuc)
+    assert list(d.player_id) == [1, 2]
+    assert list(d.gerceklesti) == [0.0, 1.0]
+    assert set(d.kapsam) == {"tam"}                  # tahminin kapsami korunur
+    assert list(d.model_olasilik) == [0.2, 0.8]

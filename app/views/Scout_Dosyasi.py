@@ -43,7 +43,7 @@ def _adaylar() -> pd.DataFrame:
                    o.league_name, o.country, o.kapsam, o.kademe,
                    o.age_season_end AS yas, o.minutes, o.score,
                    o.lig_dk_y1, o.gol_y1, o.en_iyi_lig, o.gozlem_ay,
-                   m.model_olasilik, m.model_skor,
+                   m.model_olasilik, m.model_ham, m.tahmin_turu,
                    e.n AS emsal_n, e.olumlu AS emsal_olumlu, e.oran,
                    e.oran_lo, e.oran_hi, e.lig_taban, e.kaldirac,
                    e.taban_ustunde, e.yeterli,
@@ -59,7 +59,7 @@ def _adaylar() -> pd.DataFrame:
                 WHERE pv.date <= o2.sezon_bitis - INTERVAL 1 MONTH
                 GROUP BY 1,2,3,4
             ) v USING (player_id, league_id, season)
-            LEFT JOIN player_model_score m USING (player_id, league_id, season)
+            LEFT JOIN player_tahmin m USING (player_id, league_id, season)
             LEFT JOIN player_emsal e USING (player_id, league_id, season)
             WHERE m.model_olasilik IS NOT NULL
         """).df()
@@ -93,7 +93,7 @@ df = _adaylar()
 if df.empty:
     ui.empty_state(
         "Model tahminleri yok",
-        "Önce `python scripts/train_model.py --test --kaydet` ve "
+        "Önce `python scripts/build_ranking.py` ve "
         "`python scripts/build_emsal.py` çalıştırılmalı.",
     )
     st.stop()
@@ -145,7 +145,8 @@ st.markdown(f"## {r['player_name']}")
 st.info(MT.iddia(r))
 
 c1, c2, c3, c4 = st.columns(4)
-c1.metric("Model olasılığı", f"%{100 * r['model_olasilik']:.0f}")
+c1.metric("Model olasılığı", f"%{100 * r['model_olasilik']:.0f}",
+          help=MT.olasilik_notu(r))
 c2.metric("Ligin tabanı",
           f"%{100 * r['lig_taban']:.0f}" if pd.notna(r.get("lig_taban")) else "—")
 c3.metric("Rol skoru", f"{r['score']:.1f}" if pd.notna(r["score"]) else "—")

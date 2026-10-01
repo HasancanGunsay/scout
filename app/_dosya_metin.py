@@ -91,6 +91,27 @@ def kor_cumlesi(kod: str) -> str:
     return KOR_METIN.get(kod, kod)
 
 
+TAHMIN_TURU_METIN = {
+    "lig-disi CV": "bu ligi hiç görmemiş modelden (lig dışı çapraz doğrulama)",
+    "zaman-disi": "bu sezonu hiç görmemiş modelden (zaman dışı)",
+    "uretim": "üretim modelinden (sonucu henüz bilinmeyen sezon)",
+    "uretim_kalibresiz": "üretim modelinden, kalibrasyonsuz",
+}
+
+
+def olasilik_notu(r: dict) -> str:
+    """Model olasılığının nereden geldiği (7.0) ve kalibrasyon notu (6.6)."""
+    s = ("Tahmin " + TAHMIN_TURU_METIN.get(r.get("tahmin_turu"), "bilinmeyen "
+         "kaynaktan") + "; lig türüne göre kalibre.")
+    ham = r.get("model_ham")
+    if pd.notna(ham):
+        s += f" Kalibrasyon öncesi: %{100 * ham:.0f}."
+        if r.get("kapsam") == "sicrama_only":
+            s += (" Düşük görünürlüklü liglerde, en yeni sezonda ham değer "
+                  "gerçeğe daha yakın çıktı (PLAN §50).")
+    return s
+
+
 def iddia(r: dict) -> str:
     """Tek cümle, yanlışlanabilir. Dosyanın başlığı."""
     p = [f"**{r['yas']:.1f}** yaşında"]

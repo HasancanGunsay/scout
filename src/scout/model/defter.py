@@ -41,7 +41,9 @@ KAYNAK_KULLANICI = "kullanici"
 # Defter satirinin sutunlari
 SUTUNLAR = ["kayit_tarihi", "player_id", "league_id", "season", "player_name",
             "league_name", "kapsam", "model_olasilik", "emsal_oran",
-            "lig_taban", "kaynak", "not"]
+            "lig_taban", "kaynak", "not", "tahmin_turu"]
+# tahmin_turu (7.0): iddianin olasiligi NEREDEN geldi. FAZ 7.0 oncesi
+# kayitlarda bos (NULL) = uretim modeli, 2022-24 icin ORNEKLEM ICI.
 
 
 def iddia_kaydi(r: dict, tarih: dt.date | None = None,
@@ -61,6 +63,7 @@ def iddia_kaydi(r: dict, tarih: dt.date | None = None,
                       else None),
         "kaynak": kaynak,
         "not": notu,
+        "tahmin_turu": r.get("tahmin_turu"),
     }
 
 
@@ -99,6 +102,32 @@ def puanla(d: pd.DataFrame) -> pd.DataFrame:
     out["gerceklesti"] = np.where(out.kademe.notna(),
                                   (out.kademe >= 3).astype(float), np.nan)
     return out
+
+
+def disaridan_degerlendirme(tahmin: pd.DataFrame, sonuc: pd.DataFrame
+                            ) -> pd.DataFrame:
+    """Gecmise donuk kalibrasyon raporunun GIRDISI (7.0).
+
+    FAZ 7.0'a kadar bu rapor defterdeki 2022-24 iddialarindan hesaplaniyordu;
+    o iddialar ise sezonu egitimde GORMUS uretim modelinden geliyordu (ornek-
+    lem ici - iyimser). Artik player_tahmin'deki DISARIDAN tahminlerden:
+    modelin nerede yanildigini, cevabi bilmeyen modelle olcer.
+
+    tahmin : player_tahmin (player_id, league_id, season, kapsam,
+             model_olasilik, ...)
+    sonuc  : player_outcome'dan en az kademe (+ istege bagli league_name)
+    """
+    anahtar = ["player_id", "league_id", "season"]
+    s = sonuc.drop(columns=[c for c in ("kapsam",) if c in sonuc.columns])
+    d = tahmin.merge(s, on=anahtar, how="inner")
+    return puanla(d).dropna(subset=["gerceklesti"])
+
+
+def eski_iddia_sayisi(defter: pd.DataFrame) -> int:
+    """7.0 oncesi (orneklem ici uretim modeliyle) kaydedilmis iddia sayisi."""
+    if "tahmin_turu" not in defter.columns:
+        return len(defter)
+    return int(defter.tahmin_turu.isna().sum())
 
 
 def kalibrasyon(d: pd.DataFrame, kova: int = 5) -> pd.DataFrame:

@@ -3664,3 +3664,84 @@ Aynı bakışın parçası sayıldı.)
   `kalibrator.json` 2025+ tahminleri (gerçekten dışarıdan) için hazır.
 
 Toplam **273 test**. Denetim 35 / 29 / 5 / 1 (değişmedi).
+
+
+## 51. FAZ 7.0 — Tek Doğruluk Kaynağı + Zincir Tamamlama (1 Eki 2026)
+
+`src/scout/model/tahmin.py` · `player_tahmin` tablosu · `tests/test_tahmin.py` (6)
+
+### 51.1 Sorun: iki sayfa aynı oyuncu için iki farklı olasılık
+
+| Kaynak | Ne | Kim okuyordu |
+|---|---|---|
+| `player_ranking` | dışarıdan (lig-dışı CV / zaman-dışı), kalibre | Mevki sıralaması |
+| `player_model_score` | üretim modeli, **2022–24'ü eğitimde görmüş** | Scout dosyası, defter, emsal raporu |
+
+Ölçülen fark (5.893 oyuncu-sezon): **ortalama 7, en fazla 27 puan**.
+Örnek: 2024'ün en yüksek olasılığı sıralamada %93, dosyada %97.
+İkinci sayı, cevabı bilen modelden geliyordu.
+
+### 51.2 Kural
+
+`build_ranking` artık `player_tahmin`'i de yazıyor: oyuncu-sezon başına tek
+olasılık.
+- Dışarıdan tahmin **varsa** o kullanılır (2022–24'ün tamamı).
+- Yalnızca dışarıdan tahmini olmayan satırlar (sonucu bilinmeyen yeni
+  sezonlar, 2025+) üretim modelinden gelir. Onlar zaten dışarıdan.
+  Aynı kapsam kalibratörüyle (`kalibrator.json`) düzeltilir.
+- Her satır kaynağını taşır: `tahmin_turu` = `lig-disi CV` |
+  `zaman-disi` | `uretim` | `uretim_kalibresiz`.
+
+Okuyanlar: Scout dosyası (olasılığın yanında kaynağı ve ham değeri de
+gösterir), Hesap defteri, `defter.py`, `build_emsal.py`.
+`player_model_score` yalnızca üretim modelinin iç çıktısı olarak kalır.
+Hiçbir sayfa onu okumuyor.
+
+### 51.3 Hesap defteri
+
+- **Kayıt değişmez:** 7.0 öncesi 353 iddia olduğu gibi duruyor.
+  Deftere `tahmin_turu` sütunu eklendi; eski satırlarda boş (= örneklem içi).
+- **Geriye dönük kalibrasyon raporu artık defterin iddialarından değil,**
+  `player_tahmin`'in 5.893 dışarıdan tahmininden hesaplanıyor. §42.3'teki
+  "+0,094" ölçüsünün sorunu buydu: rapor, sezonu görmüş modelin
+  iddialarını ölçüyordu.
+- Yeni kural ilk çalıştığında **33 yeni (geriye dönük) iddia** kaydedildi:
+  dışarıdan tahmine göre ilk-50'ler, üretim modelininkilerden farklı
+  oyunculardan oluşuyor.
+- Defter her `--kaydet`te `data/defter/iddia_defteri.csv`'ye aynalanıyor
+  (git'te). Veritabanı yeniden üretilebilir, defter üretilemez.
+
+### 51.4 Yeni bulgu: dışarıdan ölçünce
+
+| Lig türü | n | Model dedi | Gerçekleşen | Sapma |
+|---|---|---|---|---|
+| İzlenen (`tam`) | 2.349 | 0,583 | 0,589 | −0,006 |
+| Düşük görünürlük | 3.544 | 0,108 | 0,121 | −0,013 |
+
+Kapsam kalibrasyonu (§50) tutuyor. Lig bazında en büyük sapma
+**Premier League: model 0,790 dedi, gerçekleşen 0,670 (+0,121, n=230).**
+Sebebi ölçülmedi. Kullanıcının odağı (ucuz/düşük görünürlük) dışında.
+Kayıt altında, düzeltilmedi. Lig bazında kalibrasyon, 22 ligle aşırı
+uyum riski taşır.
+
+### 51.5 Günlük zincir
+
+`daily_run.ps1`: `build_outcomes → build_sonra → build_ranking --sessiz →
+build_emsal → defter --kaydet`. Önceden `build_sonra` ve `build_ranking`
+zincirde yoktu. Veri güncellenince Mevki sıralaması **sessizce** eski
+kalıyordu. `--sessiz` tanı raporunu atlar (17 sn).
+
+### 51.6 Denetim: eski kalmayı içerikten yakalamak
+
+DuckDB tablo zaman damgası tutmuyor. Dört yeni kontrol:
+`player_tahmin` anahtarı tekil · her sıralama satırını kapsıyor ·
+`player_ranking.kademe = player_outcome.kademe` (sonuç tablosu yenilenip
+sıralama yenilenmediyse ayrışır) · sonucu bilinen sezonda üretim tahmini yok.
+
+### 51.7 Test
+
+`test_tahmin.py` (6), `test_defter.py` +3, `test_dosya_sayfasi.py` +1.
+Sonuncusu sayfayı gerçekten çalıştırıp gösterilen olasılığın
+`player_tahmin` ile aynı olduğunu sınıyor. Eski kaynakla kalsaydı %97 ≠ %93
+ile kalırdı. Toplam **283 test**. Denetim 39 / 33 / 5 / 1 (5 = bilinen
+sağlayıcı boşlukları).
