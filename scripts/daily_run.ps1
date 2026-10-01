@@ -179,7 +179,7 @@ foreach ($step in @("build_db.py", "build_features.py", "build_links.py",
 #    guncellenmiyor. Bir iddianin degeri geri alinamamasindan gelir.
 if (-not $failed) {
     & $py (Join-Path $root "scripts\defter.py") --kaydet 2>&1 |
-        Where-Object { $_ -match "kaydet" } | ForEach-Object { Write-Log "  $_" }
+        Where-Object { $_ -match "kaydet|yedek" } | ForEach-Object { Write-Log "  $_" }
 }
 
 # Denetim de cokebiliyor (28 Agu 2026: import sirasinda yerel seviye cokme,

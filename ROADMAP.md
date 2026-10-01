@@ -464,6 +464,7 @@ izlenecek; bizim arayüz de "keyif veren" olmalı.
 | 8.2 | Takip listesi: oyuncuyu takibe al, kendi notunu yaz; defterle bağlantı ("senin seçimlerin") |
 | 8.3 | Sofascore'a hızlı geçiş (ad + kulüp ile arama), TM profili |
 | 8.4 | Görsel düzen: sayfa sayısını azalt, tutarlı kartlar, keyifli tasarım |
+| 8.5 | Bakım: ROADMAP §1 ("Sistem şu an nerede", hâlâ 72 test diyor) ve README'yi güncelle; `use_container_width` → `width="stretch"` (41 yer, Streamlit kaldıracak) |
 
 ---
 
