@@ -4004,3 +4004,73 @@ Sağ kanat (−0,010) ve Sol kanat (+0,011) ayırt edilemiyor.
    (TM satırları) sınanmalı.
 
 Held-out sayacı: 2018–2021 **bir kez** açıldı. 2024 (API) için sayaç 5'te.
+
+
+## 54. FAZ 7.3 — Kalibratör Zaman İçinde Nasıl Güncellenmeli? (1 Eki 2026)
+
+`src/scout/model/zaman_kalibrasyon.py` · `scripts/kalibrasyon_kayma.py` ·
+`kalibrasyon.py`'ye ağırlıklı Platt + kesişim kaydırması ·
+`tests/test_zaman_kalibrasyon.py` (10)
+
+### 54.1 Soru
+
+Model iyi sıralıyor ama olasılık seviyesi oynuyor: TM mühürlü testinde
+sezon sapması +0,063 / −0,056 / +0,011 / +0,017 (§53.5). API döneminde düşük
+görünürlük iyimserliği 2022'den 2024'e azaldı (§50.4). Kalibratörü son
+sezona göre mi, tüm geçmişe göre mi, ağırlıklı mı güncellemeli?
+
+### 54.2 Kurulum
+
+**İleri-zincir tahmin:** her sezon t için model (`tam`, §53) yalnızca
+2013..t−1 ile eğitilir ve t'yi tahmin eder, yani üretimdeki durum.
+Kurallar hedef sezon s için yalnızca s'den önceki sezonların tahmin ve
+sonuçlarını kullanır. `test_gelecegi_gormez`, hedef sezonu ve sonrasını
+bozmanın sonucu değiştirmediğini her kural için sınıyor.
+
+Kurallar: `ham` · `tum_gecmis` (Platt, tüm geçmiş) · `son1` · `son2` ·
+`son1_kesisim` (yalnız kesişim, tek parametre) · `agirlikli` (üstel,
+yarılanma 1 sezon; önceden sabit).
+
+**Karar kuralı (önceden):** geliştirme hedefleri 2015–2017. En düşük
+log-kayıplı kural, `tum_gecmis`e karşı oyuncu kümeli %95 GA sıfırın
+altındaysa seçilir; değilse `tum_gecmis`. Sınama 2022–2024 (TM).
+**Açık kayıt:** 2022–24'ün TM taban oranları 7.1 sağlamasında basılmıştı.
+
+### 54.3 Sonuç: hiçbir güncelleme kuralı işe yaramıyor
+
+| | Geliştirme 2015–17 log-kayıp | Sınama 2022–24 log-kayıp | sınama ort. \|sapma\| |
+|---|---|---|---|
+| **ham** | **0,5871** | 0,6001 | 0,0027 |
+| tum_gecmis | 0,5879 | 0,6001 | 0,0026 |
+| son1 | 0,5886 | 0,6006 | 0,0058 |
+| son2 | 0,5882 | 0,5998 | 0,0069 |
+| son1_kesisim | 0,5888 | 0,6003 | 0,0068 |
+| agirlikli | 0,5881 | 0,5999 | 0,0029 |
+
+- Geliştirmede en iyisi `ham`. `tum_gecmis`e karşı fark −0,0009
+  [−0,0023, +0,0005], anlamsız. Kural gereği **`tum_gecmis` seçildi**.
+  Sınamada `tum_gecmis − ham` = −0,0000. Pratikte ikisi aynı.
+- **"Son sezona göre düzelt" kuralları en kötüleri.** Geliştirmede sezon
+  sapması −0,04 → +0,01..+0,05 diye yön değiştiriyor. Son sezonu izleyen
+  kural bir sonraki yılı tahmin edemiyor, tepkiyi abartıyor.
+- **Kayma bir eğilim değil, gürültü** (2019/20 COVID gibi tekil şoklar dahil).
+  Geçmiş sezonlardan kestirilemiyor.
+- **Asıl belirleyici, eğitim geçmişinin uzunluğu.** Modelin 1–4 sezonla
+  eğitildiği geliştirme yıllarında sezon sapmaları ±0,04. 9–11 sezonla
+  eğitildiği 2022–24'te ±0,005. Model ne kadar çok sezon görürse sezonlar
+  arası şoklar o kadar ortalanıyor.
+
+### 54.4 Ürüne yansıması
+
+1. **API kalibratörü değişmiyor.** Kapsam Platt'ı "tüm geçmiş" ile kurulmaya
+   devam ediyor (6.6). 2025 açıldığında 2022–24 ile yeniden kurulacak. Son
+   sezona göre güncelleme yapılmayacak.
+2. **API modeli yalnızca 2–3 sezonla eğitildi.** TM'nin 10 yılı bu kadar
+   kısa geçmişte sezon düzeyinde **±4–6 puanlık, kestirilemeyen** sapma
+   beklenmesi gerektiğini gösteriyor. Mevki sıralaması sayfasına eklendi:
+   "%62 ile %58 arasındaki farka değil, listedeki yere güvenin."
+3. §50.4'teki "düşük görünürlükte iyimserlik azalıyor" gözlemi üç sezona
+   dayanıyor. Buradaki kanıt, bunun bir eğilim olarak okunmamasını, son
+   sezona göre düzeltme yapılmamasını söylüyor.
+
+Toplam **308 test**.

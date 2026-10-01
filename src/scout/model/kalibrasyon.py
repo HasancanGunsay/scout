@@ -33,13 +33,29 @@ def _logit(p) -> np.ndarray:
     return np.log(p / (1 - p))
 
 
-def platt_fit(p, y) -> tuple[float, float]:
+def platt_fit(p, y, w=None) -> tuple[float, float]:
     """(a, b): logit(p_kal) = a + b*logit(p). Hafif L2 (C=100) - sayisal
-    kararlilik icin; pratikte duzenlemesiz."""
+    kararlilik icin; pratikte duzenlemesiz. w: satir agirliklari (7.3)."""
     x = _logit(p).reshape(-1, 1)
     y = np.asarray(y, int)
-    m = LogisticRegression(C=100.0, max_iter=1000).fit(x, y)
+    m = LogisticRegression(C=100.0, max_iter=1000).fit(x, y, sample_weight=w)
     return float(m.intercept_[0]), float(m.coef_[0, 0])
+
+
+def kesisim_fit(p, y) -> tuple[float, float]:
+    """Yalniz kesisim kaydirmasi: logit(p_kal) = a + logit(p), b = 1 sabit.
+    a, ortalama tahmin = gozlenen oran olacak sekilde (tek parametre - az
+    veriyle kararli). Ortalama olasilik a'da monoton: ikiye bolme yeter."""
+    lp = _logit(p)
+    hedef = float(np.mean(y))
+    lo, hi = -10.0, 10.0
+    for _ in range(80):
+        a = (lo + hi) / 2
+        if np.mean(1 / (1 + np.exp(-(lp + a)))) < hedef:
+            lo = a
+        else:
+            hi = a
+    return (lo + hi) / 2, 1.0
 
 
 def platt_uygula(p, ab: tuple[float, float]) -> np.ndarray:
