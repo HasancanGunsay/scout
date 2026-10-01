@@ -4074,3 +4074,82 @@ altındaysa seçilir; değilse `tum_gecmis`. Sınama 2022–2024 (TM).
    sezona göre düzeltme yapılmamasını söylüyor.
 
 Toplam **308 test**.
+
+
+## 55. FAZ 7.4 — API Modeli vs TM Modeli, Aynı Oyuncular (1 Eki 2026)
+
+`scripts/api_tm_karsilastir.py` · `reports/api_tm_karsilastirma_2022_2024.txt`
+
+### 55.1 Soru ve kurulum
+
+İzlenen liglerde API'nin oyun metrikleri (reyting, ikili mücadele, pas, top
+kesme...) TM'nin bilmediği bir şey biliyor mu? Ücretli veriye geçme
+kararının dayanağı bu.
+
+- **Nüfus:** 2022–24, izlenen 9 lig, U23. İki tabloda da ≥450 dk olan
+  **1.742** oyuncu-sezon (API'nin 2.349'undan; TM bağlantısı ve TM dakika
+  filtresi). Kademe uyumu %100.
+- **API:** `player_ranking`, kalibrasyon öncesi (2022/23 lig-dışı CV, 2024
+  zaman-dışı). **TM:** ileri-zincir (§54).
+- **Birleşik:** iki logitin ortalaması, **parametresiz**.
+- Önceden yazılan okuma: birleşik − TM > 0 ise API, TM'nin üstüne bilgi katar.
+- 2024 API tahminleri 6. kez kullanıldı; model seçimi yok.
+
+### 55.2 Sonuç
+
+| (lig içi AUC) | API | TM | Birleşik |
+|---|---|---|---|
+| tam (değer dahil) | 0,685 | **0,714** | 0,705 |
+| saf (değersiz) | 0,674 | **0,716** | 0,709 |
+| dakika+yaş | 0,644 | 0,648 | |
+| piyasa | 0,664 | 0,667 | |
+
+| Fark | Sonuç |
+|---|---|
+| **birleşik − TM** (ana okuma) | **−0,009** [−0,019, +0,001]: **API katkısı YOK** |
+| API − TM | **−0,030*** [−0,046, −0,013] |
+| API saf − TM saf | **−0,042*** [−0,066, −0,019] |
+
+Sezon sezon API − TM: 2022 −0,029*, 2023 −0,011, 2024 −0,048*.
+Mevki: **Defans −0,049*** (saf: **−0,090***), Orta saha −0,014, Forvet −0,020
+(saf: +0,002). İnce mevkide API yalnızca 10 numara (0,811 / 0,781) ve sağ
+kanatta (0,638 / 0,604) önde. n küçük, aralık yok.
+
+### 55.3 Nasıl okunmalı — eşit bir yarış DEĞİL
+
+1. **Eğitim verisi asimetrik.** TM modeli 9–11 sezon × 14 lig ile eğitildi.
+   API modeli 2 sezon × 23 lig ile, çoğu düşük görünürlüklü havuzda. §54
+   eğitim geçmişinin uzunluğunun belirleyici olduğunu gösterdi. Fark kısmen
+   **veri kaynağından değil, geçmişin uzunluğundan** geliyor olabilir.
+2. **Protokol farkı.** API 2022/23 lig-dışı (kendi ligini hiç görmemiş),
+   TM ileri-zincir (aynı ligin önceki yıllarını görmüş). Ama 2024'te ikisi
+   de zaman-dışı ve fark yine en büyük orada (−0,048*). Sonuç protokole
+   bağlı görünmüyor.
+3. **Ölçülen yalnızca izlenen ligler.** Düşük görünürlüklü liglerde TM verisi
+   **yok**. Orada API tek kaynak ve 6.x'teki tüm bulgular (ucuz bantta
+   11/12, eşleştirilmiş kontrolde +394 dk) geçerli.
+
+### 55.4 Ne öğrendik
+
+- **İzlenen liglerde API'nin olay sayımları TM'nin üstüne bilgi katmıyor.**
+  İkisini birleştirmek yalnız TM'den iyi değil, hatta biraz geride.
+- **Defansta fark en büyük** (saf −0,090). Bu, §52.6 ve §53.6 ile tutarlı:
+  defans oyuncusunun **ne yaptığını** sayan metrikler (müdahale, top kesme)
+  zayıf. **Ne kadar güvenildiğini** gösterenler (ilk 11 payı, tam maç,
+  önceki sezon, takım gücü) güçlü. TM bunları zengin biçimde taşıyor.
+- **Forvette** iki kaynak eşit (saf +0,002). Gol/asist her ikisinde de var.
+
+### 55.5 Ücretli veri kararı için anlamı
+
+Bu sonuç **"daha ayrıntılı olay sayımı satın al"** yönünde bir gerekçe
+**vermiyor**. Ücretli API'nin aynı türden metrikleri (daha çok sezon dahil)
+izlenen liglerde TM'den iyi olmayabilir. Değerli olabilecek iki şey:
+1. **Düşük görünürlüklü liglerde daha fazla sezon.** Orada TM yok. §54'e
+   göre geçmişin uzunluğu belirleyici ve API modelinin geçmişi yalnızca 2
+   sezon. Ücretli planın asıl getirisi burada olur.
+2. **API modeline TM tarzı "güven" özellikleri.** İlk 11 payı zaten var.
+   Tam maç payı, önceki sezon dakika payı ve takım gücü eklenebilir. API
+   oyuncu istatistiğinde yedek giriş/çıkış alanları var; takım gücü
+   puan durumundan gelir (ek istek). **Uyarı:** API tarafında temiz sınav
+   verisi kalmadı (2024 altı kez kullanıldı). Böyle bir değişiklik ancak
+   2025 ileriye dönük defterle sınanabilir.
