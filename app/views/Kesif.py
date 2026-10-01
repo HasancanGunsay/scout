@@ -22,6 +22,27 @@ sh.page_setup(
 feats = sh.load_features()
 role_list, thresholds = sh.roles()
 
+# Mevki + rol SAYFANIN ÜSTÜNDE (1 Eki 2026, kullanıcı: "rol değiştiremiyorum").
+# Kenar çubuğunda menünün ve 23 ligin seçili durduğu Lig kutusunun altında
+# kalıyordu - çalışıyordu ama bulunamıyordu. Aramanın ana kararı bu ikisi.
+MEVKI_ADI = {"Goalkeeper": "Kaleci", "Defender": "Defans",
+             "Midfielder": "Orta saha", "Attacker": "Forvet"}
+with st.container(border=True):
+    c_pos, c_rol = st.columns([1, 2.2])
+    pos = c_pos.segmented_control(
+        "Mevki", list(MEVKI_ADI), format_func=MEVKI_ADI.get,
+        default="Attacker", required=True, key="ks_pos")
+    roles_for_pos = [r for r in role_list if r.pos_group == pos]
+    role_names = [r.name for r in roles_for_pos]
+    # anahtar mevkiye bağlı: mevki değişince rol o mevkinin ilk şablonuna döner
+    role_name = c_rol.pills(
+        "Rol (puanlama şablonu)", role_names, default=role_names[0],
+        required=True, key=f"ks_rol_{pos}",
+        help="Skor bu şablonun ağırlıklarıyla hesaplanır. Ağırlıkları soldaki "
+             "'Ağırlıklar' bölümünden kendi aramana göre değiştirebilirsin.")
+    role = next(r for r in roles_for_pos if r.name == role_name)
+
+
 # ------------------------------------------------------------------ filtreler
 with st.sidebar:
     st.header("Filtreler")
@@ -64,15 +85,6 @@ with st.sidebar:
 
     seasons = sorted(feats.season.dropna().unique().astype(int), reverse=True)
     picked_seasons = st.multiselect("Sezon", seasons, default=seasons)
-
-    st.divider()
-    pos_groups = ["Goalkeeper", "Defender", "Midfielder", "Attacker"]
-    pos = st.selectbox("Mevki grubu", pos_groups, index=3)
-
-    roles_for_pos = [r for r in role_list if r.pos_group == pos]
-    role_names = [r.name for r in roles_for_pos]
-    role_name = st.selectbox("Rol (puanlama şablonu)", role_names)
-    role = next(r for r in roles_for_pos if r.name == role_name)
 
     st.divider()
     age_max = st.slider("Azami yaş (sezon sonu)", 16.0, 40.0, 23.0, 0.5)
