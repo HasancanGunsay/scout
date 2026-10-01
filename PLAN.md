@@ -3857,3 +3857,80 @@ raporlanacak.
 Ham TM anlık görüntüsü değişmedikçe yeniden kurmaya gerek yok; günlük
 zincirde değil. TM dosyası yenilendiğinde (`data/raw/transfermarkt/<tarih>/`)
 en yeni klasör otomatik seçilir. Toplam **291 test**.
+
+
+## 53. FAZ 7.2 — TM Modeli: Geliştirme ve Mühürlü Test (1 Eki 2026)
+
+`src/scout/model/tm_model.py` · `scripts/tm_model.py` ·
+`src/scout/model/egitim.py` (eğitim yardımcıları `train_model`'den taşındı;
+`player_ranking` parmak izi 10 ondalığa kadar aynı) · `tests/test_tm_model.py` (7)
+
+### 53.1 Kurulum
+
+- **Nüfus:** U23, ≥450 lig dakikası, 14 izlenen lig. Hedef aynı:
+  `y = kademe ≥ 3`, 12 ay.
+- **Eğitim hattı aynı** (`egitim.py`: L2 lojistik, eğitim medyanıyla
+  doldurma, C=1). Ölçü aynı (lig içi AUC, oyuncu kümeli eşli bootstrap).
+- **Varyantlar:** `basit` (yaş + dakika payı) · `piyasa` (yaş + değer) ·
+  `saf` (oyun verisi + savunma bağlamı, değer YOK) · `tam` (saf + değer) ·
+  `tam_savsiz` (tam − savunma bağlamı) · `tam_mevki` (tam + savunma
+  bağlamı × defans).
+- Oyun verisi: dakika/ilk 11/tam maç/yedek payı, önceki sezon dakika payı,
+  G+A/90 kohort yüzdeliği (lig-sezon-mevki, tüm yaşlar), kart/90, takım
+  gücü, ilk-5 ligi. Savunma bağlamı: takıma göre artı-eksi ve yenen gol,
+  `dk/(dk+900)` ile sıfıra çekilmiş (gürültülü).
+
+### 53.2 Geliştirme kuralları (çalıştırmadan önce, betikte)
+
+- **K1 savunma bağlamı tutulur** ⇔ `tam − tam_savsiz` defans alt grubunda
+  hem LOLO hem kayan doğrulamada > 0 **ve** genelde anlamlı negatif değil.
+- **K2 mevki etkileşimi benimsenir** ⇔ `tam_mevki`, `tam`'ı iki
+  doğrulamada da GA sıfırı dışlayarak yener (projenin mevcut varyant kuralı).
+
+### 53.3 MÜHÜRLÜ TEST HİPOTEZLERİ — test açılmadan yazıldı ve commit edildi
+
+Seçilen model 2013–2017'nin tamamıyla eğitilir; 2018–2021 **bir kez**
+tahmin edilir. `data/tm_tarih/muhur_acilis.json` yazılır; o dosya varken
+betik ikinci kez test açmayı reddeder.
+
+| | Hipotez | Başarı ölçütü |
+|---|---|---|
+| **H1** | Model, dakika+yaşı yener | lig içi AUC farkı, %95 GA > 0 |
+| **H2** | Model, piyasayı yener | fark GA > 0 |
+| H3 | Yalnız oyun verisi (saf) vs piyasa | **yön iddiası yok**; API döneminde fark anlamsızdı (§45). Raporlanır |
+| **H4** | (savunma bağlamı tutulduysa) defansta model > savunma bağlamısız model | fark GA > 0 |
+| **H5** | Ucuz bantta (≤5M / değersiz) sezon × mevki top-20 isabeti, dakika+yaşın top-20'sinden yüksek | ortalama yüksek ve hücrelerin çoğunda kazanır |
+
+Ek olarak raporlanır (hipotez değil, 7.3'ün girdisi): sezon sezon AUC ve
+kalibrasyon (ECE, sapma); 2019/20 ve 2020/21 COVID sezonları işaretli;
+ince mevki bazında model − basit.
+
+**Ne anlama gelecek:** H1 ve H2 tutarsa TM verisi izlenen liglerde, API'siz
+ve 10 yıllık bağımsız bir dönemde, piyasanın ötesinde bilgi taşıyor demektir.
+H2 tutmazsa model izlenen liglerde **piyasayı tekrar etmekten öteye
+geçmiyor** demektir. Bu, projenin asıl iddiası olan "ucuz ve görünmez
+oyuncu" için önemli bir uyarı olur. Sonuç ne çıkarsa çıksın yazılacak.
+
+### 53.4 Geliştirme sonucu (2013–2017; test açılmadan)
+
+Lig içi AUC, oyuncu kümeli eşli bootstrap (B=400).
+
+| | basit | piyasa | **saf** | **tam** | tam − basit | tam − piyasa | saf − piyasa |
+|---|---|---|---|---|---|---|---|
+| LOLO (n=3.879) | 0,670 | 0,679 | 0,735 | 0,733 | +0,063* | +0,054* | +0,056* |
+| Kayan 13–15→16–17 (n=1.522) | 0,694 | 0,688 | 0,740 | 0,739 | +0,046* | +0,052* | +0,052* |
+| LOLO defans (n=1.251) | 0,695 | 0,689 | 0,754 | 0,749 | +0,054* | | |
+| Kayan defans (n=481) | 0,723 | 0,660 | 0,720 | 0,722 | **−0,003** (ns) | | |
+
+- **K1 savunma bağlamı: TUTULDU, ama zayıf.** Defansta `tam − tam_savsiz`
+  +0,003 (LOLO) ve +0,006 (kayan); ikisi de anlamsız. Kural "iki
+  doğrulamada pozitif ve genelde zarar yok" diyordu, "anlamlı" demiyordu.
+  Kural gevşek kurulmuştu; bu açıkça kayıt altında. H4'ün tutmaması beklenmeli.
+- **K2 mevki etkileşimi: REDDEDİLDİ** (+0,003, GA sıfırı içeriyor).
+- **Seçilen: `tam`.**
+
+**Dikkat çeken:** İzlenen liglerde TM oyun verisi piyasayı açıkça yeniyor
+(saf − piyasa +0,05) ve değer, oyun verisine bir şey eklemiyor (saf ≈ tam).
+API döneminde (§45) tersiydi. Fark muhtemelen nüfustan: burada herkes zaten
+izlenen bir birinci ligde ve değerlemesi var. Kayan doğrulamada defansta
+model dakika+yaşı yenemiyor. Bu, testte defans için kötümser bir beklenti.
