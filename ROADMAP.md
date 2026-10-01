@@ -433,7 +433,7 @@ kullanıcı "şimdi ne yapmış" diye kendisi incelesin. Pahalı oyuncular ilgi 
 6.3–6.5 "oyun verisi piyasadan fazlasını söylemiyor" gerçeğine göre yeniden kurulur.
 Rating (API) sonraki dönem için yok — "kaç puanla oynadı" olçülemez, yerine TM verisi.
 
-### FAZ 7 — Eldeki verinin maksimumu · 7.0–7.4 TAMAM (1 Eki 2026, PLAN §51–§55)
+### FAZ 7 — Eldeki verinin maksimumu · **TAMAM** (1 Eki 2026, PLAN §51–§56)
 
 API ücretsiz planı yalnızca 2022–2024'ü veriyor ve 2025'in ne zaman açılacağı
 bilinmiyor. 2024 held-out'u beş bakışla tükendi. Ama ham Transfermarkt
@@ -448,7 +448,21 @@ lig. Düşük görünürlüklü ligler orada yok.
 | 7.2 ✅ | Mühürlü test 2018–2021: model > dakika+yaş (+0,046) ve > piyasa (+0,057) ✅; savunma bağlamı ❌; ucuz top-20 ❌ (§53) | tamam |
 | 7.3 ✅ | Kalibrasyon kayması: güncelleme kuralı işe yaramıyor, kayma gürültü; "tüm geçmiş" kalır (§54) | tamam |
 | 7.4 ✅ | İzlenen liglerde API vs TM: TM önde (−0,030*), birleştirmek katkı vermiyor; defansta fark en büyük (§55) | tamam |
-| 7.5 | 2025/26 için **ileriye dönük defter**, TM-only modelle (873 oyuncu) | |
+| 7.5 ✅ | 2025/26 havuzu (891 U23, 14 lig) ileriye dönük deftere yazıldı; puanlama 2027-06-15 sonrası (§56) | tamam |
+
+### FAZ 8 — Arayüz: havuz + takip (kullanıcı isteği, 1 Eki 2026)
+
+Kullanıcı sistemin **tek bir isim** vermesini istemiyor: okyanustan bir
+**havuz** çıkarsın, istatistikler **liste üzerinden** incelenebilsin,
+oyuncular **takibe** alınabilsin. Güncel sezonun ayrıntıları Sofascore'da
+izlenecek; bizim arayüz de "keyif veren" olmalı.
+
+| | İş |
+|---|---|
+| 8.1 | Havuz ekranı: mevki/lig/fiyat/yaş filtreli, sıralanabilir liste; API havuzu (2022–24, düşük görünürlük dahil) + TM 2025/26 havuzu |
+| 8.2 | Takip listesi: oyuncuyu takibe al, kendi notunu yaz; defterle bağlantı ("senin seçimlerin") |
+| 8.3 | Sofascore'a hızlı geçiş (ad + kulüp ile arama), TM profili |
+| 8.4 | Görsel düzen: sayfa sayısını azalt, tutarlı kartlar, keyifli tasarım |
 
 ---
 

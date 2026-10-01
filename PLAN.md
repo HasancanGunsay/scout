@@ -4153,3 +4153,75 @@ izlenen liglerde TM'den iyi olmayabilir. Değerli olabilecek iki şey:
    puan durumundan gelir (ek istek). **Uyarı:** API tarafında temiz sınav
    verisi kalmadı (2024 altı kez kullanıldı). Böyle bir değişiklik ancak
    2025 ileriye dönük defterle sınanabilir.
+
+
+## 56. FAZ 7.5 — TM İleriye Dönük Defter: 2025/26 Havuzu (1 Eki 2026)
+
+`src/scout/model/tm_defter.py` · `scripts/tm_defter.py` · `tm_iddia_defteri`
+(DB) + **`data/defter/tm_iddia_defteri.csv` (git)** · `tests/test_tm_defter.py` (5)
+
+### 56.1 Neden şimdi
+
+API ücretsiz planı 2025'i açmıyor ve ne zaman açacağı bilinmiyor. TM ise
+2025/26 sezonunu içeriyor ve TM modeli mühürlü testten geçti (§53). Sonuç
+penceresi **2026-06-15 → 2027-06-15** açık. Bugün yazılan olasılık, sonucu
+kimsenin bilmediği bir iddia. **Projenin ilk gerçek sicili.**
+
+### 56.2 Kullanıcının isteğine göre: isim değil, havuz
+
+Kullanıcı (1 Eki 2026): sistem tek bir isim vermesin; okyanustan bir havuz
+çıkarsın, istatistikler liste üzerinden incelenebilsin, oyuncular takibe
+alınabilsin. Güncel ayrıntılar Sofascore'da izlenecek. Bu yüzden deftere
+2025/26'da izlenen 14 ligde ≥450 dk oynamış **tüm U23'ler (891)** yazıldı;
+her biri lig × mevki ve mevki içindeki sırasıyla, kulübüyle ve güncel
+kulübüyle. Arayüz (FAZ 8) havuzu buradan okuyacak.
+
+### 56.3 Model ve kayıt
+
+- Model `tam` (§53), 2013–2024'ün tamamıyla eğitildi (9.484 satır).
+  **Kalibrasyon yok** (§54: 12 sezonla eğitilen modelde güncelleme kuralı
+  ham'dan iyi değil).
+- Aynı oyuncular için yalnız oyun verisi (`saf`), dakika+yaş ve piyasa
+  olasılıkları da yazıldı; puanlamada karşılaştırma bunlarla.
+- Sezon tamlığı doğrulandı: 14 ligde takım maç sayıları önceki yıllarla aynı.
+- **Ekleme yalnız:** aynı (oyuncu, lig, sezon, model sürümü) ikinci kez
+  yazılmıyor (sınandı). Model sürümü `tm_tam_v1`.
+
+### 56.4 Değerleme boşluğu ve atılan ilk yazım (açık kayıt)
+
+2025 havuzunun **%27'sinin (237) TM'de hiç değerlemesi yok.** Değerler
+2026-02-27'de bitiyor ve bu oyuncuların büyük kısmı 2025'te yeni kulübüne
+geçmiş: Wesley (Roma), Bonny (Inter), Alberto Costa (Porto), Baidoo (Lens).
+Model bundan etkilenmiyor: değerleme göstergesinin katsayısı −0,005,
+`tam` ile `saf` sıra korelasyonu 0,988.
+
+**Ama "ucuz" tanımı etkilendi.** İlk yazımda API dönemindeki kural
+(değersiz = düşük görünürlük = ucuz, §39.4) kullanıldı ve ucuz listesinin
+tepesine Roma ve Inter oyuncuları çıktı. **İlk yazım (891 satır) dakikalar
+içinde, commit edilmeden atıldı ve düzeltilmiş tanımla yeniden yazıldı.**
+Sonuçlar 2027'ye kadar bilinemeyeceği için bu bir avantaj sağlamıyor.
+Model olasılıkları değişmedi.
+
+Yeni tanım: **ucuz = değerlemesi var ve ≤5M** (415 oyuncu). Değerlemesi
+olmayanlar `deger_durumu = bilinmiyor` (237); ucuz da pahalı da sayılmıyor.
+
+### 56.5 İleriye dönük hipotezler (sonuç bilinmeden yazıldı)
+
+Puanlama yalnızca pencere kapandıktan sonra (2027-06-15+), yeni bir TM
+anlık görüntüsüyle (`build_tm_tarih.py` ardından `tm_defter.py --puanla`).
+
+| | Ölçüt | Beklenti (§53'e göre) |
+|---|---|---|
+| **P1** | model − dakika+yaş, lig içi AUC | > 0 (GA) |
+| **P2** | model − piyasa | > 0 (GA) |
+| P3 | kalibrasyon: ECE ve ortalama sapma | \|sapma\| ≤ 0,05 |
+| P4 | ucuz bant, mevki top-20: model vs dakika+yaş | yön iddiası yok (§53 H5 tutmadı) |
+
+Havuz özeti: 891 oyuncu · 14 lig · Orta saha 325, Forvet 277, Defans 256,
+Kaleci 33 · ortalama olasılık 0,561.
+
+### 56.6 Sınır
+
+Bu sicil **yalnızca izlenen 14 ligi** kapsıyor. Projenin asıl hedefi olan
+düşük görünürlüklü ligler için ileriye dönük sicil hâlâ API'nin 2025'i
+açmasını bekliyor.
