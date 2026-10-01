@@ -1,0 +1,23 @@
+# Sirlar - ASLA commit edilmez
+.env
+.env.*
+!.env.example
+
+# Ortam
+.venv/
+__pycache__/
+*.py[cod]
+
+# Veri - buyuk ve yeniden uretilebilir
+data/raw/
+data/interim/
+data/processed/
+*.duckdb
+*.duckdb.wal
+
+# Arac ciktilari
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Kisisel arac ayarlari
+.claude/settings.local.json

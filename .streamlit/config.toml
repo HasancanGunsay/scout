@@ -1,0 +1,11 @@
+[theme]
+# Renk sistemi - veri araci icin mavi + amber vurgu.
+# Kaynak: ui-ux-pro-max tasarim sistemi, kontrast icin ayarlandi.
+primaryColor = "#1E40AF"
+backgroundColor = "#F8FAFC"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#0F172A"
+font = "sans serif"
+
+[browser]
+gatherUsageStats = false

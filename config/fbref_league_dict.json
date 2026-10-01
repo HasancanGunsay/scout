@@ -1,0 +1,222 @@
+{
+  "BRA-Serie A": {
+    "FBref": "Campeonato Brasileiro Série A",
+    "ClubElo": "BRA_1",
+    "season_start": "Apr",
+    "season_end": "Dec",
+    "season_code": "single-year"
+  },
+  "BRA-Serie B": {
+    "FBref": "Campeonato Brasileiro Série B",
+    "season_start": "Apr",
+    "season_end": "Nov",
+    "season_code": "single-year"
+  },
+  "ARG-Primera": {
+    "FBref": "Liga Profesional de Fútbol Argentina",
+    "season_start": "Jan",
+    "season_end": "Dec",
+    "season_code": "single-year"
+  },
+  "URU-Primera": {
+    "FBref": "Liga AUF Uruguaya",
+    "season_start": "Feb",
+    "season_end": "Dec",
+    "season_code": "single-year"
+  },
+  "COL-Primera A": {
+    "FBref": "Categoría Primera A",
+    "season_start": "Jan",
+    "season_end": "Dec",
+    "season_code": "single-year"
+  },
+  "ECU-Liga Pro": {
+    "FBref": "Liga Profesional Ecuador",
+    "season_start": "Feb",
+    "season_end": "Dec",
+    "season_code": "single-year"
+  },
+  "CHI-Primera": {
+    "FBref": "Liga de Primera",
+    "season_start": "Feb",
+    "season_end": "Dec",
+    "season_code": "single-year"
+  },
+  "PAR-Division de Honor": {
+    "FBref": "APF División de Honor",
+    "season_start": "Jan",
+    "season_end": "Dec",
+    "season_code": "single-year"
+  },
+
+  "FRA-Ligue 2": {
+    "FBref": "Ligue 2",
+    "ClubElo": "FRA_2",
+    "season_start": "Aug",
+    "season_end": "May"
+  },
+  "ITA-Serie B": {
+    "FBref": "Serie B (M)",
+    "ClubElo": "ITA_2",
+    "season_start": "Aug",
+    "season_end": "May"
+  },
+  "NED-Eredivisie": {
+    "FBref": "Eredivisie",
+    "ClubElo": "NED_1",
+    "season_start": "Aug",
+    "season_end": "May"
+  },
+  "NED-Eerste Divisie": {
+    "FBref": "Eerste Divisie",
+    "ClubElo": "NED_2",
+    "season_start": "Aug",
+    "season_end": "May"
+  },
+  "POR-Primeira Liga": {
+    "FBref": "Primeira Liga",
+    "ClubElo": "POR_1",
+    "season_start": "Aug",
+    "season_end": "May"
+  },
+  "BEL-Pro League": {
+    "FBref": "Belgian Pro League",
+    "ClubElo": "BEL_1",
+    "season_start": "Jul",
+    "season_end": "May"
+  },
+  "BEL-Challenger Pro League": {
+    "FBref": "Challenger Pro League",
+    "season_start": "Aug",
+    "season_end": "May"
+  },
+  "GER-2. Bundesliga": {
+    "FBref": "2. Fußball-Bundesliga",
+    "ClubElo": "GER_2",
+    "season_start": "Aug",
+    "season_end": "May"
+  },
+  "GER-3. Liga": {
+    "FBref": "3. Fußball-Liga",
+    "ClubElo": "GER_3",
+    "season_start": "Aug",
+    "season_end": "May"
+  },
+  "ESP-Segunda": {
+    "FBref": "Spanish Segunda División",
+    "ClubElo": "ESP_2",
+    "season_start": "Aug",
+    "season_end": "Jun"
+  },
+  "ENG-Championship": {
+    "FBref": "EFL Championship",
+    "ClubElo": "ENG_2",
+    "season_start": "Aug",
+    "season_end": "May"
+  },
+  "ENG-League One": {
+    "FBref": "EFL League One",
+    "ClubElo": "ENG_3",
+    "season_start": "Aug",
+    "season_end": "May"
+  },
+  "AUT-Bundesliga": {
+    "FBref": "Austrian Football Bundesliga",
+    "ClubElo": "AUT_1",
+    "season_start": "Jul",
+    "season_end": "May"
+  },
+  "SUI-Super League": {
+    "FBref": "Swiss Super League",
+    "ClubElo": "SUI_1",
+    "season_start": "Jul",
+    "season_end": "May"
+  },
+  "CRO-HNL": {
+    "FBref": "Croatian Football League",
+    "ClubElo": "CRO_1",
+    "season_start": "Jul",
+    "season_end": "May"
+  },
+  "SRB-SuperLiga": {
+    "FBref": "Serbian SuperLiga",
+    "season_start": "Jul",
+    "season_end": "May"
+  },
+  "POL-Ekstraklasa": {
+    "FBref": "Ekstraklasa",
+    "ClubElo": "POL_1",
+    "season_start": "Jul",
+    "season_end": "May"
+  },
+  "CZE-First League": {
+    "FBref": "Czech First League",
+    "season_start": "Jul",
+    "season_end": "May"
+  },
+  "TUR-Super Lig": {
+    "FBref": "Süper Lig",
+    "ClubElo": "TUR_1",
+    "season_start": "Aug",
+    "season_end": "May"
+  },
+
+  "DEN-Superliga": {
+    "FBref": "Danish Superliga",
+    "ClubElo": "DEN_1",
+    "season_start": "Jul",
+    "season_end": "May"
+  },
+  "NOR-Eliteserien": {
+    "FBref": "Eliteserien",
+    "ClubElo": "NOR_1",
+    "season_start": "Apr",
+    "season_end": "Dec",
+    "season_code": "single-year"
+  },
+  "SWE-Allsvenskan": {
+    "FBref": "Allsvenskan",
+    "ClubElo": "SWE_1",
+    "season_start": "Apr",
+    "season_end": "Nov",
+    "season_code": "single-year"
+  },
+  "SWE-Superettan": {
+    "FBref": "Superettan",
+    "season_start": "Apr",
+    "season_end": "Nov",
+    "season_code": "single-year"
+  },
+  "FIN-Veikkausliiga": {
+    "FBref": "Veikkausliiga",
+    "season_start": "Apr",
+    "season_end": "Oct",
+    "season_code": "single-year"
+  },
+
+  "JPN-J1": {
+    "FBref": "J1 League",
+    "season_start": "Feb",
+    "season_end": "Dec",
+    "season_code": "single-year"
+  },
+  "JPN-J2": {
+    "FBref": "J2 League",
+    "season_start": "Feb",
+    "season_end": "Dec",
+    "season_code": "single-year"
+  },
+  "MEX-Liga MX": {
+    "FBref": "Liga MX",
+    "ClubElo": "MEX_1",
+    "season_start": "Jul",
+    "season_end": "May"
+  },
+  "USA-MLS": {
+    "FBref": "Major League Soccer",
+    "ClubElo": "USA_1",
+    "season_start": "Feb",
+    "season_end": "Nov",
+    "season_code": "single-year"
+  }
+}

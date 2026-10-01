@@ -1,0 +1,8 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "scout", "runtimeExecutable": ".venv/Scripts/python.exe",
+      "runtimeArgs": ["-m","streamlit","run","app/Home.py","--server.port","8501","--server.headless","true"],
+      "port": 8501 }
+  ]
+}

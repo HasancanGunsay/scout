@@ -1,0 +1,61 @@
+# Hedef ligler - oncelik sirali.
+#
+# Oncelik mantigi (wonderkid avi):
+#   1. Yetenek ihracati yuksek + gence dakika veren ligler
+#   2. Kullanicinin acikca belirttigi ligler (Brezilya, Ligue 1/2, Serie B, Kuzey)
+#   3. Dusuk gorunurluk = piyasa henuz kesfetmemis
+#
+# Big-5 birinci ligler bilincli olarak DUSUK oncelikli: oradaki yetenekler
+# zaten hizla yayiliyor, sistemin katma degeri dusuk. Yine de lig gucu
+# modelinin (§5.2) referans noktasi olarak gerekliler.
+#
+# season_type: calendar = takvim yili (2024 = 2024 sezonu)
+#              split    = 2024 -> 2024/25 sezonu
+#
+# NOT: Ucretsiz plan yalnizca 2022-2024 sezonlarina eriyor.
+
+# Sira onemli: once 2024 (en guncel), sonra 2022.
+# 2022+2024 cifti geriye donuk testin (§8) tam ihtiyaci: 2022'de U21 listesi uret,
+# 2024'te kimin gercekten sicradigina bak. 2023 en son gelir (araya dolgu).
+seasons: [2024, 2022, 2023]
+
+leagues:
+  # --- Oncelik 1: cekirdek wonderkid pazarlari -----------------------------
+  - {id: 72,  name: "Brasileirao Serie B",      country: Brazil,      priority: 1, season_type: calendar}
+  - {id: 71,  name: "Brasileirao Serie A",      country: Brazil,      priority: 1, season_type: calendar}
+  - {id: 89,  name: "Eerste Divisie",           country: Netherlands, priority: 1, season_type: split}
+  - {id: 62,  name: "Ligue 2",                  country: France,      priority: 1, season_type: split}
+  - {id: 128, name: "Liga Profesional",         country: Argentina,   priority: 1, season_type: calendar}
+
+  # --- Oncelik 2: guclu gelistirici ligler ---------------------------------
+  - {id: 95,  name: "Segunda Liga",             country: Portugal,    priority: 2, season_type: split}
+  - {id: 145, name: "Challenger Pro League",    country: Belgium,     priority: 2, season_type: split}
+  - {id: 103, name: "Eliteserien",              country: Norway,      priority: 2, season_type: calendar}
+  - {id: 113, name: "Allsvenskan",              country: Sweden,      priority: 2, season_type: calendar}
+  - {id: 119, name: "Superliga",                country: Denmark,     priority: 2, season_type: split}
+  - {id: 136, name: "Serie B",                  country: Italy,       priority: 2, season_type: split}
+  - {id: 80,  name: "3. Liga",                  country: Germany,     priority: 2, season_type: split}
+
+  # --- Oncelik 3: genisleme ------------------------------------------------
+  - {id: 114, name: "Superettan",               country: Sweden,      priority: 3, season_type: calendar}
+  - {id: 244, name: "Veikkausliiga",            country: Finland,     priority: 3, season_type: calendar}
+  - {id: 239, name: "Primera A",                country: Colombia,    priority: 3, season_type: calendar}
+  - {id: 268, name: "Primera Division",         country: Uruguay,     priority: 3, season_type: calendar}
+  - {id: 242, name: "Liga Pro",                 country: Ecuador,     priority: 3, season_type: calendar}
+  - {id: 88,  name: "Eredivisie",               country: Netherlands, priority: 3, season_type: split}
+  - {id: 94,  name: "Primeira Liga",            country: Portugal,    priority: 3, season_type: split}
+  - {id: 144, name: "Jupiler Pro League",       country: Belgium,     priority: 3, season_type: split}
+
+  # --- Oncelik 4: lig gucu modeli referans noktalari (§5.2) ----------------
+  # Bu ligler kendi baslarina hedef degil, ama oyuncular buraya transfer
+  # oldugu icin lig gucu olceginin ust ucunu tanimliyorlar.
+  - {id: 61,  name: "Ligue 1",                  country: France,      priority: 4, season_type: split}
+  - {id: 135, name: "Serie A",                  country: Italy,       priority: 4, season_type: split}
+  - {id: 78,  name: "Bundesliga",               country: Germany,     priority: 4, season_type: split}
+  - {id: 140, name: "La Liga",                  country: Spain,       priority: 4, season_type: split}
+  - {id: 39,  name: "Premier League",           country: England,     priority: 4, season_type: split}
+
+# Kapsam disi - gerekcesi §11.6
+excluded:
+  - {name: "Italy Serie C (138/942/943)", reason: "stats_players=False, ampirik olarak dogrulandi"}
+  - {name: "Italy Serie D", reason: "ayni - oyuncu istatistigi yok"}

@@ -1,0 +1,242 @@
+# Rol sablonlari ve agirliklari - §5.3 Katman 1 (uzman agirliklari)
+#
+# NASIL CALISIR
+#   pos_group  : oyuncunun KIYASLANDIGI havuz (API'nin 4 kaba mevkisi).
+#                Percentile'lar bu havuz icinde hesaplanir.
+#   role       : oyuncunun NASIL puanlandigi. Ayni havuzdaki bir oyuncu
+#                farkli rollere gore farkli skor alir - "bana pres yapan
+#                bir 9 lazim" ile "bana bitirici lazim" ayni sey degil.
+#
+# Bir oyuncu kendi pos_group'undaki TUM rollere gore puanlanir; en yuksek
+# skoru aldigi rol onun "dogal rolu" sayilir. Sen aramada rolu sabitleyebilirsin.
+#
+# AGIRLIKLAR NEDEN FUTBOLCA
+#   Percentile'lar zaten SHRINKAGE UYGULANMIS degerlerden hesaplaniyor,
+#   yani gurultu istatistiksel olarak bastirilmis durumda (§12.1).
+#   Bu yuzden agirliklari "hangi metrik guvenilir" diye degil,
+#   "bu rol icin hangi is onemli" diye veriyoruz. Guvenilirligi shrinkage
+#   halletti; futbol mantigini burada kuruyoruz.
+#
+# Agirliklar goreli - toplamlari 1 olmak zorunda degil, normalize ediliyor.
+# 'invert: true' olan metrikler zaten percentile asamasinda ters cevrildi.
+
+roles:
+
+  # ======================= KALECI =======================
+  - key: gk_shotstopper
+    name: "Kaleci - Kurtaran"
+    pos_group: Goalkeeper
+    weights:
+      rating: 30
+      saves: 25
+      goals_conceded: 15      # dusuk iyi - ters cevrilir
+      passes: 10
+      duels_won: 5
+    invert: [goals_conceded]
+
+  # ======================= DEFANS =======================
+  - key: cb_ball_playing
+    name: "Stoper - Topla Oynayan"
+    pos_group: Defender
+    cluster: Stoper
+    weights:
+      passes: 22            # ilerletici pas vekili - en guvenilir metrigimiz
+      duel_win_pct: 16
+      interceptions_padj: 12
+      def_actions_padj: 10
+      key_passes: 10
+      dribbles_won: 8
+      rating: 8
+      duels: 6
+      fouls_made: 5         # az faul iyi
+      cards: 3
+    invert: [fouls_made, cards]
+
+  - key: cb_stopper
+    name: "Stoper - Yikici"
+    pos_group: Defender
+    cluster: Stoper
+    weights:
+      duels_won: 22
+      duel_win_pct: 20
+      def_actions_padj: 16
+      tackles_padj: 12
+      interceptions_padj: 12
+      blocks: 8
+      rating: 6
+      cards: 4
+    invert: [cards]
+
+  - key: fb_attacking
+    name: "Bek - Hucumcu"
+    pos_group: Defender
+    cluster: Bek
+    weights:
+      key_passes: 20
+      dribbles: 14
+      dribbles_won: 12
+      assists: 10
+      passes: 10
+      fouls_drawn: 8
+      duels_won: 8
+      rating: 8
+      def_actions_padj: 6
+      tackles_padj: 4
+
+  - key: fb_defensive
+    name: "Bek - Savunmaci"
+    pos_group: Defender
+    cluster: Bek
+    weights:
+      tackles_padj: 20
+      interceptions_padj: 18
+      duel_win_pct: 16
+      def_actions_padj: 14
+      duels_won: 10
+      passes: 8
+      rating: 8
+      fouls_made: 6
+    invert: [fouls_made]
+
+  # ======================= ORTA SAHA =======================
+  - key: mf_deep_playmaker
+    name: "Orta Saha - Regista"
+    pos_group: Midfielder
+    weights:
+      passes: 26           # oyun kurucuda hacim belirleyici
+      key_passes: 18
+      rating: 12
+      interceptions_padj: 10
+      duel_win_pct: 8
+      assists: 8
+      def_actions_padj: 8
+      dribbles_won: 5
+      cards: 5
+    invert: [cards]
+
+  - key: mf_box_to_box
+    name: "Orta Saha - Box-to-Box"
+    pos_group: Midfielder
+    weights:
+      duels: 16
+      duels_won: 14
+      def_actions_padj: 14
+      passes: 12
+      dribbles_won: 10
+      key_passes: 10
+      np_ga: 8
+      tackles_padj: 8
+      rating: 8
+
+  - key: mf_advanced_playmaker
+    name: "Orta Saha - 10 Numara"
+    pos_group: Midfielder
+    weights:
+      key_passes: 28
+      assists: 16
+      dribbles_won: 14
+      fouls_drawn: 10
+      np_ga: 10
+      passes: 8
+      shots: 8
+      rating: 6
+
+  - key: mf_destroyer
+    name: "Orta Saha - Ön Libero"
+    pos_group: Midfielder
+    weights:
+      tackles_padj: 22
+      interceptions_padj: 20
+      def_actions_padj: 18
+      duel_win_pct: 14
+      duels_won: 10
+      passes: 8
+      fouls_made: 4
+      cards: 4
+    invert: [fouls_made, cards]
+
+  # ======================= HUCUM =======================
+  - key: fw_pressing
+    name: "Forvet - Pres Yapan"
+    pos_group: Attacker
+    weights:
+      def_actions_padj: 20      # hucum bolgesinde savunma aksiyonu = pres vekili
+      tackles_padj: 16
+      duels: 14
+      interceptions_padj: 12
+      duels_won: 10
+      np_ga: 10
+      fouls_made: 8        # presci forvet faul yapar - burada TERS CEVRILMEZ
+      shots: 6
+      rating: 4
+
+  - key: fw_poacher
+    name: "Forvet - Bitirici"
+    pos_group: Attacker
+    weights:
+      np_goals: 26
+      shots: 18
+      shot_accuracy: 14
+      goals_per_shot: 12
+      shots_on: 12
+      rating: 10
+      duels_won: 8
+
+  - key: fw_creator
+    name: "Kanat - Yaratici"
+    pos_group: Attacker
+    weights:
+      key_passes: 26
+      assists: 18
+      dribbles_won: 14
+      dribbles: 10
+      fouls_drawn: 10
+      passes: 8
+      np_ga: 8
+      rating: 6
+
+  - key: fw_dribbler
+    name: "Kanat - Calimci"
+    pos_group: Attacker
+    weights:
+      dribbles_won: 26
+      dribbles: 18
+      dribble_pct: 14
+      fouls_drawn: 14
+      key_passes: 10
+      duels_won: 8
+      np_ga: 6
+      rating: 4
+
+  - key: fw_complete
+    name: "Forvet - Komple"
+    pos_group: Attacker
+    weights:
+      np_ga: 18
+      shots: 14
+      key_passes: 12
+      duels_won: 12
+      dribbles_won: 10
+      np_goals: 10
+      assists: 8
+      def_actions_padj: 8
+      rating: 8
+
+# Skor uretiminde kullanilan esikler
+# NOT (§32): savunma metrikleri "_padj" ekiyle POSSESSION-ADJUSTED surumleri
+# kullaniyor. Ham hacim takim baglamiyla kirliydi - zayif takim cok savunur,
+# oyuncusu cok top calar. Olculdu: stoperde savunma aksiyonu AUC 0,501 -> 0,534
+# (esli bootstrap GA [+0,011, +0,057], ANLAMLI). 'duels' degistirilmedi -
+# hucum ikili mucadelelerini de icerdigi icin ayrica dogrulanmadi.
+
+thresholds:
+  min_minutes_reliable: 450    # altindakiler listelenir ama 'guvenilmez' isaretli
+  min_cohort_size: 12          # daha kucuk kohortta percentile uretilmez
+  # Agirligin bu oranindan azi hesaplanabiliyorsa SKOR URETILMEZ (§21).
+  # Kucuk kohortta percentile uretmeme kuralinin esdegeri: eksik veriden
+  # makul gorunen bir sayi uretmek, sayi uretmemekten daha zararli.
+  # Olculdu: Veikkausliiga 2024'te 17 metrik hic yayinlanmamis, kapsam 0.08 -
+  # buna ragmen 1.046 skor uretiliyordu ve ortalamasi 50.1 ile gayet normal
+  # gorunuyordu.
+  min_coverage: 0.35
+

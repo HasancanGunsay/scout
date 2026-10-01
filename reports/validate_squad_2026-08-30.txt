@@ -1,0 +1,31 @@
+[in] 106,542 skor satiri, esik 450 dk
+
+==================================================================
+A) 'fark' ne kadar oynak?  (esik +-8 dogru mu)
+==================================================================
+n = 1,006 (ayni takim + ayni rol + AYNI oyuncu, ardisik sezon)
+sezonlar arasi degisimin SD'si : 14.21
+tek olcumun oynakligi (UST SINIR): 10.05 percentile
+|degisim| ortalamasi           : 10.51 %95 GA [9.90, 11.08]
+|degisim| <= 8 olan oran       : %51
+|degisim| <= 20 olan oran      : %86
+
+ONERI: esik ~20 (tek olcumun 2 SD'si). Mevcut 8 YETERSIZ.
+
+==================================================================
+B) Kulupler ayrilanin yerine BENZER stilde oyuncu mu aliyor?
+==================================================================
+n = 2,510 degisim (rolun en iyisi ayrilmis, yerine gelen var)
+gelenin uzakligi        : 2.539
+rastgele ayni-mevki     : 2.754
+FARK (+ = gelen benzer) : +0.215 %95 GA [+0.184, +0.247]
+gelenin yuzdelik sirasi : 0.406 %95 GA [0.395, 0.417]   (0,50 = rastgele)
+
+HUKUM: ANLAMLI - kulupler benzer stil ariyor.
+
+--- mevki grubuna gore ---
+  Attacker     n=1055  fark +0.061 [+0.018, +0.107]
+  Defender     n= 608  fark +0.654 [+0.600, +0.711]
+  Goalkeeper   n= 137  fark -0.170 [-0.273, -0.072]
+  Midfielder   n= 710  fark +0.140 [+0.081, +0.203]
+
