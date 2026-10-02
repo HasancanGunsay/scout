@@ -4665,3 +4665,47 @@ FAZ 8 tamam: havuz (8.1), takip (8.2), Sofascore/TM geçişi (8.3), görsel
 düzen (8.4), bakım (8.5). Arada FAZ 7.6 eşleşme düzeltmesi (§60).
 
 Toplam **353 test**.
+
+
+## 64. FAZ 8.6 — Google Stitch ile Tasarım Dili: "Saha Analitik" (2 Eki 2026)
+
+`.streamlit/config.toml` (tema) · `app/_style.py` · `app/assets/logo*.svg` ·
+`reports/tasarim/` (Stitch çıktıları, referans)
+
+### 64.1 Süreç
+
+Kullanıcı Google Stitch CLI'yi kurdu (0.11.0, kendi Google hesabı).
+Stitch'te özel bir proje açıldı ("Scout - yetenek kesif") ve iki ekran
+üretildi: **Havuz** ve **oyuncu kartı**. Stitch projeye bir de tasarım
+sistemi kurdu: *Saha Analitik* — Linear'ın sakinliği + Sofascore'un veri
+yoğunluğu, Inter + JetBrains Mono, renk yalnız durum bildirir.
+
+**Öğrenilenler (CLI):**
+- Uzun ve ayrıntılı istem ekran **üretmiyor**: `CLARIFICATION_REQUIRED`
+  dönüyor, yalnız tasarım sistemi kuruluyor. Kısa ve odaklı istem
+  çalışıyor.
+- `stitch find screens` listesi boş dönüyor (CLI hatası). Ekran kimliği,
+  görüntüsü ve HTML'i `generate` çıktısında var.
+- Stitch istemde olmayan içerik uyduruyor: "Scout IQ", Opta, xG, fazladan
+  oyuncular. **Yalnız görsel dil alındı**, içerik değil.
+
+### 64.2 Uygulanan
+
+- **Tema** (Streamlit'in kendi tema sistemi, CSS'ten sağlam): Inter +
+  JetBrains Mono, birincil `#1D4ED8`, `#F8FAFC` zemin, 8px köşe, tablo
+  başlığı `#F1F5F9`. **Lacivert gezinme paneli** `[theme.sidebar]`
+  `#213145`; kenar çubuğundaki filtreler koyu zeminde okunur.
+- **Logo** `st.logo` ile panelin en üstünde (önceden gezinmenin altına
+  düşüyordu); panel daralınca yalnız "S".
+- **KPI kutuları:** büyük mono değer, küçük büyük-harf mono etiket, 12px
+  kart.
+- **Rozetler:** mono, 5px köşe (Stitch "chip").
+- **Oyuncu başlığı:** baş harf avatarı (FE, LY…).
+- **Havuz kartı istatistik kutuları** (`ui.stat_kutulari`): `st.metric`
+  dar sütunda değeri kesiyordu ("3.1…"). Havuz puanı ve model % altında
+  ince doluluk çizgisi var.
+- **Yüzdelik çubuk kademesi** (`ui.yuzdelik_renk`): <50 gri · 50–74 mavi ·
+  ≥75 yeşil (Sofascore). Kırmızı-yeşil değil; değer her zaman yazılı (§10
+  ilkesi korunuyor).
+
+Testler: kart testi yeni kutulara göre güncellendi. Toplam **353 test**.

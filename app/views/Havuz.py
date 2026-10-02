@@ -269,12 +269,14 @@ def _kart(r: pd.Series) -> None:
                 rozet.append((HV.KAPSAM_ADI[r.kapsam],
                               "warn" if r.kapsam == "sicrama_only" else "mute"))
             ui.oyuncu_basligi(r.oyuncu, f"{r.kulup} · {r.lig} · {sez}", rozet)
-            m1, m2, m3, m4 = st.columns(4)
-            m1.metric("Havuz puanı", f"{r.havuz_puani:.0f}")
-            m2.metric("Model", f"%{100 * r.model_olasilik:.0f}")
-            m3.metric("Dakika", f"{int(r.dk):,}".replace(",", "."))
-            m4.metric("Değer", f"{r.deger / 1e6:.2f} M €"
-                      if r.deger_var == 1 and pd.notna(r.deger) else "—")
+            degerli = r.deger_var == 1 and pd.notna(r.deger)
+            ui.stat_kutulari([
+                ("Havuz puanı", f"{r.havuz_puani:.0f}", "/100", r.havuz_puani / 100),
+                ("Model", f"%{100 * r.model_olasilik:.0f}", "", r.model_olasilik),
+                ("Dakika", f"{int(r.dk):,}".replace(",", ".")),
+                ("Değer", f"{r.deger / 1e6:.2f}" if degerli else "—",
+                 "M €" if degerli else ""),
+            ])
             if r.kaynak == HV.KAYNAK_API:
                 simdi = r.simdi_kulup if isinstance(r.simdi_kulup, str) else "—"
                 deger = (f" · {r.simdi_deger / 1e6:.2f} M €"
@@ -305,9 +307,9 @@ def _kart(r: pd.Series) -> None:
                 x=yuz[::-1], y=ad[::-1], orientation="h",
                 text=[f"{y:.0f} · {h}" for y, h in zip(yuz[::-1], ham[::-1])],
                 textposition="outside", cliponaxis=False,
-                marker=dict(color=yuz[::-1], colorscale=ui.SCORE_SCALE,
-                            cmin=0, cmax=100,
-                            line=dict(color=ui.COLORS["border_strong"], width=0.5)),
+                # Stitch/Sofascore kademesi: <50 gri, 50-74 mavi, >=75 yesil
+                marker=dict(color=[ui.yuzdelik_renk(y) for y in yuz[::-1]]),
+                width=0.55,
                 hovertemplate="%{y}: %{x:.0f}. yüzdelik<extra></extra>"))
             ui.apply_plotly(fig)
             fig.update_layout(height=50 + 34 * len(ad),

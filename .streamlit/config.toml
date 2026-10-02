@@ -1,11 +1,33 @@
 [theme]
-# Renk sistemi - veri araci icin mavi + amber vurgu.
-# Kaynak: ui-ux-pro-max tasarim sistemi, kontrast icin ayarlandi.
-primaryColor = "#1E40AF"
+# 2 Eki 2026: Google Stitch ile tasarlanan "Saha Analitik" dili (PLAN §64).
+# Linear'in sakin kesinligi + Sofascore'un veri yogunlugu. Renk yalniz durum
+# ve hiyerarsi bildirir; sayilar sabit genislikli (JetBrains Mono).
+base = "light"
+primaryColor = "#1D4ED8"
 backgroundColor = "#F8FAFC"
-secondaryBackgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F1F5F9"
 textColor = "#0F172A"
-font = "sans serif"
+linkColor = "#1D4ED8"
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+headingFont = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+codeFont = "JetBrains Mono:https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
+baseRadius = "8px"
+buttonRadius = "6px"
+borderColor = "#E2E8F0"
+dataframeBorderColor = "#E2E8F0"
+dataframeHeaderBackgroundColor = "#F1F5F9"
+showWidgetBorder = true
+chartCategoricalColors = ["#1D4ED8", "#D97706", "#059669", "#7C3AED", "#0891B2"]
+
+[theme.sidebar]
+# Lacivert gezinme paneli (Stitch: inverse-surface)
+backgroundColor = "#213145"
+secondaryBackgroundColor = "#2B3D57"
+textColor = "#E2E8F0"
+primaryColor = "#93B4FF"
+borderColor = "#34475F"
+linkColor = "#BFD0FF"
+showSidebarBorder = false
 
 [browser]
 gatherUsageStats = false

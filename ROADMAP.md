@@ -453,7 +453,7 @@ lig. Düşük görünürlüklü ligler orada yok.
 | 7.5 ✅ | 2025/26 havuzu (891 U23, 14 lig) ileriye dönük deftere yazıldı; puanlama 2027-06-15 sonrası (§56) | tamam |
 | 7.6 ✅ | **Eşleşme düzeltmesi:** reddedilmiş/belirsiz TM adayları sonuç ve değerde kullanılıyordu (%26). `tm_id` artık yalnız kabulde; düşük görünürlükte 2024'te model ≈ dakika+yaş; <0,5M 'zayıf' (§60) | tamam |
 
-### FAZ 8 — Arayüz: havuz + takip · **TAMAM** (1 Eki 2026, PLAN §57–§63)
+### FAZ 8 — Arayüz: havuz + takip · **TAMAM** (1 Eki 2026, PLAN §57–§64)
 
 Kullanıcı sistemin **tek bir isim** vermesini istemiyor: okyanustan bir
 **havuz** çıkarsın, istatistikler **liste üzerinden** incelenebilsin,
@@ -468,6 +468,7 @@ izlenecek; bizim arayüz de "keyif veren" olmalı.
 | 8.3 ✅ | Sofascore (DuckDuckGo ilk sonuç, tam ad + kulüp; 9/9 doğru) ve TM profili (yalnız doğrulanmış eşleşmede) — kart, takip, profil (§61) |
 | 8.4 ✅ | 13 → 11 sayfa, üç grup; Oyuncu = Profil + Scout dosyası, Veri = durum + eşleşme; kararlar sayfanın üstünde; ortak oyuncu başlığı (§62) |
 | 8.5 ✅ | Bakım: ROADMAP §1–§2 güncel (353 test, 41 denetim, 11 sayfa, model hattı); `use_container_width` → `width="stretch"` (kalan 30 yer; uyarı yok) (§63) |
+| 8.6 ✅ | Google Stitch ile tasarım dili "Saha Analitik": Inter + JetBrains Mono, lacivert panel, istatistik kutuları, yüzdelik kademesi (§64) |
 
 ---
 

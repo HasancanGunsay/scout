@@ -59,16 +59,9 @@ pages = {
     ],
 }
 
-with st.sidebar:
-    st.markdown(
-        '<div style="display:flex;align-items:center;gap:9px;padding:2px 0 14px">'
-        '<div style="width:30px;height:30px;border-radius:7px;background:#1E40AF;'
-        'display:flex;align-items:center;justify-content:center;color:#fff;'
-        'font-weight:700;font-size:14px;font-family:Fira Code,monospace">S</div>'
-        '<div><div style="font-weight:700;font-size:1rem;line-height:1.1">Scout</div>'
-        '<div style="font-size:.7rem;color:#64748B;letter-spacing:.02em">'
-        'yetenek keşif sistemi</div></div></div>',
-        unsafe_allow_html=True,
-    )
+# Stitch "Saha Analitik": logo panelin EN USTUNDE (st.sidebar icerigi
+# gezinmenin altina dusuyordu). Daraltilinca yalniz "S" ikonu kalir.
+A = Path(__file__).resolve().parent / "assets"
+st.logo(str(A / "logo.svg"), size="large", icon_image=str(A / "logo_ikon.svg"))
 
 st.navigation(pages, expanded=True).run()

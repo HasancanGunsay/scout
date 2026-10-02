@@ -233,8 +233,10 @@ def test_kart_acilir_ve_olasilik_tek_kaynakla_ayni():
         ORDER BY t.model_olasilik DESC LIMIT 1""")
     at = _at(oyuncu=f"{pid}-{lid}-{sez}")
     assert any(f'class="ad">{ad}<' in m.value for m in at.markdown)
-    model = [m for m in at.metric if m.label == "Model"][0].value
-    assert model == f"%{100 * p:.0f}"
+    # kart istatistik kutulari (Stitch, ui.stat_kutulari)
+    kutu = " ".join(m.value for m in at.markdown if 'class="stk"' in m.value)
+    assert (f'data-etiket="Model"><div class="e">Model</div>'
+            f'<div class="v">%{100 * p:.0f}<') in kutu, kutu[:300]
     assert any(b.label == "Oyuncu sayfasında aç" for b in at.button)
     # 8.3: Sofascore + TM; TM profili yalniz KABUL edilmis eslesmeden (§60)
     lb = {x.proto.label: x.proto.url for x in at.get("link_button")}
