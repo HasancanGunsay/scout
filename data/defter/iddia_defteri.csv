@@ -385,3 +385,40 @@ kayit_tarihi,player_id,league_id,season,player_name,league_name,kapsam,model_ola
 2026-10-01,301287,80,2024,M. Flotho,3. Liga,sicrama_only,0.37681653205005716,0.35,0.096,otomatik,,zaman-disi
 2026-10-01,358628,94,2024,Samu,Primeira Liga,tam,0.8504670396096649,0.8,0.5822784810126582,otomatik,,zaman-disi
 2026-10-01,409558,62,2024,J. Kalulu,Ligue 2,sicrama_only,0.3546093831071124,0.375,0.25,otomatik,,zaman-disi
+2026-10-02,80752,136,2022,T. Tessmann,Serie B,sicrama_only,0.43753419543258604,0.475,0.1511627906976744,otomatik,,lig-disi CV
+2026-10-02,128342,62,2022,R. Ndiaye,Ligue 2,sicrama_only,0.4255386199014563,0.45,0.2125,otomatik,,lig-disi CV
+2026-10-02,305817,72,2022,Biel,Serie B,sicrama_only,0.41889270580505705,0.225,0.09375,otomatik,,lig-disi CV
+2026-10-02,61742,113,2023,H. Valdimarsson,Allsvenskan,sicrama_only,0.38410467687841376,0.1,0.05970149253731343,otomatik,,lig-disi CV
+2026-10-02,126980,136,2023,T. Barbieri,Serie B,sicrama_only,0.3590447702823736,0.25,0.21621621621621623,otomatik,,lig-disi CV
+2026-10-02,129790,136,2023,Tomás Esteves,Serie B,sicrama_only,0.34947212612115275,0.25,0.21621621621621623,otomatik,,lig-disi CV
+2026-10-02,162032,140,2023,Miguel Gutiérrez,La Liga,tam,0.865476117665844,0.8,0.7162162162162162,otomatik,,lig-disi CV
+2026-10-02,162386,113,2023,K. Lund,Allsvenskan,sicrama_only,0.36479931052467895,0.225,0.05970149253731343,otomatik,,lig-disi CV
+2026-10-02,162489,39,2023,J. Trafford,Premier League,tam,0.8700414710968419,0.625,0.6506024096385542,otomatik,,lig-disi CV
+2026-10-02,162502,80,2023,M. Lotka,3. Liga,sicrama_only,0.3402422958192997,0.1,0.0625,otomatik,,lig-disi CV
+2026-10-02,191245,62,2023,N. Kandil,Ligue 2,sicrama_only,0.3422489156703601,0.45,0.2,otomatik,,lig-disi CV
+2026-10-02,195100,71,2023,Natan,Serie A,sicrama_only,0.3601474176950719,0.4,0.20833333333333334,otomatik,,lig-disi CV
+2026-10-02,280055,80,2023,L. Kerber,3. Liga,sicrama_only,0.35276753227115065,0.225,0.0625,otomatik,,lig-disi CV
+2026-10-02,294593,71,2023,Rubens,Serie A,sicrama_only,0.34986727516049126,0.5,0.20833333333333334,otomatik,,lig-disi CV
+2026-10-02,328035,80,2023,M. Baur,3. Liga,sicrama_only,0.3403387788882105,0.175,0.0625,otomatik,,lig-disi CV
+2026-10-02,342019,136,2023,D. Ghilardi,Serie B,sicrama_only,0.4084503386552227,0.4,0.21621621621621623,otomatik,,lig-disi CV
+2026-10-02,404574,71,2023,Luis Guilherme,Serie A,sicrama_only,0.3723422906179367,0.175,0.20833333333333334,otomatik,,lig-disi CV
+2026-10-02,126980,136,2024,T. Barbieri,Serie B,sicrama_only,0.2887987465047325,0.3,0.1791044776119403,otomatik,,zaman-disi
+2026-10-02,129058,39,2024,B. Verbruggen,Premier League,tam,0.8571978583094534,,0.7567567567567568,otomatik,,zaman-disi
+2026-10-02,158551,62,2024,J. Mvuka,Ligue 2,sicrama_only,0.3204461223112353,0.3,0.2876712328767123,otomatik,,zaman-disi
+2026-10-02,162481,95,2024,Diogo Nascimento,Segunda Liga,sicrama_only,0.31216546774023685,0.475,0.18181818181818182,otomatik,,zaman-disi
+2026-10-02,174703,62,2024,T. Le Bris,Ligue 2,sicrama_only,0.289363216234018,0.15,0.2876712328767123,otomatik,,zaman-disi
+2026-10-02,271350,136,2024,T. Muharemović,Serie B,sicrama_only,0.3296359886821231,0.2,0.1791044776119403,otomatik,,zaman-disi
+2026-10-02,284942,62,2024,B. Traoré,Ligue 2,sicrama_only,0.313447414598971,0.35,0.2876712328767123,otomatik,,zaman-disi
+2026-10-02,320017,113,2024,Y. Salech,Allsvenskan,sicrama_only,0.3183700095101835,0.175,0.08108108108108109,otomatik,,zaman-disi
+2026-10-02,327692,62,2024,T. Koudou,Ligue 2,sicrama_only,0.3060115351174878,0.3,0.2876712328767123,otomatik,,zaman-disi
+2026-10-02,336683,95,2024,Gabriel Brás,Segunda Liga,sicrama_only,0.30376235250381156,0.275,0.18181818181818182,otomatik,,zaman-disi
+2026-10-02,341912,136,2024,G. Ambrosino,Serie B,sicrama_only,0.3330324644170913,0.325,0.1791044776119403,otomatik,,zaman-disi
+2026-10-02,342054,88,2024,R. Flamingo,Eredivisie,tam,0.8537698629699556,0.9,0.6095238095238096,otomatik,,zaman-disi
+2026-10-02,365742,62,2024,M. Diaz,Ligue 2,sicrama_only,0.29666998944154555,0.35,0.2876712328767123,otomatik,,zaman-disi
+2026-10-02,370475,89,2024,E. Dijkstra,Eerste Divisie,sicrama_only,0.290400995350065,0.35,0.23776223776223776,otomatik,,zaman-disi
+2026-10-02,406591,62,2024,C. Konaté,Ligue 2,sicrama_only,0.3110285720245508,0.35,0.2876712328767123,otomatik,,zaman-disi
+2026-10-02,409840,89,2024,J. Uneken,Eerste Divisie,sicrama_only,0.3034390470171211,0.425,0.23776223776223776,otomatik,,zaman-disi
+2026-10-02,428084,62,2024,Sadibou Sané,Ligue 2,sicrama_only,0.30304561496616406,0.35,0.2876712328767123,otomatik,,zaman-disi
+2026-10-02,434028,89,2024,N. Verschuren,Eerste Divisie,sicrama_only,0.30030214613336204,0.325,0.23776223776223776,otomatik,,zaman-disi
+2026-10-02,443829,89,2024,J. Mokio,Eerste Divisie,sicrama_only,0.32159974136446995,,0.23776223776223776,otomatik,,zaman-disi
+2026-10-02,449245,72,2024,Pedro Lima,Serie B,sicrama_only,0.28734098554304177,0.075,0.0,otomatik,,zaman-disi
