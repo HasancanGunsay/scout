@@ -28,3 +28,6 @@ Bursaspor_Scout/
 
 # Is basvurusu (CV, on yazi) - kisisel bilgi, repoya girmez
 basvuru/
+
+# Vercel CLI baglantisi
+.vercel/
