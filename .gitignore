@@ -21,3 +21,10 @@ data/processed/
 
 # Kisisel arac ayarlari
 .claude/settings.local.json
+
+# Kisiye / kulube ozel - herkese acik repoya girmez
+Bursaspor_Scout/
+/*.pdf
+
+# Is basvurusu (CV, on yazi) - kisisel bilgi, repoya girmez
+basvuru/

@@ -11,7 +11,7 @@
 > ölçülmüş sonuçları görmezden gelmek demektir.
 >
 > Diğer dosyalar: [PLAN.md](PLAN.md) tasarım gerekçeleri ve ölçüm bulguları ·
-> [GELISTIRME.md](GELISTIRME.md) denetim sonuçları · [README.md](README.md) kullanım
+> [GELISTIRME.md](GELISTIRME.md) denetim sonuçları · [README.tr.md](README.tr.md) kullanım
 
 ---
 

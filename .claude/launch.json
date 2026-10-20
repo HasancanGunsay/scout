@@ -3,6 +3,9 @@
   "configurations": [
     { "name": "scout", "runtimeExecutable": ".venv/Scripts/python.exe",
       "runtimeArgs": ["-m","streamlit","run","app/Home.py","--server.port","8501","--server.headless","true"],
-      "port": 8501 }
+      "port": 8501 },
+    { "name": "portfolio", "runtimeExecutable": ".venv/Scripts/python.exe",
+      "runtimeArgs": ["-m","http.server","8600","--directory","portfolio"],
+      "port": 8600 }
   ]
 }

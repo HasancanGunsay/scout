@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scout · Hasancan Günsay</title>
+<meta name="description" content="Scout: a leakage-safe system that forecasts which young footballers will establish themselves in a top-flight league, validated on a sealed test against minutes+age and market-value baselines.">
+<meta property="og:title" content="Scout · forecasting young footballers' breakthroughs">
+<meta property="og:description" content="Sealed-test AUC 0.742 vs 0.696 (minutes+age) and 0.686 (market value). Pre-registered hypotheses, prospective ledger, honest failures.">
+<meta property="og:type" content="website">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#"><span class="logo">S</span>SCOUT</a>
+    <nav>
+      <a href="#question">Question</a>
+      <a href="#validation">Validation</a>
+      <a href="#bug">The bug</a>
+      <a href="#limits">Limits</a>
+      <a href="#product">Product</a>
+      <a href="#applied">Applied</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Case study · Sports forecasting</div>
+    <h1>Scout: forecasting which young footballers break through, and checking whether it really works</h1>
+    <p class="lede">An end-to-end system built on free data. It predicts whether an under-23 player
+      will establish himself in a top-flight league within 12 months, and it is held to the
+      standard a market would hold it to: does it beat the market's own number, on data it has
+      never seen, with the hypotheses written down before the test was opened?</p>
+    <p class="who">Built solo by <strong>Hasancan Günsay</strong> · physicist · ML engineer · 2026</p>
+    <div class="btns">
+      <a class="btn primary" href="https://github.com/HasancanGunsay/scout">Code on GitHub</a>
+      <a class="btn ghost" href="#validation">Jump to results</a>
+      <a class="btn ghost" href="mailto:hasancangunsay16@gmail.com">Contact</a>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="v">0.742</div><div class="l">sealed-test AUC, 2018–21, one opening (n = 3,097)</div></div>
+      <div class="kpi"><div class="v">+0.057</div><div class="l">over the market-value baseline, 95% CI [+0.042, +0.072]</div></div>
+      <div class="kpi"><div class="v">891</div><div class="l">forecasts frozen for 2025/26, scored after 15 June 2027</div></div>
+      <div class="kpi"><div class="v">353 · 41</div><div class="l">automated tests · data-audit checks on every daily run</div></div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+<!-- ============================================================ question -->
+<section id="question">
+  <div class="wrap">
+    <div class="eyebrow">01 · The question</div>
+    <h2>What exactly is being predicted, and what has to be beaten</h2>
+    <div class="narrow">
+      <p>Scouting reports are full of opinions that are never scored. I wanted a question with a
+        hard, checkable answer:</p>
+      <p class="question">Given everything known about an under-23 player at the end of a season,
+        will he play at least 900 league minutes in one of 14 tracked top-flight leagues in the
+        next 12 months?</p>
+      <p>A model is only interesting if it beats what people already use. I compare against two
+        baselines, the same way a forecast should be compared against the market price rather than
+        against a coin flip:</p>
+      <ul class="clean">
+        <li><strong>Minutes + age</strong>: the scout's rule of thumb. Young and already playing a lot.</li>
+        <li><strong>Market value</strong>: the market's own aggregated opinion (Transfermarkt valuations).</li>
+      </ul>
+      <p>Evaluation is <em>within league</em> (ROC AUC computed inside each league-season, then
+        averaged weighted by positives), so the model cannot look good simply by knowing that Premier League players
+        tend to stay in the Premier League. Confidence intervals come from a paired bootstrap
+        clustered by player.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ data -->
+<section id="data">
+  <div class="wrap">
+    <div class="eyebrow">02 · Data and pipeline</div>
+    <h2>Free data, two sources, one entity-resolution problem</h2>
+    <div class="grid2">
+      <div class="card">
+        <h3 style="margin-top:0">API-Football (free tier)</h3>
+        <p><span class="mono">37,890</span> player-seasons × <span class="mono">304</span> features,
+          24 leagues including second tiers and South America, 2022–2024. Quota-aware,
+          cached and resumable ingestion: every cached response is spent quota, so raw data is
+          treated as immutable.</p>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">Transfermarkt open dataset</h3>
+        <p><span class="mono">92,958</span> player-seasons, 14 European top flights, 2012–2026:
+          appearances, line-ups, valuations, contracts. Ten seasons that had never been used
+          made a genuinely untouched test period possible.</p>
+      </div>
+    </div>
+    <p style="margin-top:22px" class="narrow">Linking the two sources is the hard part: the same player appears as "T. Abed" in one
+      and under his full name in the other. The matcher assigns confidence grades; of
+      <span class="mono">19,541</span> links, <span class="mono">13,070</span> are accepted (high confidence or manually
+      confirmed). The rest sit in a review queue. That design decision matters later.</p>
+
+    <div class="flow">
+      <div class="step"><div class="n">01</div><div class="t">Ingest</div><div class="d">rate-limited, cached, resumable</div></div>
+      <div class="step"><div class="n">02</div><div class="t">DuckDB</div><div class="d">one rebuildable analytical store</div></div>
+      <div class="step"><div class="n">03</div><div class="t">Features</div><div class="d">per-90, shrinkage, cohort percentiles, role clusters</div></div>
+      <div class="step"><div class="n">04</div><div class="t">Entity links</div><div class="d">API ↔ TM, graded confidence</div></div>
+      <div class="step"><div class="n">05</div><div class="t">Outcomes</div><div class="d">12-month window, minutes tiers</div></div>
+      <div class="step"><div class="n">06</div><div class="t">Model + calibration</div><div class="d">L2 logistic, Platt by league type</div></div>
+      <div class="step"><div class="n">07</div><div class="t">Ledger + audit</div><div class="d">append-only forecasts, 41 checks</div></div>
+    </div>
+    <p class="small">The whole chain runs unattended every morning from Windows Task Scheduler,
+      in a fixed order, and finishes with the audit, whose result is written to the run log.</p>
+  </div>
+</section>
+
+<!-- ============================================================ validation -->
+<section id="validation">
+  <div class="wrap">
+    <div class="eyebrow">03 · Validation</div>
+    <h2>A sealed test with pre-registered hypotheses</h2>
+    <div class="narrow">
+      <p>Model choices were made on 2013–2017 only (leave-one-league-out and rolling-origin
+        validation). Before touching 2018–2021, I committed the hypotheses and their success
+        criteria to git. The test script writes a lock file on first opening and refuses to
+        run a second time, so the test set cannot be tuned against quietly.</p>
+    </div>
+
+    <figure class="card chart">
+      <img src="assets/img/sealed-test.svg" alt="Sealed test AUC: model 0.742, play data only 0.744, minutes plus age 0.696, market value 0.686">
+      <figcaption>Sealed test, 2018–2021, opened once (n = 3,097 player-seasons, 57.3% positive).
+        Paired, player-clustered bootstrap, B = 1,000.</figcaption>
+    </figure>
+
+    <div class="tblwrap">
+      <table class="tbl">
+        <thead><tr><th>Pre-registered hypothesis</th><th>Result (Δ AUC, 95% CI)</th><th>Verdict</th></tr></thead>
+        <tbody>
+          <tr><td>H1 · Model beats minutes + age</td><td class="num">+0.046 [+0.027, +0.064]</td><td><span class="pass">PASS</span></td></tr>
+          <tr><td>H2 · Model beats market value</td><td class="num">+0.057 [+0.042, +0.072]</td><td><span class="pass">PASS</span></td></tr>
+          <tr><td>H3 · Play data alone vs market (no direction claimed)</td><td class="num">+0.058 [+0.042, +0.076]</td><td>reported</td></tr>
+          <tr><td>H4 · Defensive context (on-pitch goal difference) adds signal for defenders</td><td class="num">−0.005 [−0.019, +0.007]</td><td><span class="fail">FAIL</span></td></tr>
+          <tr><td>H5 · In the cheap band, the model's top-20 lists beat minutes + age in most cells</td><td class="num">won 5 / 12 cells</td><td><span class="fail">FAIL</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure class="card chart">
+      <img src="assets/img/sealed-seasons.svg" alt="AUC by season 2018 to 2021: model above both baselines in every season">
+      <figcaption>The edge holds in all four seasons, including the two COVID-affected ones.
+        Development-period effect sizes (+0.054 / +0.063) were preserved on the test:
+        no sign of overfitting to the validation scheme.</figcaption>
+    </figure>
+
+    <h3>Calibration drifts, and chasing it makes things worse</h3>
+    <div class="narrow">
+      <p>Ranking was stable, but the probability <em>level</em> moved by up to ±6 points from season
+        to season (base rate jumped to 64% in 2019/20). I tested six recalibration rules in a
+        forward chain (raw, all history, last season, last two seasons, intercept-only, exponential
+        weighting), each with a test proving it never sees the target season.</p>
+      <p><strong>None beat "use all history".</strong> Rules that chase the most recent season were the
+        worst: the drift is noise, not a trend, and reacting to it overshoots. What actually
+        shrank the drift was the length of the training history (±0.04 with 1–4 seasons,
+        ±0.005 with 9–11). The product now tells users to trust the <em>rank</em>, not the
+        difference between 62% and 58%.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ bug -->
+<section id="bug">
+  <div class="wrap">
+    <div class="eyebrow">04 · The bug in my own pipeline</div>
+    <h2>26% of outcomes were measured on the wrong person's career</h2>
+    <div class="narrow">
+      <p>While adding profile links to the UI I noticed "T. Abed" (Jong PSV) pointing to a different
+        player entirely. The linking table stored the <em>best candidate</em> for every player,
+        including low-confidence and rejected matches, and several consumers joined on it without
+        checking confidence. Result: <span class="mono">9,723 / 36,881</span> outcome rows, and the
+        market-value feature on the same rows, came from someone else.</p>
+      <p>The fix was structural rather than a filter in each consumer: the ID column is now only
+        populated for accepted matches, so every existing and future join is correct by
+        construction. Two audit checks were added to keep it that way.</p>
+    </div>
+    <div class="tblwrap" style="margin-top:20px">
+      <table class="tbl">
+        <thead><tr><th>Same measurement</th><th>Before fix</th><th>After fix</th></tr></thead>
+        <tbody>
+          <tr><td>Cross-validated AUC, all leagues</td><td class="num">0.744</td><td class="num">0.732</td></tr>
+          <tr><td>Model − minutes+age, all leagues</td><td class="num">+0.094</td><td class="num">+0.074</td></tr>
+          <tr><td>Low-visibility leagues, 2024: model − minutes+age</td><td class="num">+0.102</td><td class="num">+0.006 (not significant)</td></tr>
+          <tr><td>Calibrated, conditional ECE (CV)</td><td class="num">0.028</td><td class="num">0.030</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout warn narrow">
+      <p>Part of the model's apparent strength in low-visibility leagues was fake: value and outcome
+        came from the same wrong person, so they agreed with each other. I publish the lower
+        numbers. The primary model was not re-chosen after looking at 2024, because selecting on
+        the held-out season would have been a second mistake.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ limits -->
+<section id="limits">
+  <div class="wrap">
+    <div class="eyebrow">05 · What the data cannot do</div>
+    <h2>Negative results that changed decisions</h2>
+    <div class="grid3">
+      <div class="card"><h3 style="margin-top:0">Defenders</h3>
+        <p>For defenders, event counts (tackles, interceptions) carry little signal. What predicts
+          is how much the coach <em>trusts</em> them: start share, full-match share, previous
+          season, team strength. The system measures trust, not defending.</p></div>
+      <div class="card"><h3 style="margin-top:0">More event data ≠ better</h3>
+        <p>On the same 1,742 player-seasons, adding API event features to the Transfermarkt model
+          did not help (combined − TM: −0.009 [−0.019, +0.001]). That argued <em>against</em> paying
+          for richer event data for tracked leagues.</p></div>
+      <div class="card"><h3 style="margin-top:0">Top of the list</h3>
+        <p>In tracked leagues the model's top-20 lists are not reliably better than a simple
+          minutes list (H5 failed). Its value is across the whole ranking, and in low-visibility
+          leagues.</p></div>
+      <div class="card"><h3 style="margin-top:0">Resale value</h3>
+        <p>The model's picks go on to play more, but a matched-control study could not show
+          that their market value rises faster. The UI says so in plain words.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ ledger -->
+<section id="ledger">
+  <div class="wrap">
+    <div class="eyebrow">06 · Forward test</div>
+    <h2>A ledger the model cannot edit</h2>
+    <div class="narrow">
+      <p>Back-tests can always be improved after the fact. So every forecast is written to an
+        append-only ledger with a timestamp and the model version, before its outcome exists.
+        <span class="mono">891</span> forecasts on the 2025/26 under-23 pool are frozen and will be
+        scored after 15 June 2027. Players a user adds to the watchlist are logged too, with a
+        flag recording whether the outcome was already visible at the time of the pick, so
+        hindsight picks can never be counted as skill.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ product -->
+<section id="product">
+  <div class="wrap">
+    <div class="eyebrow">07 · Product</div>
+    <h2>A tool for browsing a pool, not a single "best player"</h2>
+    <p class="narrow">Streamlit app over the same store, eleven pages. Scores are shown as
+      percentiles within comparable groups, every rank shows what actually happened next, and
+      weak evidence is labelled as weak. The interface is in Turkish because it was built for a
+      Turkish-speaking user.</p>
+    <figure>
+      <img class="shot" src="assets/img/player-card.png" alt="Player card with pool score, model probability and percentile profile" loading="lazy">
+      <figcaption>Player card: pool score (percentile within season × position), model probability,
+        and a percentile profile against the same-position U23 cohort across 14 leagues.</figcaption>
+    </figure>
+    <div class="grid2">
+      <figure style="margin:0">
+        <img class="shot" src="assets/img/position-ranking.png" alt="Position ranking page" loading="lazy">
+        <figcaption>Position ranking: every list shows how many actually established themselves
+          versus the pool's base rate, and states that resale value was not shown to improve.</figcaption>
+      </figure>
+      <figure style="margin:0">
+        <img class="shot" src="assets/img/ledger.png" alt="Forecast ledger page" loading="lazy">
+        <figcaption>Ledger: retrospective records are explicitly "not a track record";
+          the real record is the forward section.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ applied -->
+<section id="applied">
+  <div class="wrap">
+    <div class="eyebrow">08 · Applied</div>
+    <h2>From a model to a transfer shortlist under real constraints</h2>
+    <div class="narrow">
+      <p>I applied the system to the transfer needs of a second-tier club (anonymised here)
+        that is pushing for promotion, working from its real squad, budget and rules. The interesting part was not the model but the constraints
+        around it:</p>
+      <ul class="clean">
+        <li><strong>Budget:</strong> a regulator-set spending cap of roughly €5M for the whole season,
+          wages and fees included. Contract expiry dates mattered more than market values.</li>
+        <li><strong>Quota rules:</strong> at most 8 foreign players, at least 2 of them born in 2003 or
+          later, and a different rule set after promotion. Each candidate was tagged by which
+          quota slot he would use.</li>
+        <li><strong>Two windows:</strong> a cheap mid-season fix now, a free-transfer core next summer.</li>
+        <li><strong>Data staleness:</strong> the open dataset ends in July. Every candidate's club and
+          contract were re-verified against current sources: 19 of 47 were dropped (already sold,
+          loaned, or priced far above budget).</li>
+      </ul>
+      <p>The remaining 28 candidates each received a generated report: contract and quota status,
+        last-ten-match table, availability adjusted for mid-season loans, percentile profile,
+        automatic risk flags (card rate, missed squads, stale valuations), and a <em>blank</em>
+        observation form. The technical and mental grades are left for a human who has actually
+        watched the player. The data is not allowed to pretend otherwise.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ stack -->
+<section id="stack">
+  <div class="wrap">
+    <div class="eyebrow">09 · Engineering</div>
+    <h2>Stack and practices</h2>
+    <div class="tags" style="margin-bottom:22px">
+      <span class="tag">Python</span><span class="tag">DuckDB</span><span class="tag">pandas</span>
+      <span class="tag">scikit-learn</span><span class="tag">NumPy</span><span class="tag">bootstrap CIs</span>
+      <span class="tag">Platt calibration</span><span class="tag">Streamlit</span><span class="tag">pytest</span>
+      <span class="tag">REST ingestion</span><span class="tag">Task Scheduler</span><span class="tag">git</span>
+    </div>
+    <ul class="clean narrow">
+      <li>Every analysis decision, measurement and rejected idea is recorded in a design log
+        (64 sections), including the ones that did not work.</li>
+      <li>Held-out data is counted: the log records how many times each test season has been
+        looked at, and declares it exhausted for model selection when it is.</li>
+      <li>One source of truth for predictions; the UI never recomputes a probability.</li>
+      <li>353 tests, 41 audit checks, idempotent daily rebuild from immutable raw data.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>Hasancan Günsay · İzmir, Turkey · open to on-site, hybrid and remote roles</div>
+    <div>
+      <a href="mailto:hasancangunsay16@gmail.com">Email</a> ·
+      <a href="https://www.linkedin.com/in/hasancangunsay">LinkedIn</a> ·
+      <a href="https://github.com/HasancanGunsay">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
