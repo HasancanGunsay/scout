@@ -55,7 +55,9 @@ if hasattr(sys.stdout, "reconfigure"):
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DB = ROOT / "data" / "scout.duckdb"
+sys.path.insert(0, str(ROOT / "src"))
+from scout.kaynaklar import db_yolu  # noqa: E402
+DB = db_yolu()  # SCOUT_DB ya da data/scout.duckdb (FAZ 9.5)
 
 # §21'de olculen bozuk lig-sezonlar - modele GIRMEZ.
 # Veikkausliiga: 17 metrik hic yayinlanmamis.

@@ -15,7 +15,9 @@ import duckdb
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-DB = ROOT / "data" / "raw" / "transfermarkt" / "2026-07-11" / "transfermarkt-datasets.duckdb"
+sys.path.insert(0, str(ROOT / "src"))
+from scout.kaynaklar import tm_db_yolu  # noqa: E402
+DB = tm_db_yolu()  # config/kaynaklar.yaml (FAZ 9.1)
 
 
 def hr(title: str) -> None:

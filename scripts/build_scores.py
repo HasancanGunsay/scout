@@ -19,6 +19,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+from scout.kaynaklar import db_yolu  # noqa: E402
 
 from scout.features.age_long import BoylamsalYasEgrisi  # noqa: E402
 from scout.scoring.engine import load_roles, score_all  # noqa: E402
@@ -31,7 +32,7 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 
-DB = ROOT / "data" / "scout.duckdb"
+DB = db_yolu()  # SCOUT_DB ya da data/scout.duckdb (FAZ 9.5)
 ROLES = ROOT / "config" / "roles.yaml"
 
 

@@ -1,0 +1,10 @@
+{
+  "defter": "data/defter/tm_iddia_defteri.csv",
+  "sha256": "951378f8d01455d33196116c35b0b96f0697ad5f1bbf2eb8b70c9297a197c6c6",
+  "satir": 891,
+  "kayit_commit": "db45049",
+  "model_surumu": "tm_tam_v1",
+  "muhur_tarihi": "2026-10-30",
+  "plan": "docs/defter_2025_puanlama.md",
+  "not": "Puanlama tm_defter.py --puanla ile BIR KEZ; bu parmak izi tutmazsa puanlama reddedilir."
+}

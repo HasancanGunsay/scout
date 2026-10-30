@@ -8,7 +8,7 @@ Düşük görünürlüklü liglerde genç yetenek keşfi için veri sistemi.
 | [PLAN.md](PLAN.md) | Tasarım, gerekçeler, ölçüm bulguları |
 | [GELISTIRME.md](GELISTIRME.md) | Profesyonel seviye geliştirme planı: FAZ 9–15 (veri, lig genişlemesi, model, mühendislik, ürün) |
 
-Sistem denetimi: `python scripts/audit.py` — 41 otomatik kontrol · testler: `python -m pytest` — 353 test.
+Sistem denetimi: `python scripts/audit.py` — 46 otomatik kontrol · testler: `python -m pytest` — 375 test.
 
 ## Kurulum
 
@@ -120,7 +120,7 @@ Durumu istek harcamadan görmek için:
 | `build_emsal.py` | emsal oranları → `player_emsal` | **0** |
 | `defter.py --kaydet` | API iddia defteri (append-only) | **0** |
 | `build_tm_tarih.py` · `tm_model.py` · `tm_defter.py` | Transfermarkt hattı, 2025/26 ileriye dönük defter | **0** |
-| `audit.py` | **sistem denetimi** — 41 kontrol, bozuk olanı bulur | **0** |
+| `audit.py` | **sistem denetimi** — 46 kontrol, bozuk olanı ve bayat kaynağı bulur | **0** |
 | `sanity_u21.py` | veri tutarlılık denetimi | **0** |
 | `explore_transfermarkt.py` | Transfermarkt veri setini haritalar | **0** |
 | `explore_tm_depth.py` | Transfermarkt kapsam derinliği | **0** |

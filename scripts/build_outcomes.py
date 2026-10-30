@@ -22,6 +22,8 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from scout.kaynaklar import db_yolu, tm_db_yolu  # noqa: E402
+
 from scout.features.outcome import (ILK_BES, KADEME_ADI, TM_KARSILIGI,  # noqa: E402
                                     gozlem_ay, izlenen_ligler, kademe,
                                     kapsam, sezon_bitis)
@@ -30,8 +32,8 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
-DB = ROOT / "data" / "scout.duckdb"
-TM = ROOT / "data" / "raw" / "transfermarkt" / "2026-07-11" / "transfermarkt-datasets.duckdb"
+DB = db_yolu()  # SCOUT_DB ya da data/scout.duckdb (FAZ 9.5)
+TM = tm_db_yolu()  # config/kaynaklar.yaml (FAZ 9.1)
 BASLANGIC = "2022-01-01"
 
 
@@ -117,7 +119,14 @@ def sonuclari_uret(con) -> pd.DataFrame:
 
     # Her dilimde EN COK oynadigi birinci lig - kademe ondan hesaplanir
     if len(ozet):
-        ozet = ozet.sort_values("dk", ascending=False)
+        # Esitlik kurali ACIK (30 Eki 2026): yalniz "dk" ile siralama esit
+        # dakikada ligi rastgele seciyordu - ayni veriden 4 calistirmanin
+        # birinde oyuncu 503702'nin ligi FR1/BE1 arasinda degisti. Lig ilk-5
+        # mi degil mi kademeyi (3/4) belirledigi icin bu yalniz etiket degil.
+        # Sira: cok dakika > guclu lig (ilk-5) > lig kodu.
+        ozet = ozet.assign(_ilk5=ozet.competition_id.isin(ILK_BES)).sort_values(
+            ["dk", "_ilk5", "competition_id"], ascending=[False, False, True],
+            kind="mergesort").drop(columns="_ilk5")
         en_iyi = ozet.drop_duplicates(["player_id", "league_id", "season", "dilim"])
         toplam = (ozet.groupby(["player_id", "league_id", "season", "dilim"],
                                as_index=False)
@@ -167,7 +176,13 @@ def sonuclari_uret(con) -> pd.DataFrame:
     eksik = int((~out.y2_tam).sum())
     print(f"[2b]   {eksik:,} satirda 24 aylik pencere tamamlanmamis - "
           f"kademe_24ay NULL birakildi (birincil sonuc 12 aylik)")
-    out["en_iyi_lig"] = en_iyi.sort_values("kademe", ascending=False) \
+    # Esitlik kurali ACIK (30 Eki 2026): yalniz "kademe"ye gore siralamak
+    # esitlikleri kararsiz biraktigi icin ayni veriden iki calistirmada 3
+    # oyuncunun en_iyi_lig etiketi degisti (kademe degil, yalniz etiket).
+    # Sira: yuksek kademe > ilk 12 ay > cok dakika > lig kodu.
+    out["en_iyi_lig"] = en_iyi.sort_values(
+        ["kademe", "dilim", "lig_dk", "competition_id"],
+        ascending=[False, True, False, True], kind="mergesort") \
         .drop_duplicates(["player_id", "league_id", "season"]) \
         .set_index(["player_id", "league_id", "season"]).competition_id \
         .reindex(pd.MultiIndex.from_frame(

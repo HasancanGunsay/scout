@@ -37,6 +37,7 @@ import pandas as pd
 warnings.filterwarnings("ignore")
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+from scout.kaynaklar import db_yolu  # noqa: E402
 
 from scout.features.outcome import TM_KARSILIGI  # noqa: E402
 from scout.model.egitim import _hazirla, egit  # noqa: E402
@@ -47,7 +48,7 @@ from scout.model.tm_model import VARYANTLAR, hazirla  # noqa: E402
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-DB = ROOT / "data" / "scout.duckdb"
+DB = db_yolu()  # SCOUT_DB ya da data/scout.duckdb (FAZ 9.5)
 SEZONLAR = (2022, 2023, 2024)
 B = 1000
 

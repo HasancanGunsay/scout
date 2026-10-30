@@ -4709,3 +4709,94 @@ yoğunluğu, Inter + JetBrains Mono, renk yalnız durum bildirir.
   ilkesi korunuyor).
 
 Testler: kart testi yeni kutulara göre güncellendi. Toplam **353 test**.
+
+
+## 65. FAZ 9 — Veri Dayanıklılığı (30 Eki 2026)
+
+`src/scout/kaynaklar.py` · `config/kaynaklar.yaml` · `src/scout/build_kaydi.py` ·
+`scripts/build_kaydi.py` · `scripts/kaynak_karsilastir.py` · `scripts/daily_run.ps1` ·
+`docs/defter_2025_puanlama.md` · `data/defter/tm_2025_muhur.json` ·
+`tests/test_kaynaklar.py`, `test_probe_season_access.py`, `test_defter_muhur.py`,
+`test_build_kaydi.py`
+
+### 65.1 Veri erişiminin durumu (30 Eki 2026'da ölçüldü)
+
+| Kaynak | Durum |
+|---|---|
+| API-Football ücretsiz plan | 2025 ve 2026 **kapalı** (yeniden sınandı: "try from 2022 to 2024") |
+| Transfermarkt açık veri seti | **Durmuş.** Toplama hattı 17 Temmuz'dan beri başarısız (kaynak site GitHub sunucularından erişimi engelliyor); yeniden başlama tarihi yok. Maçlar 2026-07-06, katılımlar 2026-06-28'de bitiyor; 2026/27 kadroları yok |
+| TM son yayımlanan sürüm (5 Eyl) | Bizdekinden yeni: değerler 2026-02-27 → **2026-06-12** (+148 bin), transferler 35 bin → **175 bin** (silinmiş geçmiş geri yüklenmiş). Maç ve katılım tabloları aynı. İndirildi (`data/raw/transfermarkt/2026-09-05/`), **zincirde kullanılmıyor** |
+
+### 65.2 Bulunan iki hata
+
+1. **Sezon sondası sonucu hiç yazmıyordu.** Yazma satırları `return 0`'ın
+   arkasındaydı (30 Ağustos'taki "düzeltme" de oraya eklenmişti). 30 günlük
+   tazelik kontrolü çalışmıyordu; 29 Eylül'den beri günlük zincir her gün 2
+   istek harcıyordu. Düzeltildi ve test edildi. Testin ilk sürümü varsayılan
+   argümanın tanım anında bağlanması yüzünden gerçek `season_access.json`'a
+   yazdı; içerik o günkü gerçek sondanın sonucuyla aynıydı. Düzeltildi.
+2. **Zincir iki TM sürümünü karıştırabilirdi.** `build_db` klasördeki en yeni
+   TM sürümünü, `build_outcomes` / `build_sonra` / `calibrate` / `backtest`
+   sabit 2026-07-11'i, `build_tm_tarih` / `tm_defter` yine en yenisini
+   kullanıyordu. Yeni sürüm indirildiği gün zincir sessizce iki sürümü
+   karıştıracaktı. Artık hepsi `config/kaynaklar.yaml`'daki sabit sürümü okuyor
+   (`kaynaklar.tm_db_yolu`). Geçiş, karşılaştırma raporu ve onayla yapılır.
+
+### 65.3 9.1 Kaynak tazeliği
+
+Denetime 4 kontrol eklendi (41 → **46**): TM güncel değil (UYARI), TM değerleri
+maçlardan geride (UYARI), daha yeni TM sürümü bekliyor (UYARI), API sezon sınaması
+tazeliği (GECTI). Veri sayfasında "Kaynak tazeliği" bölümü.
+
+**Karşılaştırma raporu** (`reports/kaynak_karsilastirma_2026-07-11_2026-09-05.md`):
+bizim 13.379 TM oyuncumuzun 5.082'sinin son değeri daha yeni tarihli (yeni/eski
+oran medyanı 0,94). **İleriye dönük defterdeki 882 oyuncunun 761'inde sezon sonu
+değeri farklı**: 891 tahmin 3,5 ay eski değerlerle yapılmış. Puanlama planına
+yazıldı.
+
+### 65.4 9.2–9.3 Defter puanlama planı (mühür)
+
+`docs/defter_2025_puanlama.md`, sonuç bilinmeden yazıldı:
+- P1–P4 aynen (§56.5).
+- Sonuç tanımı ve sansür kuralı.
+- Eski değer koşulu.
+- Yedek sonuç kaynağı kararı (1 Mart 2027).
+- Kısmi kapsam kuralı ve kaynak eşdeğerlik şartı: kademe uyumu ≥ %97.
+
+`tm_2025_muhur.json` defter CSV'sinin SHA-256'sını tutar. `tm_defter.py --puanla`:
+- defteri git'teki CSV'den okur;
+- parmak izi tutmazsa reddeder;
+- pencere tam satır yoksa hiçbir şey yazmaz;
+- ilk puanlamada açılış dosyası yazar ve ikinci puanlamayı reddeder (§53 kuralı).
+
+### 65.5 9.5 Atomik build
+
+Zincir adımları canlı veritabanına değil kopyasına yazar (`SCOUT_DB`, tüm betikler
+`kaynaklar.db_yolu()` üzerinden). Sonunda karar (`build_kaydi.karar`):
+- **Geçiş şartı:** zincir tamamlanmış olmalı ve denetimde canlıya göre **yeni** bir
+  KALDI olmamalı. Bilinen 5 sağlayıcı eksiği geçişi engellemez.
+- **Geçerse:** kopya `os.replace` ile canlının yerine geçer; eskisi `.prev` olarak kalır.
+- **Geçmezse:** canlı hiç değişmez; kopya `.red` olarak saklanır.
+
+Hesap defteri yalnız geçişten sonra yazılır. Her karar `data/raw/build_kaydi.csv`'ye
+(append-only) yazılır. Eski P1-2 (Temmuz 2026'dan beri açık) kapandı.
+
+**İlk gerçek çalıştırma başarısız oldu ve canlıyı koruyamadı (açık kayıt):**
+- **Ne oldu:** `build_db.py` hedef dosyayı `DB` değil `OUT` adlı sabitle tanımlıyordu;
+  toplu değişiklik onu atladı. Ayrıca `src` yolunu eklemediği için `scout` paketini
+  bulamadı. Adım, çökmeden önce oyuncu tablolarını **canlı** dosyaya yazdı.
+- **Kapının davranışı:** doğru karar verdi ("zincir yarıda kaldı", kopya `.red`).
+  Ama yazma kapının dışında, adımın kendisinde olduğu için canlı değişmişti.
+- **Fark nasıl anlaşıldı:** canlının parmak izi `.red` ve arayüz kopyasından farklıydı.
+- **Kurtarma:** canlı, birebir kopya olan `.red`'den geri yüklendi (SHA-256 `5dfd21…`
+  orijinalle aynı); bozulmuş hali ayrıca saklandı.
+- **Kalıcı önlem:** `test_zincir_betikleri_scout_db_kullanir` her zincir betiğini ayrı
+  bir süreçte, yalnız kendi yol ayarlarıyla yükler ve yazacağı yolun `SCOUT_DB` olduğunu
+  sınar. `test_betiklerde_sabit_canli_yol_yok` betiklerde sabit veritabanı yolunu yasaklar.
+  Benim ilk import testim yolu kendisi eklediği için bu hatayı yakalayamamıştı.
+
+### 65.6 Açık kalan
+
+- **9.4 kaynak katmanı ve kişi kaydı:** büyük bir refaktör; ayrı onayla.
+- **TM 5 Eylül sürümüne geçiş:** kullanıcı kararı. Geçilirse havuzdaki
+  olasılıklar defterdekinden ayrışır (defter değişmez).

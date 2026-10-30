@@ -20,7 +20,10 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 
-DB = Path(__file__).resolve().parents[1] / "data" / "scout.duckdb"
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+from scout.kaynaklar import db_yolu  # noqa: E402
+
+DB = db_yolu()  # SCOUT_DB ya da data/scout.duckdb (FAZ 9.5)
 
 
 def main() -> int:

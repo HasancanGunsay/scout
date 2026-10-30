@@ -38,11 +38,13 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from scout.kaynaklar import db_yolu, tm_db_yolu  # noqa: E402
+
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-DB = ROOT / "data" / "scout.duckdb"
-TM = ROOT / "data" / "raw" / "transfermarkt" / "2026-07-11" / "transfermarkt-datasets.duckdb"
+DB = db_yolu()  # SCOUT_DB ya da data/scout.duckdb (FAZ 9.5)
+TM = tm_db_yolu()  # config/kaynaklar.yaml (FAZ 9.1)
 BASLANGIC = "2022-01-01"
 
 

@@ -50,31 +50,43 @@ class TestCollectionStatus:
 
 
 class TestLatestTmDb:
-    def test_en_yeni_dizin_secilir(self, tmp_path, monkeypatch):
-        """Yol eskiden sabit kodluydu; veri seti yenilenince kiriliyordu."""
-        import scripts.build_db as bd
+    """30 Eki 2026'dan beri build_db, klasordeki EN YENI surumu degil
+    config/kaynaklar.yaml'da SABITLENEN surumu kullanir (FAZ 9.1): en yeni
+    secimi, yeni bir surum indirildigi gun zinciri iki surume bolerdi."""
+
+    @staticmethod
+    def _kur(tmp_path, monkeypatch, klasorler, sabit):
+        import scout.kaynaklar as K
 
         base = tmp_path / "data" / "raw" / "transfermarkt"
-        for d in ["2026-06-01", "2026-07-11", "2026-08-02"]:
+        for d, dosyali in klasorler:
             (base / d).mkdir(parents=True)
-            (base / d / "transfermarkt-datasets.duckdb").write_bytes(b"x")
-        monkeypatch.setattr(bd, "ROOT", tmp_path)
-        assert bd.latest_tm_db().parent.name == "2026-08-02"
+            if dosyali:
+                (base / d / "transfermarkt-datasets.duckdb").write_bytes(b"x")
+        ayar = tmp_path / "kaynaklar.yaml"
+        ayar.write_text("\n".join(["transfermarkt:", f'  anlik_goruntu: "{sabit}"', ""]),
+                        encoding="utf-8")
+        monkeypatch.setattr(K, "TM_DIZIN", base)
+        monkeypatch.setattr(K, "AYAR", ayar)
 
-    def test_dosyasiz_dizin_atlanir(self, tmp_path, monkeypatch):
+    def test_sabitlenen_surum_secilir_daha_yenisi_degil(self, tmp_path, monkeypatch):
         import scripts.build_db as bd
 
-        base = tmp_path / "data" / "raw" / "transfermarkt"
-        (base / "2026-09-01").mkdir(parents=True)          # bos dizin
-        (base / "2026-07-11").mkdir(parents=True)
-        (base / "2026-07-11" / "transfermarkt-datasets.duckdb").write_bytes(b"x")
-        monkeypatch.setattr(bd, "ROOT", tmp_path)
+        self._kur(tmp_path, monkeypatch, [("2026-06-01", True), ("2026-07-11", True),
+                                          ("2026-08-02", True)], "2026-07-11")
         assert bd.latest_tm_db().parent.name == "2026-07-11"
 
-    def test_hic_yoksa_none(self, tmp_path, monkeypatch):
+    def test_dosyasiz_dizin_sayilmaz(self, tmp_path, monkeypatch):
         import scripts.build_db as bd
 
-        monkeypatch.setattr(bd, "ROOT", tmp_path)
+        self._kur(tmp_path, monkeypatch, [("2026-09-01", False), ("2026-07-11", True)],
+                  "en_yeni")
+        assert bd.latest_tm_db().parent.name == "2026-07-11"
+
+    def test_sabit_surum_yoksa_none(self, tmp_path, monkeypatch):
+        import scripts.build_db as bd
+
+        self._kur(tmp_path, monkeypatch, [("2026-07-11", True)], "2026-09-05")
         assert bd.latest_tm_db() is None
 
 

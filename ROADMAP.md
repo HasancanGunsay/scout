@@ -37,10 +37,12 @@ Kullanıcı verisi: `data/takip/takip.json` (takip listesi) ve
 `data/defter/takip_gunlugu.csv` (append-only seçim günlüğü, §59).
 
 ### Kalite kapıları
-- `python -m pytest` → **353 test**
-- `python scripts/audit.py` → **41 kontrol** (35 geçiyor · 5 bilinen sağlayıcı
-  eksiği, §6 · 1 yapısal uyarı)
-- Günlük zincir her sabah denetimi de çalıştırıp log'a yazıyor
+- `python -m pytest` → **375 test**
+- `python scripts/audit.py` → **46 kontrol** (37 geçiyor · 5 bilinen sağlayıcı
+  eksiği, §6 · 4 uyarı: 1 yapısal + 3 kaynak tazeliği, PLAN §65)
+- Günlük zincir **atomik** (FAZ 9.5): adımlar canlının kopyasına yazar; kopya ancak
+  denetimde yeni KALDI yoksa canlının yerine geçer. Kararlar `data/raw/build_kaydi.csv`
+- Kullanılan Transfermarkt sürümü `config/kaynaklar.yaml`'da sabit (otomatik geçiş yok)
 
 ### Neye güvenebilirsin — güncel ölçümler (ayrıntı PLAN §50–§60)
 
@@ -91,7 +93,7 @@ scripts/
   train_model.py        API modeli (--kaydet-yalniz: üretim modeli)
   build_tm_tarih.py · tm_model.py · tm_defter.py   Transfermarkt hattı
   defter.py             API iddia defteri (--kaydet)
-  audit.py              41 doğrulama kontrolü
+  audit.py              46 doğrulama kontrolü (kaynak tazeliği dahil)
   daily_run.ps1         Günlük zincir (Görev Zamanlayıcı bunu çağırır)
 app/
   Home.py               st.navigation: Scout / Analiz / Sistem (11 sayfa)

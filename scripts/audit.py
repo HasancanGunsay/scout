@@ -17,6 +17,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+from scout.kaynaklar import db_yolu  # noqa: E402
 
 from scout.scoring import engine as eng  # noqa: E402
 
@@ -28,7 +29,7 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 
-DB = ROOT / "data" / "scout.duckdb"
+DB = db_yolu()  # SCOUT_DB ya da data/scout.duckdb (FAZ 9.5)
 ROLES = ROOT / "config" / "roles.yaml"
 
 RESULTS: list[tuple[str, str, str]] = []
@@ -323,6 +324,13 @@ def main() -> int:
         check("tablo mevcut: player_tahmin", False,
               "build_ranking calistirilmamis")
 
+    # ---------------------------------------------------------- kaynak tazeligi (FAZ 9.1)
+    # Dis kaynak durursa (TM Temmuz 2026'da durdu) bunu fark eden kontrol
+    # yoktu. UYARI: duzeltmesi elimizde degil ama gorunur olmali.
+    from scout.kaynaklar import tum_bulgular
+    for b in tum_bulgular():
+        check(b.kontrol, {"GECTI": True, "KALDI": False}.get(b.sonuc), b.detay)
+
     # sirlar repoya sizmis mi?
     gi = (ROOT / ".gitignore").read_text(encoding="utf-8") if (ROOT / ".gitignore").exists() else ""
     check(".env gitignore'da", ".env" in gi)
@@ -346,8 +354,21 @@ def main() -> int:
     print(f"\n{'=' * 96}")
     print(f"TOPLAM: {len(df)} kontrol · {int((df.sonuc=='GECTI').sum())} gecti · "
           f"{n_fail} kaldi · {int((df.sonuc=='UYARI').sum())} uyari")
+    if OZET_JSON:
+        # FAZ 9.5: atomik build kapisi bunu okur (build_kaydi.py)
+        Path(OZET_JSON).write_text(json.dumps({
+            "toplam": len(df), "gecti": int((df.sonuc == "GECTI").sum()),
+            "kaldi": n_fail, "uyari": int((df.sonuc == "UYARI").sum()),
+            "kaldi_kontroller": sorted(df[df.sonuc == "KALDI"].kontrol.tolist()),
+        }, ensure_ascii=False, indent=2), encoding="utf-8")
     return 1 if n_fail else 0
 
 
+OZET_JSON: str | None = None
+
 if __name__ == "__main__":
+    import argparse
+    _ap = argparse.ArgumentParser()
+    _ap.add_argument("--ozet-json", help="sonuc ozetini bu dosyaya yaz (build kapisi)")
+    OZET_JSON = _ap.parse_args().ozet_json
     sys.exit(main())

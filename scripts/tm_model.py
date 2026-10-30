@@ -32,6 +32,7 @@ import pandas as pd
 warnings.filterwarnings("ignore")
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+from scout.kaynaklar import db_yolu  # noqa: E402
 
 from scout.features.tm_tarih import GELISTIRME, MUHURLU_TEST  # noqa: E402
 from scout.model.egitim import _hazirla, egit, lolo_cv  # noqa: E402
@@ -42,7 +43,7 @@ from scout.model.tm_model import OZ_DEGER, VARYANTLAR, hazirla  # noqa: E402
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-DB = ROOT / "data" / "scout.duckdb"
+DB = db_yolu()  # SCOUT_DB ya da data/scout.duckdb (FAZ 9.5)
 MUHUR = ROOT / "data" / "tm_tarih" / "muhur_acilis.json"
 RAPOR = ROOT / "reports" / "tm_muhurlu_test_2018_2021.txt"
 C = 1.0

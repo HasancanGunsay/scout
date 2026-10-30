@@ -86,6 +86,23 @@ def pencere_kapandi_mi(veri_sonu: dt.date) -> bool:
     return veri_sonu >= PENCERE_BITIS
 
 
+def dosya_parmak_izi(yol) -> str:
+    """SHA-256 - muhurlu defterin degismedigini puanlamadan once kanitlar."""
+    import hashlib
+    from pathlib import Path
+
+    return hashlib.sha256(Path(yol).read_bytes()).hexdigest()
+
+
+def muhur_dogrula(csv_yolu, muhur: dict) -> None:
+    """docs/defter_2025_puanlama.md ile kaydedilen muhur (FAZ 9.2).
+    Defter dosyasi muhurden sonra degistiyse puanlama REDDEDILIR."""
+    iz = dosya_parmak_izi(csv_yolu)
+    if iz != muhur["sha256"]:
+        raise ValueError(f"defter muhurden sonra degismis: {iz[:12]} != "
+                         f"{muhur['sha256'][:12]} - puanlama yapilmaz")
+
+
 def puanla(defter: pd.DataFrame, sonuc: pd.DataFrame) -> pd.DataFrame:
     """sonuc: (player_id, comp, season, kademe, pencere_tam) - yeni bir TM
     anlik goruntusunden kurulmus tm_oyuncu_sezon. Pencere tam degilse NaN."""

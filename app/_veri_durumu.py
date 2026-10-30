@@ -79,6 +79,19 @@ def goster() -> None:
 
     st.divider()
 
+    # ------------------------------------------------------------------ kaynaklar (FAZ 9.1)
+    st.subheader("Kaynak tazeliği")
+    from scout.kaynaklar import tum_bulgular
+    ikon = {"GECTI": ":material/check_circle:", "UYARI": ":material/warning:",
+            "KALDI": ":material/error:"}
+    for b in tum_bulgular():
+        metin = f"**{b.kontrol}** · {b.detay}"
+        {"GECTI": st.success, "UYARI": st.warning, "KALDI": st.error}[b.sonuc](
+            metin, icon=ikon[b.sonuc])
+    st.caption("Kullanılan Transfermarkt anlık görüntüsü `config/kaynaklar.yaml`'da sabit. "
+               "Yeni sürüme geçiş karşılaştırma raporu ve onayla yapılır (GELISTIRME §9).")
+    st.divider()
+
     # ------------------------------------------------------------------ tazelik
     c1, c2 = st.columns([3, 1])
     c1.caption(f"Analitik tablolar son güncelleme: **{sh.data_age()}**")

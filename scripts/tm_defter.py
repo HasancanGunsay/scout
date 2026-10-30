@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import json
 import sys
 import warnings
 from pathlib import Path
@@ -30,21 +31,22 @@ warnings.filterwarnings("ignore")
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from scout.kaynaklar import db_yolu, tm_db_yolu  # noqa: E402
+
 from scout.model.egitim import _hazirla, egit  # noqa: E402
 from scout.model.kalibrasyon import ece  # noqa: E402
 from scout.model.ranker import esli_bootstrap, fark_ga, lig_ici_auc  # noqa: E402
 from scout.model.tm_defter import (DEFTER_SEZONU, MODEL_SURUMU,  # noqa: E402
-                                   PENCERE_BITIS, kayit_tablosu,
+                                   PENCERE_BITIS, kayit_tablosu, muhur_dogrula,
                                    pencere_kapandi_mi, puanla, yeni_satirlar)
 from scout.model.tm_model import VARYANTLAR, hazirla  # noqa: E402
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-DB = ROOT / "data" / "scout.duckdb"
+DB = db_yolu()  # SCOUT_DB ya da data/scout.duckdb (FAZ 9.5)
 CSV = ROOT / "data" / "defter" / "tm_iddia_defteri.csv"
-HAM = sorted((ROOT / "data" / "raw" / "transfermarkt").glob(
-    "*/transfermarkt-datasets.duckdb"))[-1]
+HAM = tm_db_yolu()  # config/kaynaklar.yaml (FAZ 9.1)
 
 
 def _defter(con) -> pd.DataFrame:
@@ -128,37 +130,69 @@ def durum() -> None:
     print(f"  pencere kapanisi {PENCERE_BITIS}: {max(kalan, 0)} gun kaldi")
 
 
-def puanla_cmd() -> int:
-    con = duckdb.connect(str(DB), read_only=True)
-    d = _defter(con)
-    s = con.sql("SELECT player_id, comp, season, kademe, pencere_tam "
-                "FROM tm_oyuncu_sezon").df()
-    con.close()
-    if d.empty:
-        print("[puanla] TM defteri bos - once --kaydet")
-        return 0
-    p = puanla(d, s)
+MUHUR = ROOT / "data" / "defter" / "tm_2025_muhur.json"
+ACILIS = ROOT / "data" / "defter" / "tm_2025_puanlama_acilis.json"
+RAPOR = ROOT / "reports" / "tm_defter_2025_puanlama.md"
+
+
+def rapor_satirlari(g: pd.DataFrame, n_toplam: int, B: int = 1000) -> list[str]:
+    """P1-P4 (PLAN §56.5, docs/defter_2025_puanlama.md). Metin, hesap degil."""
+    kol = ["model_olasilik", "saf_olasilik", "basit_olasilik", "piyasa_olasilik"]
+    L = [f"Sonucu gelen: {len(g):,} / {n_toplam:,}", "",
+         "Lig ici AUC: " + " · ".join(f"{k}={lig_ici_auc(g, k):.3f}" for k in kol), ""]
+    bs = esli_bootstrap(g, kol, B=B)
+    for a, b, ad in [("model_olasilik", "basit_olasilik", "P1 model - dakika+yas"),
+                     ("model_olasilik", "piyasa_olasilik", "P2 model - piyasa")]:
+        o, lo, hi = fark_ga(bs, a, b)
+        L.append(f"- {ad}: {o:+.3f} [{lo:+.3f}, {hi:+.3f}]")
+    L.append(f"- P3 kalibrasyon: ECE {ece(g.model_olasilik, g.y):.3f} · sapma "
+             f"{g.model_olasilik.mean() - g.y.mean():+.3f}")
+    u = g[g.ucuz.astype(bool) & (g.pos_group != "Goalkeeper")]
+    for pg, x in u.groupby("pos_group"):
+        L.append(f"- P4 {pg} ucuz top-20: model "
+                 f"{x.nlargest(20, 'model_olasilik').y.mean():.2f} · dakika+yas "
+                 f"{x.nlargest(20, 'basit_olasilik').y.mean():.2f} · taban {x.y.mean():.2f}")
+    return L
+
+
+def puanla_cmd(csv: Path = CSV, muhur: Path = MUHUR, acilis: Path = ACILIS,
+               rapor: Path = RAPOR, sonuc: pd.DataFrame | None = None,
+               B: int = 1000) -> int:
+    """Ileriye donuk defteri BIR KEZ puanla (FAZ 9.2).
+
+    - Defter git'teki CSV'den okunur; parmak izi muhurle ayni olmali.
+    - Sonuc penceresi tam olan satir yoksa hicbir sey yazilmaz (pencere acik).
+    - Ilk puanlama acilis dosyasini yazar; dosya varken ikinci puanlama
+      REDDEDILIR (2018-21 muhurlu testle ayni kural, §53).
+    """
+    if acilis.exists():
+        print(f"[puanla] RED: defter zaten puanlandi ({acilis.name}). Sonuc: {rapor.name}")
+        return 1
+    m = json.loads(muhur.read_text(encoding="utf-8"))
+    muhur_dogrula(csv, m)
+    d = pd.read_csv(csv)
+    if sonuc is None:
+        con = duckdb.connect(str(DB), read_only=True)
+        sonuc = con.sql("SELECT player_id, comp, season, kademe, pencere_tam "
+                        "FROM tm_oyuncu_sezon").df()
+        con.close()
+    p = puanla(d, sonuc)
     gelen = p[p.gerceklesti.notna()]
     if not len(gelen):
         print(f"[puanla] pencere ACIK - sonuc yok. Kapanis {PENCERE_BITIS}; "
               "sonra yeni TM anlik goruntusu + build_tm_tarih.py.")
         return 0
     g = gelen.assign(y=gelen.gerceklesti, league_id=gelen.comp)
-    print(f"[puanla] sonucu gelen {len(g):,} / {len(p):,}")
-    kol = ["model_olasilik", "saf_olasilik", "basit_olasilik", "piyasa_olasilik"]
-    print("  " + " ".join(f"{k}={lig_ici_auc(g, k):.3f}" for k in kol))
-    bs = esli_bootstrap(g, kol, B=1000)
-    for a, b, ad in [("model_olasilik", "basit_olasilik", "P1 model - dakika+yas"),
-                     ("model_olasilik", "piyasa_olasilik", "P2 model - piyasa")]:
-        o, lo, hi = fark_ga(bs, a, b)
-        print(f"  {ad:24s} {o:+.3f} [{lo:+.3f}, {hi:+.3f}]")
-    print(f"  P3 kalibrasyon: ECE {ece(g.model_olasilik, g.y):.3f} · sapma "
-          f"{g.model_olasilik.mean() - g.y.mean():+.3f}")
-    u = g[g.ucuz & (g.pos_group != "Goalkeeper")]
-    for pg, x in u.groupby("pos_group"):
-        print(f"  P4 {pg:11s} ucuz top-20: model {x.nlargest(20, 'model_olasilik').y.mean():.2f}"
-              f" · dakika+yas {x.nlargest(20, 'basit_olasilik').y.mean():.2f} · "
-              f"taban {x.y.mean():.2f}")
+    L = rapor_satirlari(g, len(p), B=B)
+    acilis.write_text(json.dumps({
+        "tarih": dt.datetime.now().isoformat(timespec="seconds"),
+        "defter_sha256": m["sha256"], "sonucu_gelen": int(len(g)),
+        "toplam": int(len(p)), "tm_anlik_goruntu": tm_db_yolu().parent.name,
+    }, ensure_ascii=False, indent=2), encoding="utf-8")
+    baslik = "# TM ileriye donuk defter 2025/26 - puanlama (tek acilis)"
+    rapor.write_text("\n\n".join([baslik, "\n".join(L)]) + "\n", encoding="utf-8")
+    print("\n".join(L))
+    print(f"[puanla] acilis kaydedildi: {acilis.name} · rapor: {rapor.name}")
     return 0
 
 

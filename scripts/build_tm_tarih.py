@@ -26,6 +26,8 @@ warnings.filterwarnings("ignore")
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from scout.kaynaklar import db_yolu, tm_db_yolu  # noqa: E402
+
 from scout.features.outcome import (ILK_BES, PENCERE_AY, gozlem_ay,  # noqa: E402
                                     izlenen_ligler, kademe, sezon_bitis)
 from scout.features.tm_tarih import (INCE_MEVKI, KABA_YEDEK, MUHURLU_TEST,  # noqa: E402
@@ -34,9 +36,8 @@ from scout.features.tm_tarih import (INCE_MEVKI, KABA_YEDEK, MUHURLU_TEST,  # no
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-DB = ROOT / "data" / "scout.duckdb"
-HAM = sorted((ROOT / "data" / "raw" / "transfermarkt").glob(
-    "*/transfermarkt-datasets.duckdb"))[-1]
+DB = db_yolu()  # SCOUT_DB ya da data/scout.duckdb (FAZ 9.5)
+HAM = tm_db_yolu()  # config/kaynaklar.yaml (FAZ 9.1)
 ILK_SEZON, SON_SEZON = 2012, 2025
 ANAHTAR = ["player_id", "comp", "season"]
 

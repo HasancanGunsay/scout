@@ -25,6 +25,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+from scout.kaynaklar import db_yolu  # noqa: E402
 
 from scout.features import age as age_mod  # noqa: E402
 from scout.features import metrics as met  # noqa: E402
@@ -41,7 +42,7 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 
-DB = ROOT / "data" / "scout.duckdb"
+DB = db_yolu()  # SCOUT_DB ya da data/scout.duckdb (FAZ 9.5)
 
 # Kohort: ayni lig, ayni sezon, ayni ROL KUMESI (§1.5).
 # 'role_cohort', kume yeterince buyukse rol kumesi, degilse pos_group'a duser.

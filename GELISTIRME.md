@@ -64,7 +64,7 @@ Bu plan yazılmadan önce sistemin gerçek durumu ölçüldü (30 Ekim 2026):
 **Neden önce bu:** Bulgu 1. Sistem bugün tek bir dış veri setinin sürmesine güveniyor ve
 o veri seti durdu. Bunu fark eden bir kontrol yoktu; 30 Ekim'deki elle yapılan inceleme yakaladı.
 
-### 9.1 Kaynak tazelik denetimi
+### 9.1 Kaynak tazelik denetimi · ✅ TAMAM (30 Eki 2026, PLAN §65)
 - `audit.py`'ye her kaynak için tazelik kontrolü:
   - TM anlık görüntü yaşı. Örnek eşik: oyun sezonu içinde 21 günden eski ise uyarı.
   - Son maç tarihi ile bugün arasındaki fark.
@@ -72,7 +72,7 @@ o veri seti durdu. Bunu fark eden bir kontrol yoktu; 30 Ekim'deki elle yapılan 
 - **Veri** sayfasında kaynak başına "son güncelleme · beklenen sıklık · durum" kartı.
 - **Kabul:** TM duraklaması bugün çalıştırılınca kırmızı görünür; test ile güvenceye alınmış.
 
-### 9.2 2025/26 defterinin puanlama planını şimdi mühürle
+### 9.2 2025/26 defterinin puanlama planını şimdi mühürle · ✅ TAMAM (PLAN §65)
 Puanlama Haziran 2027'de. Kuralları sonuç gelmeden yazmak, projenin en güçlü yanının devamı.
 - `docs/defter_2025_puanlama.md`:
   - Hipotezler: model > dakika+yaş, model > piyasa, kalibrasyon ECE eşiği, mevki alt grupları.
@@ -81,7 +81,7 @@ Puanlama Haziran 2027'de. Kuralları sonuç gelmeden yazmak, projenin en güçl�
 - Commit edilir. Puanlama betiği bu dosyanın commit kimliğini rapora yazar.
 - **Kabul:** dosya commit'li; betik sahte veriyle uçtan uca çalışıyor (test).
 
-### 9.3 Sonuç kaynağı için yedek plan
+### 9.3 Sonuç kaynağı için yedek plan · ✅ PLAN YAZILDI (karar 1 Mart 2027)
 TM devam etmezse 2025/26 sonuçlarını (2026/27 dakikaları) ölçecek yol gerekir. Seçenekler,
 dürüst değerlendirmeyle:
 
@@ -95,7 +95,7 @@ dürüst değerlendirmeyle:
 - **Karar tarihi:** 1 Mart 2027. O gün TM hâlâ duruyorsa kullanıcıya seçenek sunulur.
 - **Kabul:** karar kuralı 9.2 dosyasında yazılı.
 
-### 9.4 Kaynak katmanı (adaptörler) ve kişi kaydı
+### 9.4 Kaynak katmanı (adaptörler) ve kişi kaydı · ⏳ SIRADA
 Bugün API ve TM, özellik ve sonuç kodunun içine gömülü. Yeni lig ya da kaynak eklemek her
 seferinde çekirdeğe dokunmayı gerektiriyor.
 - `src/scout/sources/`: her kaynak aynı sözleşmeyi uygular.
@@ -109,7 +109,7 @@ seferinde çekirdeğe dokunmayı gerektiriyor.
   - 353 test geçer.
   - Yeni kaynak eklemek tek bir adaptör dosyası + eşleştirme kuralı ile mümkün.
 
-### 9.5 Atomik build ve build kaydı
+### 9.5 Atomik build ve build kaydı · ✅ TAMAM (PLAN §65)
 Eski P1-2 hâlâ açık: zincir yarıda kalırsa tablolar karışık sürümde kalır.
 - Zincir yeni bir DuckDB dosyasına yazar; denetim geçerse eskisinin yerine **taşınır**
   (atomik değiştirme). Geçmezse eski veritabanı yerinde kalır, arayüz eskiyi gösterir.

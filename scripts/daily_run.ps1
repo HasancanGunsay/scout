@@ -160,49 +160,81 @@ if (Wait-Internet) {
     Write-Log "UYARI: ag yok, veri cekimi hic denenmedi - mevcut veriyle devam"
 }
 
-# 2) build zinciri - SIRALI bagimlilik, biri coktuyse sonrakiler anlamsiz
+# 2) build zinciri - ATOMIK (FAZ 9.5, 30 Eki 2026)
+#    Adimlar canli veritabanina degil KOPYASINA yazar (SCOUT_DB). Sonunda
+#    build_kaydi.py karar verir: zincir tamam ve denetimde canliya gore YENI
+#    bir KALDI yoksa kopya canlinin yerine gecer (eskisi scout.prev.duckdb).
+#    Degilse canli HIC degismez (kopya scout.red.duckdb olarak saklanir).
+#    Eskiden zincir yarida kalinca tablolar karisik surumde kaliyordu.
 $failed = $null
-#    7.0 (1 Eki 2026): build_sonra + build_ranking eklendi. Onceden zincirde
-#    yoktu - veri guncellenince Mevki Siralamasi SESSIZCE eski kaliyordu.
-#    build_ranking player_tahmin'i (tek dogruluk kaynagi) da yazar; emsal ve
-#    defter ondan okudugu icin ONLARDAN ONCE calisir.
-foreach ($step in @("build_db.py", "build_features.py", "build_links.py",
-                    "build_scores.py", "build_outcomes.py",
-                    "build_sonra.py", "build_ranking.py --sessiz",
-                    "build_emsal.py")) {
-    $parca = $step -split ' '
-    $ek = if ($parca.Count -gt 1) { $parca[1..($parca.Count - 1)] } else { @() }
-    if (-not (Invoke-Step $parca[0] $ek)) { $failed = $step; break }
-}
+$canliOzet = Join-Path $root "data\raw\denetim_canli.json"
+$buildOzet = Join-Path $root "data\raw\denetim_build.json"
+foreach ($f in $canliOzet, $buildOzet) { if (Test-Path $f) { Remove-Item $f } }
 
-# 3) Hesap defteri - iddiayi KAYDET. Append-only; gecmis kayit
-#    guncellenmiyor. Bir iddianin degeri geri alinamamasindan gelir.
-if (-not $failed) {
-    & $py (Join-Path $root "scripts\defter.py") --kaydet 2>&1 |
-        Where-Object { $_ -match "kaydet|yedek" } | ForEach-Object { Write-Log "  $_" }
-}
-
-# Denetim de cokebiliyor (28 Agu 2026: import sirasinda yerel seviye cokme,
-# daily_run basindaki GIL deseninin aynisi). Cokerse loga yuzlerce traceback
-# satiri bosaliyordu. Artik bir kez yeniden deneniyor ve cikti anlamli
-# satirlarla sinirli. Denetim tablolari DEGISTIRMEZ - cokmesi veri zincirini
-# etkilemez, yalnizca o gunku dogrulama raporu kaybolur.
-if (-not $failed) {
-    $denetimOk = $false
+function Invoke-Audit {
+    <#  Denetimi calistir, ozeti JSON'a yaz, anlamli satirlari logla.
+        Denetim de cokebiliyor (28 Agu 2026: import sirasinda yerel seviye
+        cokme) - bir kez yeniden denenir. Denetim tablolari DEGISTIRMEZ. #>
+    param([string]$ozetJson, [string]$etiket)
     foreach ($deneme in 1, 2) {
-        $cikti = & $py (Join-Path $root "scripts\audit.py") 2>&1
+        $cikti = & $py (Join-Path $root "scripts\audit.py") --ozet-json $ozetJson 2>&1
         $ozet = $cikti | Where-Object { $_ -match "KALDI|TOPLAM|^\s{2,}\S" }
         if ($ozet -match "TOPLAM") {
-            $ozet | ForEach-Object { Write-Log "  denetim: $_" }
-            $denetimOk = $true
-            break
+            $ozet | ForEach-Object { Write-Log "  ${etiket}: $_" }
+            return $true
         }
-        Write-Log "UYARI: denetim tamamlanmadi (deneme $deneme)"
+        Write-Log "UYARI: $etiket tamamlanmadi (deneme $deneme)"
         if ($deneme -eq 1) { Start-Sleep -Seconds 5 }
     }
-    if (-not $denetimOk) {
-        Write-Log "UYARI: denetim iki denemede de calismadi - VERI ZINCIRI ETKILENMEDI"
+    return $false
+}
+
+# 2a) taban: canli veritabaninin bugunku denetimi (bilinen KALDI'lar)
+$null = Invoke-Audit $canliOzet "denetim (canli, taban)"
+
+# 2b) kopyayi hazirla ve zinciri ona yazdir
+$kopya = & $py (Join-Path $root "scripts\build_kaydi.py") hazirla 2>&1 | Select-Object -Last 1
+if ($LASTEXITCODE -ne 0) {
+    Write-Log "BASARISIZ: build kopyasi hazirlanamadi ($kopya) - zincir calismadi"
+    $failed = "build_kaydi hazirla"
+} else {
+    Write-Log "build kopyasi: $kopya"
+    $env:SCOUT_DB = $kopya
+    #    7.0 (1 Eki 2026): build_sonra + build_ranking eklendi. build_ranking
+    #    player_tahmin'i (tek dogruluk kaynagi) yazar; emsal ondan okur.
+    foreach ($step in @("build_db.py", "build_features.py", "build_links.py",
+                        "build_scores.py", "build_outcomes.py",
+                        "build_sonra.py", "build_ranking.py --sessiz",
+                        "build_emsal.py")) {
+        $parca = $step -split ' '
+        $ek = if ($parca.Count -gt 1) { $parca[1..($parca.Count - 1)] } else { @() }
+        if (-not (Invoke-Step $parca[0] $ek)) { $failed = $step; break }
     }
+    # 2c) kopyanin denetimi
+    if (-not $failed) {
+        if (-not (Invoke-Audit $buildOzet "denetim (build)")) {
+            Write-Log "UYARI: build denetimi calismadi - kopya canliya GECMEYECEK"
+        }
+    }
+    Remove-Item Env:SCOUT_DB
+}
+
+# 2d) karar: kopya canliya gecsin mi? (build_kaydi.csv'ye yazilir)
+$gecti = $false
+if ($failed -ne "build_kaydi hazirla") {
+    $zincir = if ($failed) { "basarisiz" } else { "ok" }
+    $kapatArg = @("kapat", "--zincir", $zincir, "--once", $canliOzet, "--sonra", $buildOzet)
+    if ($failed) { $kapatArg += @("--kirilan", $failed) }
+    & $py (Join-Path $root "scripts\build_kaydi.py") @kapatArg 2>&1 | ForEach-Object { Write-Log "  $_" }
+    $gecti = ($LASTEXITCODE -eq 0)
+    if (-not $gecti -and -not $failed) { $failed = "build kapisi (denetim)" }
+}
+
+# 3) Hesap defteri - iddiayi KAYDET, yalniz yeni build canliya gectiyse.
+#    Append-only; gecmis kayit guncellenmiyor.
+if ($gecti) {
+    & $py (Join-Path $root "scripts\defter.py") --kaydet 2>&1 |
+        Where-Object { $_ -match "kaydet|yedek" } | ForEach-Object { Write-Log "  $_" }
 }
 
 if ($failed) {

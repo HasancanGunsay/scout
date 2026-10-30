@@ -47,6 +47,7 @@ import pandas as pd
 warnings.filterwarnings("ignore")
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+from scout.kaynaklar import db_yolu  # noqa: E402
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import fiyat_bandi as fb  # noqa: E402
@@ -58,7 +59,7 @@ from scout.model.tahmin import tahmin_tablosu  # noqa: E402
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-DB = ROOT / "data" / "scout.duckdb"
+DB = db_yolu()  # SCOUT_DB ya da data/scout.duckdb (FAZ 9.5)
 MEVKILER = ["Defender", "Midfielder", "Attacker", "Goalkeeper"]
 
 

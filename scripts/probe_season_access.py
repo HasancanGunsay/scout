@@ -96,18 +96,24 @@ def main() -> int:
         print("config/leagues.yaml icindeki 'seasons' listesine eklenebilir.")
     else:
         print("Yeni sezon acilmamis - pencere hala 2022-2024.")
-    return 0
 
     # Sonucu yaz - --gunluk tazelik kontrolu buna bakiyor.
-    # 30 Agu 2026: bu satirlar EKSIKTI. Dosya hic yazilmadigi icin tazelik
-    # kontrolu her gun bosa dusuyor ve sonda 30 gunde bir yerine HER GUN
-    # 2 istek yakiyordu - ayda ~60 istek, yarim gunluk toplama.
-    SONUC.write_text(
+    # 30 Agu 2026: bu satirlar EKSIKTI. 30 Eki 2026: eklenmislerdi ama
+    # `return 0`'in ARKASINDAYDILAR, hic calismiyorlardi - dosya 30 Agu'da
+    # elle yazilmis haliyle kaldi, 29 Eyl'den beri gunluk zincir her gun
+    # 2 istek yakti. Simdi return'den once; test_probe_season_access sinar.
+    sonuc_yaz(sezonlar, acik)
+    return 0
+
+
+def sonuc_yaz(sezonlar: list[int], acik: list[int], yol: Path | None = None) -> None:
+    yol = yol or SONUC        # cagri aninda okunur (test SONUC'u degistirebilsin)
+    yol.write_text(
         json.dumps({"tarih": dt.date.today().isoformat(),
                     "denenen": sezonlar, "acik": acik},
                    ensure_ascii=False, indent=2),
         encoding="utf-8")
-    print(f"[yazildi] {SONUC.name}")
+    print(f"[yazildi] {yol.name}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,23 @@
+# Dis veri kaynaklari - hangi anlik goruntunun KULLANILDIGI tek yerden.
+#
+# Neden (30 Eki 2026, GELISTIRME FAZ 9): build_db en yeni TM klasorunu, bazi
+# betikler sabit '2026-07-11' yolunu kullaniyordu. Yeni bir anlik goruntu
+# indirilince zincir iki surumu karistirabilirdi; defter ve model sessizce
+# degisirdi. Artik hepsi scout.kaynaklar.tm_db_yolu() uzerinden buradan okur.
+#
+# Yeni anlik goruntuye gecis = bu satiri degistirmek + karsilastirma raporu
+# (scripts/kaynak_karsilastir.py) + kullanici onayi. "en_yeni" yazilirsa klasordeki
+# en yeni surum secilir (onerilmez: gecis gorunmez olur).
+
+transfermarkt:
+  anlik_goruntu: "2026-07-11"
+  # Beklenen yenilenme: haftalik (sezon icinde). Bundan eski son mac tarihi
+  # denetimde uyari uretir.
+  bayat_gun: 21
+  # FAZ 9.3 karar tarihi: TM bu tarihte hala duruyorsa yedek sonuc kaynagi secilir.
+  karar_tarihi: "2027-03-01"
+
+api_football:
+  # Ucretsiz plan sezon penceresi; probe_season_access.py 30 gunde bir sinar.
+  sezon_sinama_gun: 30
+  gunluk_kota: 100

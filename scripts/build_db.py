@@ -30,28 +30,33 @@ if hasattr(sys.stdout, "reconfigure"):
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+from scout.kaynaklar import db_yolu  # noqa: E402
+
 CACHE = ROOT / "data" / "raw" / "apifootball" / "players"
-OUT = ROOT / "data" / "scout.duckdb"
+# 30 Eki 2026: burasi sabit 'data/scout.duckdb' idi ve FAZ 9.5 gecisinde
+# atlandi (degisken adi DB degil OUT). Atomik build'in ilk denemesinde
+# build_db SCOUT_DB'yi yok sayip CANLI dosyaya yazdi; canli .red kopyasindan
+# geri yuklendi. test_build_kaydi.test_zincir_betikleri_scout_db_kullanir sinar.
+OUT = db_yolu()  # SCOUT_DB ya da data/scout.duckdb (FAZ 9.5)
 STATE = ROOT / "data" / "raw" / "apifootball" / "_ingest_state.json"
 LEAGUES_YAML = ROOT / "config" / "leagues.yaml"
 
 
 def latest_tm_db() -> Path | None:
-    """En yeni Transfermarkt anlik goruntusunu bul.
+    """Zincirin kullandigi Transfermarkt anlik goruntusu.
 
-    Yol eskiden sabit kodluydu ('2026-07-11'); veri seti haftalik yenilendigi
-    icin yeni surum indirilince kiriliyordu. Artik tarihli dizinlerden en
-    yenisi otomatik seciliyor.
+    Tarihce: once sabit '2026-07-11', sonra "klasordeki en yeni". Ikincisi
+    30 Eki 2026'da tehlikeli cikti: yeni bir surum indirilince zincir onu
+    sessizce alip baska betiklerin sabit surumuyle karistiriyordu. Artik
+    config/kaynaklar.yaml'daki surum (scout.kaynaklar.tm_db_yolu).
     """
-    base = ROOT / "data" / "raw" / "transfermarkt"
-    if not base.exists():
+    from scout.kaynaklar import tm_db_yolu
+    try:
+        return tm_db_yolu()
+    except FileNotFoundError as exc:
+        print(f"  ! {exc}")
         return None
-    dirs = sorted((d for d in base.iterdir() if d.is_dir()), reverse=True)
-    for d in dirs:
-        f = d / "transfermarkt-datasets.duckdb"
-        if f.exists():
-            return f
-    return None
 
 # API alan yolu -> tablo sutunu
 METRIC_MAP = {
