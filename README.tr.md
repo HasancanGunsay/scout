@@ -6,7 +6,7 @@ Düşük görünürlüklü liglerde genç yetenek keşfi için veri sistemi.
 |---|---|
 | **[ROADMAP.md](ROADMAP.md)** | **Buradan başla.** Sistem nerede, ne yapılacak, neler denendi ve reddedildi |
 | [PLAN.md](PLAN.md) | Tasarım, gerekçeler, ölçüm bulguları |
-| [GELISTIRME.md](GELISTIRME.md) | Denetim sonuçları, önceliklendirilmiş geliştirme listesi |
+| [GELISTIRME.md](GELISTIRME.md) | Profesyonel seviye geliştirme planı: FAZ 9–15 (veri, lig genişlemesi, model, mühendislik, ürün) |
 
 Sistem denetimi: `python scripts/audit.py` — 41 otomatik kontrol · testler: `python -m pytest` — 353 test.
 

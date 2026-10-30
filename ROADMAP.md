@@ -11,7 +11,7 @@
 > ölçülmüş sonuçları görmezden gelmek demektir.
 >
 > Diğer dosyalar: [PLAN.md](PLAN.md) tasarım gerekçeleri ve ölçüm bulguları ·
-> [GELISTIRME.md](GELISTIRME.md) denetim sonuçları · [README.tr.md](README.tr.md) kullanım
+> [GELISTIRME.md](GELISTIRME.md) FAZ 9–15 geliştirme planı · [README.tr.md](README.tr.md) kullanım
 
 ---
 
@@ -469,6 +469,23 @@ izlenecek; bizim arayüz de "keyif veren" olmalı.
 | 8.4 ✅ | 13 → 11 sayfa, üç grup; Oyuncu = Profil + Scout dosyası, Veri = durum + eşleşme; kararlar sayfanın üstünde; ortak oyuncu başlığı (§62) |
 | 8.5 ✅ | Bakım: ROADMAP §1–§2 güncel (353 test, 41 denetim, 11 sayfa, model hattı); `use_container_width` → `width="stretch"` (kalan 30 yer; uyarı yok) (§63) |
 | 8.6 ✅ | Google Stitch ile tasarım dili "Saha Analitik": Inter + JetBrains Mono, lacivert panel, istatistik kutuları, yüzdelik kademesi (§64) |
+
+### FAZ 9–15 — Profesyonel seviye · **PLANLANDI** (30 Eki 2026)
+
+Ayrıntı ve kabul kriterleri: [GELISTIRME.md](GELISTIRME.md). Özet:
+
+| Faz | İş | Öncelik |
+|---|---|---|
+| 9 | Veri dayanıklılığı: kaynak tazelik denetimi, 2025/26 defter puanlama planı (mühür), TM için yedek sonuç kaynağı, kaynak katmanı, atomik build | **P0** |
+| 10 | Lig genişlemesi, ücretsiz API penceresi (2022–24): Dalga 1 TFF 1. Lig + 6 pazar | **P0** (arka planda) |
+| 11 | Güncel sezon: TFF resmi maç raporu adaptörü (önce fizibilite) | P1 |
+| 12 | Model: Elo takım gücü, köprü oyuncularla lig gücü, çoklu ufuk, oyuncu bazında belirsizlik | P1 |
+| 13 | Mühendislik: paket + CLI, CI (fikstür DB), veri sözleşmeleri, model kaydı, performans | P1 |
+| 14 | Ürün: kulüp profili, kadro ihtiyacı, kontenjan/bütçe süzgeci, rapor üreticisi | P2 |
+| 15 | İleriye dönük sınav, Haziran 2027 | takvim |
+
+**Neden şimdi:** Transfermarkt veri setinin güncellemeleri Temmuz 2026'dan beri duruyor
+(sonuç ölçümü ve defter puanlaması bu kaynağa bağlı); API kotasının %98'i boşta.
 
 ---
 
