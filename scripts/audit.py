@@ -324,6 +324,18 @@ def main() -> int:
         check("tablo mevcut: player_tahmin", False,
               "build_ranking calistirilmamis")
 
+    # ---------------------------------------------------------- kisi kaydi (FAZ 9.4)
+    if {"kisi", "kisi_kaynak", "kaynak_kimlik"} <= tables:
+        from scout.resolve.kisi import denetim as kisi_denetim
+        for ad, ok, detay in kisi_denetim(con):
+            check(ad, ok, detay)
+        if "tm_appearances" in tables and "kaynak_mac_katilim" in tables:
+            a = q("SELECT count(*) n FROM tm_appearances").n[0]
+            b = q("SELECT count(*) n FROM kaynak_mac_katilim WHERE kaynak = 'tm'").n[0]
+            check("kaynak katmani: TM mac katilimi eksiksiz", a == b, f"{b:,} / {a:,}")
+    else:
+        check("tablo mevcut: kisi kaydi (build_kisi)", False, "build_kisi.py calistirilmamis")
+
     # ---------------------------------------------------------- kaynak tazeligi (FAZ 9.1)
     # Dis kaynak durursa (TM Temmuz 2026'da durdu) bunu fark eden kontrol
     # yoktu. UYARI: duzeltmesi elimizde degil ama gorunur olmali.

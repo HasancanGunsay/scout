@@ -4800,3 +4800,54 @@ Hesap defteri yalnız geçişten sonra yazılır. Her karar `data/raw/build_kayd
 - **9.4 kaynak katmanı ve kişi kaydı:** büyük bir refaktör; ayrı onayla.
 - **TM 5 Eylül sürümüne geçiş:** kullanıcı kararı. Geçilirse havuzdaki
   olasılıklar defterdekinden ayrışır (defter değişmez).
+
+
+## 66. FAZ 9.4 — Kaynak Katmanı ve Kişi Kaydı (30 Eki 2026)
+
+`src/scout/sources/` (`__init__`: şema; `adaptorler`: API-Football, Transfermarkt) ·
+`src/scout/resolve/kisi.py` · `scripts/build_kisi.py` (zincirde `build_links`'ten
+sonra) · `audit.py` (+5 kontrol) · `tests/test_kisi.py` (6)
+
+### 66.1 Neden
+
+API-Football ve Transfermarkt, özellik ve sonuç kodunun içine gömülüydü. Yeni bir
+lig ya da kaynak (FAZ 11'deki TFF) eklemek her seferinde çekirdeğe dokunmayı
+gerektiriyordu. Kimlik iki yerde ayrı ayrı taşınıyordu: `player_links` (API↔TM) ve
+`takip.kisi_anahtari`.
+
+### 66.2 Tasarım
+
+- **Standart tablolar** (her kaynak aynı şemayla): `kaynak_kimlik`,
+  `kaynak_mac_katilim`, `kaynak_oyuncu_sezon`, `kaynak_deger`, `kaynak_sozlesme`.
+  Her satırda `kaynak`, `kaynak_id` ve `kaynak_surum` var.
+- **Adaptör sözleşmesi:** `sql(tablo)`, şema sırasıyla bir SELECT döndürür ya da None.
+  `eslesme_sql()` kaynağın kimliğini bir kişiye bağlar. `omurga` bayrağı kişi
+  kaydının omurgası olan kaynağı (TM) işaretler.
+- **Kişi kaydı** (`kisi_kaynak`, `kisi`): mevcut kuralla birebir aynı.
+  - Her TM kimliği bir kişidir (`tm:<id>`).
+  - API kimliği yalnız kabul edilmiş eşleşmeyle (A/B/manuel, §60) bir TM kişisine bağlanır.
+  - Bağlanmayan kimlik kendi başına kişidir (`api:<id>`).
+- **Eklemeli:** mevcut hesaplar (özellik, sonuç, model, arayüz) bu tabloları okumuyor.
+  İlk gerçek kullanıcı TFF adaptörü (FAZ 11) olacak.
+
+### 66.3 Sonuç
+
+| | |
+|---|---|
+| `kaynak_kimlik` | 69.690 (19.541 API + 50.149 TM) |
+| `kisi_kaynak` | API: 10.079 A + 2.991 B eşleşme, 6.471 tekil · TM: 50.149 omurga |
+| `kisi` | **56.620** |
+| `kaynak_mac_katilim` | 651.297 (TM; API maç bazında veri vermiyor) |
+| Kuruluş süresi | ~2,4 sn |
+
+- **Takip listesiyle uyum:** 19.541 API oyuncusunun 19.541'inde kişi kimliği
+  `takip.kisi_anahtari` ile aynı.
+- **Yeni kaynak:** testte sahte bir TFF adaptörü, yalnız adaptör ve eşleşme kuralıyla
+  eklendi. Eşleşen kimlik mevcut kişiye bağlandı (`api,tff,tm`), eşleşmeyen yeni kişi
+  oldu, bu sezonun maç dakikası kişi üzerinden okundu. Çekirdek kod değişmedi.
+- **Denetim (+5):**
+  - her kaynak kimliği tek kişiye bağlı;
+  - iki TM kimliği aynı kişiye bağlanmamış;
+  - `tm:` kişilerinin TM kimliği var;
+  - her API oyuncusu kayıtta;
+  - TM maç katılımı eksiksiz.

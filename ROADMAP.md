@@ -37,8 +37,8 @@ Kullanıcı verisi: `data/takip/takip.json` (takip listesi) ve
 `data/defter/takip_gunlugu.csv` (append-only seçim günlüğü, §59).
 
 ### Kalite kapıları
-- `python -m pytest` → **375 test**
-- `python scripts/audit.py` → **46 kontrol** (37 geçiyor · 5 bilinen sağlayıcı
+- `python -m pytest` → **381 test**
+- `python scripts/audit.py` → **51 kontrol** (42 geçiyor · 5 bilinen sağlayıcı
   eksiği, §6 · 4 uyarı: 1 yapısal + 3 kaynak tazeliği, PLAN §65)
 - Günlük zincir **atomik** (FAZ 9.5): adımlar canlının kopyasına yazar; kopya ancak
   denetimde yeni KALDI yoksa canlının yerine geçer. Kararlar `data/raw/build_kaydi.csv`
@@ -82,6 +82,10 @@ src/scout/              (yalnız ASCII kod üretir; Türkçe metin app/'te)
                         benzerlik, sonuç (outcome), tm_tarih, dosya, emsal
   roles/cluster.py      Doğrulanmış rol ayrımı (çift tepelilik testi)
   resolve/matcher.py    TM ↔ API eşleştirme; KABUL + kabul_disini_bosalt (§60)
+  resolve/kisi.py       Kişi kaydı: kaynak kimlikleri → tek kişi (tm:/api:) (§66)
+  sources/              Kaynak katmanı: standart tablolar + adaptörler (API, TM) (§66)
+  kaynaklar.py          Kaynak yolları (TM sürümü sabit), tazelik, SCOUT_DB (§65)
+  build_kaydi.py        Atomik build kapısı (§65)
   scoring/engine.py     Ağırlıklı skor + katkı ayrıştırması
   model/                egitim, kalibrasyon, tahmin (tek kaynak), siralama,
                         defter, tm_model, tm_defter, zaman_kalibrasyon
@@ -93,7 +97,7 @@ scripts/
   train_model.py        API modeli (--kaydet-yalniz: üretim modeli)
   build_tm_tarih.py · tm_model.py · tm_defter.py   Transfermarkt hattı
   defter.py             API iddia defteri (--kaydet)
-  audit.py              46 doğrulama kontrolü (kaynak tazeliği dahil)
+  audit.py              51 doğrulama kontrolü (kaynak tazeliği, kişi kaydı dahil)
   daily_run.ps1         Günlük zincir (Görev Zamanlayıcı bunu çağırır)
 app/
   Home.py               st.navigation: Scout / Analiz / Sistem (11 sayfa)
@@ -108,9 +112,9 @@ app/
 ```
 
 **Günlük zincir sırası kritik** (`daily_run.ps1`):
-`ingest → build_db → build_features → build_links → build_scores →
-build_outcomes → build_sonra → build_ranking → build_emsal → defter --kaydet
-→ audit`
+`ingest → [kopya] build_db → build_features → build_links → build_kisi → build_scores →
+build_outcomes → build_sonra → build_ranking → build_emsal → audit → kapı
+(kopya canlıya geçer mi?) → defter --kaydet` (§65: adımlar kopyaya yazar)
 
 `build_features` içinde: metrikler → **rol ayrımı** → shrinkage → percentile → yaş.
 Rol ayrımı per-90'lardan sonra, percentile'dan önce olmak zorunda (kohortu o belirliyor).

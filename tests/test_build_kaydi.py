@@ -49,7 +49,8 @@ def test_yarim_kalan_build_canliyi_degistirmez(tmp_path):
     assert _oku(tmp_path / "scout.red.duckdb") == "yarim"     # inceleme icin saklandi
 
 
-ZINCIR = ["build_db.py", "build_features.py", "build_links.py", "build_scores.py",
+ZINCIR = ["build_db.py", "build_features.py", "build_links.py", "build_kisi.py",
+          "build_scores.py",
           "build_outcomes.py", "build_sonra.py", "build_ranking.py", "build_emsal.py",
           "audit.py", "defter.py"]
 

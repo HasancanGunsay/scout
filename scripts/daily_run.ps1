@@ -202,8 +202,10 @@ if ($LASTEXITCODE -ne 0) {
     $env:SCOUT_DB = $kopya
     #    7.0 (1 Eki 2026): build_sonra + build_ranking eklendi. build_ranking
     #    player_tahmin'i (tek dogruluk kaynagi) yazar; emsal ondan okur.
+    #    9.4 (30 Eki 2026): build_kisi - kaynak katmani + kisi kaydi; eslesme
+    #    player_links'ten okundugu icin build_links'ten SONRA. Eklemeli.
     foreach ($step in @("build_db.py", "build_features.py", "build_links.py",
-                        "build_scores.py", "build_outcomes.py",
+                        "build_kisi.py", "build_scores.py", "build_outcomes.py",
                         "build_sonra.py", "build_ranking.py --sessiz",
                         "build_emsal.py")) {
         $parca = $step -split ' '

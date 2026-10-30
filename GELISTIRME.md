@@ -95,7 +95,7 @@ dürüst değerlendirmeyle:
 - **Karar tarihi:** 1 Mart 2027. O gün TM hâlâ duruyorsa kullanıcıya seçenek sunulur.
 - **Kabul:** karar kuralı 9.2 dosyasında yazılı.
 
-### 9.4 Kaynak katmanı (adaptörler) ve kişi kaydı · ⏳ SIRADA
+### 9.4 Kaynak katmanı (adaptörler) ve kişi kaydı · ✅ TAMAM (30 Eki 2026, PLAN §66)
 Bugün API ve TM, özellik ve sonuç kodunun içine gömülü. Yeni lig ya da kaynak eklemek her
 seferinde çekirdeğe dokunmayı gerektiriyor.
 - `src/scout/sources/`: her kaynak aynı sözleşmeyi uygular.

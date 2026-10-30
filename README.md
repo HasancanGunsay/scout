@@ -53,9 +53,9 @@ your own API key (`.env.example`).
 src/scout/      ingest · features · entity resolution · scoring · model · calibration · ledger
 scripts/        daily chain (ingest → build_* → ledger → audit), model training, sealed test
 app/            Streamlit UI (11 pages, Turkish)
-tests/          375 tests
+tests/          381 tests
 portfolio/      the case-study site (static HTML) and the scripts that build its figures
-PLAN.md         design log: every decision, measurement and rejected idea (Turkish, 65 sections)
+PLAN.md         design log: every decision, measurement and rejected idea (Turkish, 66 sections)
 ROADMAP.md      current state and next steps (Turkish)
 README.tr.md    Turkish usage guide
 ```
