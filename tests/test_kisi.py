@@ -12,7 +12,7 @@ def con():
     c = duckdb.connect()
     c.execute("""CREATE TABLE tm_players AS SELECT * FROM (VALUES
         (10, 'Ali Veli', DATE '2004-01-01', 'Türkiye', 180, 'right', 'Centre-Back',
-         'Position', 'Bursaspor', DATE '2027-06-30'),
+         'Position', 'Ornek SK', DATE '2027-06-30'),
         (11, 'John Doe', DATE '2003-05-05', 'England', 175, 'left', 'Left-Back',
          'Position', 'X FC', NULL),
         (12, 'Tek Kisi', DATE '2002-02-02', 'Ghana', 190, 'right', NULL,
