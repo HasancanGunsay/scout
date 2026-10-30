@@ -38,8 +38,8 @@ Kullanıcı verisi: `data/takip/takip.json` (takip listesi) ve
 
 ### Kalite kapıları
 - `python -m pytest` → **381 test**
-- `python scripts/audit.py` → **51 kontrol** (42 geçiyor · 5 bilinen sağlayıcı
-  eksiği, §6 · 4 uyarı: 1 yapısal + 3 kaynak tazeliği, PLAN §65)
+- `python scripts/audit.py` → **49 kontrol** (42 geçiyor · 5 bilinen sağlayıcı
+  eksiği, §6 · 2 uyarı: 1 yapısal + TM veri seti durmuş, PLAN §65, §67)
 - Günlük zincir **atomik** (FAZ 9.5): adımlar canlının kopyasına yazar; kopya ancak
   denetimde yeni KALDI yoksa canlının yerine geçer. Kararlar `data/raw/build_kaydi.csv`
 - Kullanılan Transfermarkt sürümü `config/kaynaklar.yaml`'da sabit (otomatik geçiş yok)

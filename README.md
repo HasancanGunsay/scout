@@ -55,7 +55,7 @@ scripts/        daily chain (ingest → build_* → ledger → audit), model tra
 app/            Streamlit UI (11 pages, Turkish)
 tests/          381 tests
 portfolio/      the case-study site (static HTML) and the scripts that build its figures
-PLAN.md         design log: every decision, measurement and rejected idea (Turkish, 66 sections)
+PLAN.md         design log: every decision, measurement and rejected idea (Turkish, 67 sections)
 ROADMAP.md      current state and next steps (Turkish)
 README.tr.md    Turkish usage guide
 ```

@@ -10,7 +10,7 @@
 # en yeni surum secilir (onerilmez: gecis gorunmez olur).
 
 transfermarkt:
-  anlik_goruntu: "2026-07-11"
+  anlik_goruntu: "2026-09-05"
   # Beklenen yenilenme: haftalik (sezon icinde). Bundan eski son mac tarihi
   # denetimde uyari uretir.
   bayat_gun: 21

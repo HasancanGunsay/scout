@@ -4851,3 +4851,72 @@ gerektiriyordu. Kimlik iki yerde ayrı ayrı taşınıyordu: `player_links` (API
   - `tm:` kişilerinin TM kimliği var;
   - her API oyuncusu kayıtta;
   - TM maç katılımı eksiksiz.
+
+
+## 67. Transfermarkt 5 Eylül Sürümüne Geçiş + FAZ 10 Dalga 1 Başladı (30 Eki 2026)
+
+### 67.1 Geçiş
+
+`config/kaynaklar.yaml` → `anlik_goruntu: "2026-09-05"`, kullanıcı onayıyla. Kopya
+üzerinde tam zincir (`build_tm_tarih` dahil) çalıştı, atomik kapıdan geçti
+(`build_kaydi.csv`: zincir tamam, yeni KALDI yok). Denetim 49 kontrol: 42 geçiyor,
+5 bilinen KALDI, 2 uyarı. "Değerler maçlardan geride" ve "yeni sürüm bekliyor"
+uyarıları düştü.
+
+### 67.2 Bulgu: eski sürümde değerleme GEÇMİŞİ eksikti
+
+Yeni sürüm yalnız Mart–Haziran 2026 değerlerini eklemedi; eski sürümde **kaybolmuş
+geçmişi geri getirdi** (bakımcının #377/#378 düzeltmesi):
+
+| Yıl | 2026-07-11 | 2026-09-05 |
+|---|---|---|
+| 2022 | 45.706 | 59.564 |
+| 2023 | 40.118 | 57.576 |
+| 2024 | 19.284 | **45.376** |
+| 2025 | 14.822 | **45.482** |
+
+**TM tarafı:** U23 havuz satırlarında 2013–2023'te **hiçbir** değer değişmedi.
+Değişiklik yalnız 2024 (157 satır; değeri olan oran %93,8 → %99,1) ve 2025 sezonlarında
+(599 satır; %73,4 → %99,1). **Mühürlü test (2018–21, §53) etkilenmiyor.**
+
+**API tarafı:** Değer özelliği nokta-zamanlıdır (sezon bitişinden bir ay öncesine kadarki
+son değerleme). Ama düşük görünürlüklü liglerden eşleşen oyuncuların 2022–24 değerleme
+geçmişi eksikti. 4.794 tahminin hepsi değişti: ortalama |fark| 0,050, en büyük 0,66,
+sıra korelasyonu 0,921. Tahminler, sonuçlar ve eşleşmeler aynı kaldı (12 eşleşme
+satırında küçük fark).
+
+### 67.3 Model başarısı DÜŞTÜ: eski sayılar bir veri hatasıyla şişmişti
+
+Lig-dışı CV (2022–23, n = 3.171), aynı satırlar, eşli oyuncu bootstrap (B = 400).
+**2024'e bakılmadı.**
+
+| | Eski sürüm | Yeni sürüm | Fark |
+|---|---|---|---|
+| Hepsi | 0,732 | **0,721** | −0,011 [−0,017, −0,004] |
+| Düşük görünürlük | 0,798 | **0,769** | −0,029 [−0,050, −0,004] |
+| İzlenen ligler | 0,715 | **0,708** | −0,006 [−0,012, −0,001] |
+
+§60 ile aynı ders: kaybolan değerlemeler rastgele değildi. "Değeri yok" bilgisi, veri
+kaybıyla ilişkili olduğu için modele sahte bir sinyal veriyordu. Yeni sayılar daha düşük
+ama veri doğru. Model spesifikasyonu değişmedi.
+
+**Portfolyo sitesindeki "CV AUC 0,732" artık güncel değil** (yeni: 0,721). Mühürlü
+test sayıları (0,742 vb.) geçerli. Siteyi güncellemek kullanıcı onayına bağlı.
+
+### 67.4 İleriye dönük defter
+
+`tm_iddia_defteri` (891) ve `iddia_defteri` değişmedi (append-only, mühürlü). 2025/26
+havuzunda değeri olan oyuncu oranı yeni sürümde %73,4'ten %99,1'e çıkıyor. Defterdeki
+tahminler eski değerlerle kayıtlı; bu `docs/defter_2025_puanlama.md` §4'te yazılı.
+
+### 67.5 FAZ 10 Dalga 1
+
+`config/leagues.yaml`'a 7 lig eklendi:
+- TFF 1. Lig (204, öncelik 1).
+- Avusturya Bundesliga (218), İsviçre Super League (207), Hırvatistan HNL (210),
+  Sırbistan Super Liga (286), Polonya Ekstraklasa (106), Romanya Liga I (283).
+
+Hepsi `sicrama_only`: izlenen 14 lige sıçrayan görünür. 1. Lig → Süper Lig (TR1)
+görünür. 21 lig-sezon, ~945 istek, ~10 gün. Toplama 30 Ekim'de başladı. Kabul
+kriterleri GELISTIRME §4'te (lig tamlığı, taban oranları, önceden yazılmış kuralla
+model yeniden değerlendirmesi).

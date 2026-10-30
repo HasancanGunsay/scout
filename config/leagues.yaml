@@ -55,6 +55,19 @@ leagues:
   - {id: 140, name: "La Liga",                  country: Spain,       priority: 4, season_type: split}
   - {id: 39,  name: "Premier League",           country: England,     priority: 4, season_type: split}
 
+  # --- FAZ 10 Dalga 1 (30 Eki 2026, GELISTIRME §4) ---------------------------
+  # Turkiye baglami + Turk kuluplerine oyuncu akisi olan pazarlar. API ucretsiz
+  # penceresi (2022-24), bos kotayla ~52 istek/lig-sezon -> ~12 gun.
+  # Hicbiri TM_KARSILIGI'nda degil -> kapsam "sicrama_only" (izlenen 14 lige
+  # sicrayan gorunur; 1. Lig -> Super Lig TR1 izlendigi icin GORUNUR).
+  - {id: 204, name: "1. Lig",                   country: Turkey,      priority: 1, season_type: split}
+  - {id: 218, name: "Bundesliga",               country: Austria,     priority: 2, season_type: split}
+  - {id: 207, name: "Super League",             country: Switzerland, priority: 2, season_type: split}
+  - {id: 210, name: "HNL",                      country: Croatia,     priority: 2, season_type: split}
+  - {id: 286, name: "Super Liga",               country: Serbia,      priority: 2, season_type: split}
+  - {id: 106, name: "Ekstraklasa",              country: Poland,      priority: 2, season_type: split}
+  - {id: 283, name: "Liga I",                   country: Romania,     priority: 2, season_type: split}
+
 # Kapsam disi - gerekcesi §11.6
 excluded:
   - {name: "Italy Serie C (138/942/943)", reason: "stats_players=False, ampirik olarak dogrulandi"}

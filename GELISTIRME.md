@@ -129,7 +129,7 @@ Veri 2022–24'e ait, yani güncel scouting için değil, şunlar için değerli
 
 **Maliyet hesabı:** lig-sezon başına ≈ 52 istek. Günde ≈ 95 boş istek ile günde ≈ 1,8 lig-sezon.
 
-### Dalga 1 · Türkiye bağlamı ve Türk kulüplerine oyuncu akışı olan pazarlar
+### Dalga 1 · Türkiye bağlamı ve Türk kulüplerine oyuncu akışı olan pazarlar · ⏳ TOPLANIYOR (30 Eki 2026 başladı, PLAN §67)
 
 | Lig (API id) | Sezon | Neden |
 |---|---|---|
