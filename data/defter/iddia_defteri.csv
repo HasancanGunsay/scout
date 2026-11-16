@@ -422,3 +422,110 @@ kayit_tarihi,player_id,league_id,season,player_name,league_name,kapsam,model_ola
 2026-10-02,434028,89,2024,N. Verschuren,Eerste Divisie,sicrama_only,0.30030214613336204,0.325,0.23776223776223776,otomatik,,zaman-disi
 2026-10-02,443829,89,2024,J. Mokio,Eerste Divisie,sicrama_only,0.32159974136446995,,0.23776223776223776,otomatik,,zaman-disi
 2026-10-02,449245,72,2024,Pedro Lima,Serie B,sicrama_only,0.28734098554304177,0.075,0.0,otomatik,,zaman-disi
+2026-10-30,6725,71,2022,F. Vera,Serie A,sicrama_only,0.4032892677269139,0.175,0.10256410256410256,otomatik,,lig-disi CV
+2026-10-30,6725,128,2022,F. Vera,Liga Profesional Argentina,sicrama_only,0.5013182909981552,0.225,0.04032258064516129,otomatik,,lig-disi CV
+2026-10-30,9906,71,2022,Luan Cândido,Serie A,sicrama_only,0.44889139532790756,0.425,0.10256410256410256,otomatik,,lig-disi CV
+2026-10-30,9954,71,2022,Rodrigo Nestor,Serie A,sicrama_only,0.4603782115915128,0.225,0.10256410256410256,otomatik,,lig-disi CV
+2026-10-30,10161,71,2022,Matheuzinho,Serie A,sicrama_only,0.5338874501332908,0.35,0.10256410256410256,otomatik,,lig-disi CV
+2026-10-30,10234,71,2022,Lucas Piton,Serie A,sicrama_only,0.4068054856536208,0.35,0.10256410256410256,otomatik,,lig-disi CV
+2026-10-30,13278,239,2022,K. Mier,Primera A,sicrama_only,0.6872887454456811,0.02857142857142857,0.01694915254237288,otomatik,,lig-disi CV
+2026-10-30,25061,39,2022,A. Bella-Kotchap,Premier League,tam,0.850007656562245,0.925,0.6363636363636364,otomatik,,lig-disi CV
+2026-10-30,59635,239,2022,D. Ruiz,Primera A,sicrama_only,0.6815000197616413,0.025,0.01694915254237288,otomatik,,lig-disi CV
+2026-10-30,63577,39,2022,M. Mudryk,Premier League,tam,0.8643332860909771,0.775,0.6363636363636364,otomatik,,lig-disi CV
+2026-10-30,138787,39,2022,A. Gordon,Premier League,tam,0.8496911927223721,0.675,0.6363636363636364,otomatik,,lig-disi CV
+2026-10-30,159122,128,2022,F. Farías,Liga Profesional Argentina,sicrama_only,0.4385024577943389,0.2,0.04032258064516129,otomatik,,lig-disi CV
+2026-10-30,237087,128,2022,E. Fernández,Liga Profesional Argentina,sicrama_only,0.5931537218389019,0.225,0.04032258064516129,otomatik,,lig-disi CV
+2026-10-30,237089,128,2022,J. Sforza,Liga Profesional Argentina,sicrama_only,0.39968246639290206,0.175,0.04032258064516129,otomatik,,lig-disi CV
+2026-10-30,237143,128,2022,S. Simón,Liga Profesional Argentina,sicrama_only,0.4437039759491635,0.225,0.04032258064516129,otomatik,,lig-disi CV
+2026-10-30,295513,128,2022,J. López,Liga Profesional Argentina,sicrama_only,0.42119277100911917,0.125,0.04032258064516129,otomatik,,lig-disi CV
+2026-10-30,305821,71,2022,Matheus Martins,Serie A,sicrama_only,0.40208969356153346,0.175,0.10256410256410256,otomatik,,lig-disi CV
+2026-10-30,313732,71,2022,Pablo Maia,Serie A,sicrama_only,0.4019235980784654,0.3,0.10256410256410256,otomatik,,lig-disi CV
+2026-10-30,355004,128,2022,V. Gómez,Liga Profesional Argentina,sicrama_only,0.414993367798407,0.125,0.04032258064516129,otomatik,,lig-disi CV
+2026-10-30,9906,71,2023,Luan Cândido,Serie A,sicrama_only,0.3295259809028447,0.45,0.20833333333333334,otomatik,,lig-disi CV
+2026-10-30,44871,39,2023,A. Hickey,Premier League,tam,0.8651155200262376,0.725,0.6506024096385542,otomatik,,lig-disi CV
+2026-10-30,47899,113,2023,O. Dovin,Allsvenskan,sicrama_only,0.3084164017998085,0.125,0.05970149253731343,otomatik,,lig-disi CV
+2026-10-30,106485,71,2023,Maurício,Serie A,sicrama_only,0.41114563739527776,0.25,0.20833333333333334,otomatik,,lig-disi CV
+2026-10-30,129711,39,2023,B. Johnson,Premier League,tam,0.8611257180384245,0.85,0.6506024096385542,otomatik,,lig-disi CV
+2026-10-30,158694,39,2023,T. Livramento,Premier League,tam,0.8653033648513583,0.775,0.6506024096385542,otomatik,,lig-disi CV
+2026-10-30,191160,80,2023,J. Makengo,3. Liga,sicrama_only,0.32359904386230587,0.175,0.0625,otomatik,,lig-disi CV
+2026-10-30,194981,62,2023,O. Nkambadio,Ligue 2,sicrama_only,0.3683538953942731,0.3,0.2,otomatik,,lig-disi CV
+2026-10-30,197450,71,2023,Natanael,Serie A,sicrama_only,0.33145019595058206,0.4,0.20833333333333334,otomatik,,lig-disi CV
+2026-10-30,275651,136,2023,A. Bonny,Serie B,sicrama_only,0.4003068488468672,0.3,0.21621621621621623,otomatik,,lig-disi CV
+2026-10-30,280245,71,2023,Martinelli,Serie A,sicrama_only,0.3290254382415592,0.3,0.20833333333333334,otomatik,,lig-disi CV
+2026-10-30,313732,71,2023,Pablo Maia,Serie A,sicrama_only,0.49923264057116823,0.45,0.20833333333333334,otomatik,,lig-disi CV
+2026-10-30,333137,62,2023,K. Ouattara,Ligue 2,sicrama_only,0.3270268735005079,0.275,0.2,otomatik,,lig-disi CV
+2026-10-30,348568,136,2023,A. Circati,Serie B,sicrama_only,0.466580383845836,0.3,0.21621621621621623,otomatik,,lig-disi CV
+2026-10-30,349001,71,2023,Wesley,Serie A,sicrama_only,0.35174937071510426,0.3,0.20833333333333334,otomatik,,lig-disi CV
+2026-10-30,377122,71,2023,Endrick,Serie A,sicrama_only,0.6852297950987305,0.2,0.20833333333333334,otomatik,,lig-disi CV
+2026-10-30,7318,218,2024,A. Dedić,Bundesliga,sicrama_only,0.48560592229944977,0.3,0.10588235294117647,otomatik,,zaman-disi
+2026-10-30,144729,39,2024,T. Harwood-Bellis,Premier League,tam,0.8564737497844295,0.75,0.7567567567567568,otomatik,,zaman-disi
+2026-10-30,194981,62,2024,O. Nkambadio,Ligue 2,sicrama_only,0.5221492365239033,0.11764705882352941,0.2876712328767123,otomatik,,zaman-disi
+2026-10-30,199931,218,2024,W. Bøving,Bundesliga,sicrama_only,0.3902759535861748,0.125,0.10588235294117647,otomatik,,zaman-disi
+2026-10-30,237186,128,2024,C. Medina,Liga Profesional Argentina,sicrama_only,0.4105908668141833,0.25,0.02197802197802198,otomatik,,zaman-disi
+2026-10-30,271539,207,2024,J. Hadjam,Super League,sicrama_only,0.5154754243909899,0.475,0.21428571428571427,otomatik,,zaman-disi
+2026-10-30,277306,218,2024,M. Sangaré,Bundesliga,sicrama_only,0.3820588320909767,0.2,0.10588235294117647,otomatik,,zaman-disi
+2026-10-30,279993,207,2024,A. Kade,Super League,sicrama_only,0.43970852173309144,0.4,0.21428571428571427,otomatik,,zaman-disi
+2026-10-30,283026,218,2024,M. Biereth,Bundesliga,sicrama_only,0.5314841980364111,0.125,0.10588235294117647,otomatik,,zaman-disi
+2026-10-30,284322,39,2024,K. Mainoo,Premier League,tam,0.852173581448091,0.8,0.7567567567567568,otomatik,,zaman-disi
+2026-10-30,290646,207,2024,A. Sanches,Super League,sicrama_only,0.6412101501340268,0.425,0.21428571428571427,otomatik,,zaman-disi
+2026-10-30,302869,218,2024,N. Dorgeles,Bundesliga,sicrama_only,0.41618135552676133,0.225,0.10588235294117647,otomatik,,zaman-disi
+2026-10-30,302926,128,2024,N. Romero,Liga Profesional Argentina,sicrama_only,0.4334622454833704,0.1,0.02197802197802198,otomatik,,zaman-disi
+2026-10-30,304161,207,2024,B. Traoré,Super League,sicrama_only,0.5261996273919037,0.375,0.21428571428571427,otomatik,,zaman-disi
+2026-10-30,310187,218,2024,Stefan Bajčetić,Bundesliga,sicrama_only,0.3698327857307626,0.225,0.10588235294117647,otomatik,,zaman-disi
+2026-10-30,315249,136,2024,N. Bertola,Serie B,sicrama_only,0.41196746572787224,0.425,0.1791044776119403,otomatik,,zaman-disi
+2026-10-30,322984,218,2024,S. Baidoo,Bundesliga,sicrama_only,0.4878063459434682,0.35,0.10588235294117647,otomatik,,zaman-disi
+2026-10-30,323591,103,2024,S. Nypan,Eliteserien,sicrama_only,0.5381065265998619,0.075,0.018518518518518517,otomatik,,zaman-disi
+2026-10-30,329715,218,2024,O. Gloukh,Bundesliga,sicrama_only,0.6052177493007619,0.3,0.10588235294117647,otomatik,,zaman-disi
+2026-10-30,335095,113,2024,H. Bolin,Allsvenskan,sicrama_only,0.3733506043100552,0.175,0.08108108108108109,otomatik,,zaman-disi
+2026-10-30,338201,62,2024,H. Picard,Ligue 2,sicrama_only,0.36367800216921264,0.5,0.2876712328767123,otomatik,,zaman-disi
+2026-10-30,340626,140,2024,Fermín,La Liga,tam,0.8633492011541947,0.75,0.7051282051282052,otomatik,,zaman-disi
+2026-10-30,349001,71,2024,Wesley,Serie A,sicrama_only,0.42471598393592325,0.225,0.07142857142857142,otomatik,,zaman-disi
+2026-10-30,350854,113,2024,R. Amané,Allsvenskan,sicrama_only,0.37517782646148723,0.225,0.08108108108108109,otomatik,,zaman-disi
+2026-10-30,351483,103,2024,F. Sjøvold,Eliteserien,sicrama_only,0.36583213826148997,0.15,0.018518518518518517,otomatik,,zaman-disi
+2026-10-30,352730,103,2024,S. Ørjasæter,Eliteserien,sicrama_only,0.46508898998848336,0.25,0.018518518518518517,otomatik,,zaman-disi
+2026-10-30,355004,128,2024,V. Gómez,Liga Profesional Argentina,sicrama_only,0.6412334703670566,0.125,0.02197802197802198,otomatik,,zaman-disi
+2026-10-30,361497,39,2024,D. Huijsen,Premier League,tam,0.866202065782725,0.75,0.7567567567567568,otomatik,,zaman-disi
+2026-10-30,362750,128,2024,T. Fernández,Liga Profesional Argentina,sicrama_only,0.44625498974237504,0.25,0.02197802197802198,otomatik,,zaman-disi
+2026-10-30,362752,128,2024,C. Ordoñez,Liga Profesional Argentina,sicrama_only,0.5531951778081834,0.225,0.02197802197802198,otomatik,,zaman-disi
+2026-10-30,369425,207,2024,J. Adjetey,Super League,sicrama_only,0.4611597898268856,0.425,0.21428571428571427,otomatik,,zaman-disi
+2026-10-30,377122,71,2024,Endrick,Serie A,sicrama_only,0.5316113310141043,0.125,0.07142857142857142,otomatik,,zaman-disi
+2026-10-30,390586,207,2024,L. Avdullahu,Super League,sicrama_only,0.5895441847405145,0.475,0.21428571428571427,otomatik,,zaman-disi
+2026-10-30,404885,128,2024,D. Puebla,Liga Profesional Argentina,sicrama_only,0.4418482327682771,0.025,0.02197802197802198,otomatik,,zaman-disi
+2026-10-30,409215,218,2024,Kouakou Joane Gadou,Bundesliga,sicrama_only,0.4922789966886789,0.25,0.10588235294117647,otomatik,,zaman-disi
+2026-10-30,410125,218,2024,M. Yalcouyé,Bundesliga,sicrama_only,0.5282608605435178,0.25,0.10588235294117647,otomatik,,zaman-disi
+2026-10-30,414385,128,2024,C. Echeverri,Liga Profesional Argentina,sicrama_only,0.5228898253320456,0.1,0.02197802197802198,otomatik,,zaman-disi
+2026-10-30,425733,71,2024,Estêvão,Serie A,sicrama_only,0.7133496008211562,0.125,0.07142857142857142,otomatik,,zaman-disi
+2026-10-30,431149,62,2024,Cyriaque Kalou Irié,Ligue 2,sicrama_only,0.48066063198791525,0.25,0.2876712328767123,otomatik,,zaman-disi
+2026-10-30,449249,128,2024,Franco Mastantuono,Liga Profesional Argentina,sicrama_only,0.3837695615020452,,0.02197802197802198,otomatik,,zaman-disi
+2026-11-01,123468,207,2024,M. Keller,Super League,sicrama_only,0.4741590574520118,0.15,0.14285714285714285,otomatik,,zaman-disi
+2026-11-01,278453,207,2024,A. Hajdari,Super League,sicrama_only,0.5391335400268337,0.45,0.14285714285714285,otomatik,,zaman-disi
+2026-11-01,303322,286,2024,N. Djiga,Super Liga,sicrama_only,0.4062752244926233,0.175,0.04054054054054054,otomatik,,zaman-disi
+2026-11-01,310029,207,2024,J. Mendes,Super League,sicrama_only,0.42292633503388494,0.4,0.14285714285714285,otomatik,,zaman-disi
+2026-11-01,320122,207,2024,P. Loretz,Super League,sicrama_only,0.53158213582179,0.225,0.14285714285714285,otomatik,,zaman-disi
+2026-11-01,322626,207,2024,M. Zanotti,Super League,sicrama_only,0.5485842362745709,0.5,0.14285714285714285,otomatik,,zaman-disi
+2026-11-01,325784,207,2024,K. Sow,Super League,sicrama_only,0.4558223985833619,0.45,0.14285714285714285,otomatik,,zaman-disi
+2026-11-01,342230,207,2024,A. Stanković,Super League,sicrama_only,0.5160952163340999,0.35,0.14285714285714285,otomatik,,zaman-disi
+2026-11-01,349344,207,2024,L. Jaquez,Super League,sicrama_only,0.45255055644661984,0.45,0.14285714285714285,otomatik,,zaman-disi
+2026-11-01,388568,207,2024,G. Diouf,Super League,sicrama_only,0.38103405745215946,0.4,0.14285714285714285,otomatik,,zaman-disi
+2026-11-02,265761,106,2024,K. Trelowski,Ekstraklasa,sicrama_only,0.5117339150205114,0.025,0.014285714285714285,otomatik,,zaman-disi
+2026-11-02,269892,106,2024,A. Kozubal,Ekstraklasa,sicrama_only,0.4709476697050852,0.175,0.014285714285714285,otomatik,,zaman-disi
+2026-11-02,341375,106,2024,S. Abramowicz,Ekstraklasa,sicrama_only,0.4340962890094865,0.027777777777777776,0.014285714285714285,otomatik,,zaman-disi
+2026-11-03,656,218,2022,O. Solet,Bundesliga,sicrama_only,0.5697950591316688,0.25,0.0625,otomatik,,lig-disi CV
+2026-11-03,7318,218,2022,A. Dedić,Bundesliga,sicrama_only,0.5321083648217712,0.25,0.0625,otomatik,,lig-disi CV
+2026-11-03,7327,218,2022,A. Prass,Bundesliga,sicrama_only,0.4419098061529905,0.2,0.0625,otomatik,,lig-disi CV
+2026-11-03,7328,218,2022,N. Seiwald,Bundesliga,sicrama_only,0.6581128367396488,0.35,0.0625,otomatik,,lig-disi CV
+2026-11-03,7332,218,2022,L. Sučić,Bundesliga,sicrama_only,0.5399071604799085,0.175,0.0625,otomatik,,lig-disi CV
+2026-11-03,33321,218,2022,Keito Nakamura,Bundesliga,sicrama_only,0.417825487952778,0.05,0.0625,otomatik,,lig-disi CV
+2026-11-03,45826,218,2022,S. Pavlović,Bundesliga,sicrama_only,0.643948032234327,0.3,0.0625,otomatik,,lig-disi CV
+2026-11-03,48389,218,2022,N. Okafor,Bundesliga,sicrama_only,0.5402375205253144,0.125,0.0625,otomatik,,lig-disi CV
+2026-11-03,115587,218,2022,M. Kjærgaard,Bundesliga,sicrama_only,0.5231765458362151,0.175,0.0625,otomatik,,lig-disi CV
+2026-11-03,115589,218,2022,B. Šeško,Bundesliga,sicrama_only,0.5573666719279843,0.125,0.0625,otomatik,,lig-disi CV
+2026-11-03,123469,207,2022,Z. Amdouni,Super League,sicrama_only,0.42449720874347896,,0.35714285714285715,otomatik,,lig-disi CV
+2026-11-03,179843,218,2022,L. Gourna-Douath,Bundesliga,sicrama_only,0.41139823023520544,0.125,0.0625,otomatik,,lig-disi CV
+2026-11-04,14701,210,2022,J. Šutalo,HNL,sicrama_only,0.5378003344628177,0.275,0.07692307692307693,otomatik,,lig-disi CV
+2026-11-04,48612,207,2022,K. Imeri,Super League,sicrama_only,0.39528218731555315,0.175,0.12962962962962962,otomatik,,lig-disi CV
+2026-11-04,135964,207,2022,M. Burch,Super League,sicrama_only,0.4483651214820501,0.425,0.12962962962962962,otomatik,,lig-disi CV
+2026-11-04,163032,207,2022,F. Rieder,Super League,sicrama_only,0.5530110251953411,0.4,0.12962962962962962,otomatik,,lig-disi CV
+2026-11-04,264705,207,2022,A. Jashari,Super League,sicrama_only,0.5155302715147637,0.325,0.12962962962962962,otomatik,,lig-disi CV
+2026-11-04,295026,210,2022,M. Baturina,HNL,sicrama_only,0.4417554075177378,0.225,0.07692307692307693,otomatik,,lig-disi CV
+2026-11-04,162761,78,2024,C. Lukeba,Bundesliga,tam,0.8497919437420582,0.875,0.6716417910447762,otomatik,,zaman-disi
