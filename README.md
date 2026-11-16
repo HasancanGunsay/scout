@@ -34,6 +34,9 @@ Other findings recorded in the design log:
 - A linking bug meant 26% of outcomes were measured on the wrong player's career. Fixed at the
   source; cross-validated AUC fell 0.744 → 0.732 and the low-visibility-league edge in 2024
   disappeared. The lower numbers are the published ones.
+- Switching to the 2026-09-05 Transfermarkt snapshot showed the previous one was missing over half
+  of the 2024 valuation history. On complete data, cross-validated AUC is 0.721 (Δ −0.011
+  [−0.017, −0.004]). The sealed 2018–2021 test uses unchanged rows and is unaffected.
 - In tracked leagues, adding API event features to the Transfermarkt model adds nothing
   (−0.009 [−0.019, +0.001]).
 - 891 forecasts for 2025/26 are frozen in an append-only ledger and will be scored after
